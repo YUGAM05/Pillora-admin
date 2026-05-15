@@ -34,7 +34,7 @@ export default function AnalyticsAdmin() {
 
     const fetchAnalytics = useCallback(async () => {
         try {
-            const res = await api.get(`/analytics/stats?timeframe=${timeframe}`);
+            const res = await api.get(`/metrics/view?timeframe=${timeframe}`);
             if (res.data.success) {
                 setStats(res.data.stats);
             }
@@ -86,7 +86,14 @@ export default function AnalyticsAdmin() {
                     <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 font-jakarta flex items-center gap-3 md:gap-4 tracking-tight">
                         <Activity className="w-8 h-8 md:w-10 md:h-10 text-blue-600" /> Real-time Analytics
                     </h3>
-                    <p className="text-slate-500 font-medium text-sm md:text-lg italic mt-1">Live traffic and bandwidth insights for pillora.in</p>
+                    <div className="flex items-center gap-3 mt-1">
+                        <p className="text-slate-500 font-medium text-sm md:text-lg italic">Live traffic insights for pillora.in</p>
+                        {stats?.lastRecordAt && (
+                            <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-100/50 animate-pulse">
+                                <Zap className="w-3 h-3" /> Last Signal: {new Date(stats.lastRecordAt).toLocaleTimeString()}
+                            </span>
+                        )}
+                    </div>
                 </div>
                 <div className="flex bg-slate-100/50 p-1 rounded-xl md:rounded-2xl border border-slate-100 self-start xl:self-center overflow-x-auto max-w-full no-scrollbar">
                     {['1h', '24h', '7d', '30d'].map((t) => (
