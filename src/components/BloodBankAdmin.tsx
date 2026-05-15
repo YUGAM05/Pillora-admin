@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { getToken } from '@/lib/tokenStorage';
-import { Download, FileSpreadsheet, FileText, Users, Droplet, Calendar, Phone, MapPin, AlertCircle, Search, ChevronRight } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Users, Droplet, Calendar, Phone, MapPin, AlertCircle, Search, ChevronRight, Trash2 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function BloodBankAdmin() {
     const [activeTab, setActiveTab] = useState<'donors' | 'requests'>('donors');
+    const [requestFilter, setRequestFilter] = useState<'all' | 'Open' | 'Fulfilled' | 'Fake'>('all');
     const [donors, setDonors] = useState<any[]>([]);
     const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -39,7 +40,38 @@ export default function BloodBankAdmin() {
         } finally {
             setLoading(false);
         }
+    const handleDeleteDonor = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this donor?')) return;
+        try {
+            await api.delete(`/blood-bank/admin/donors/${id}`);
+            setDonors(donors.filter(d => d._id !== id));
+        } catch (error) {
+            console.error('Failed to delete donor', error);
+        }
     };
+
+    const handleDeleteRequest = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this request?')) return;
+        try {
+            await api.delete(`/blood-bank/admin/requests/${id}`);
+            setRequests(requests.filter(r => r._id !== id));
+        } catch (error) {
+            console.error('Failed to delete request', error);
+        }
+    };
+
+    const handleUpdateStatus = async (id: string, status: string) => {
+        try {
+            await api.patch(`/blood-bank/admin/requests/${id}/status`, { status });
+            setRequests(requests.map(r => r._id === id ? { ...r, status } : r));
+        } catch (error) {
+            console.error('Failed to update status', error);
+        }
+    };
+
+    const filteredRequests = requests.filter(r => 
+        requestFilter === 'all' ? true : r.status === requestFilter
+    );
 
     const downloadExcel = async (type: 'donors' | 'requests') => {
         try {
@@ -166,6 +198,24 @@ export default function BloodBankAdmin() {
                     </button>
                 </div>
 
+                </div>
+
+                {activeTab === 'requests' && (
+                    <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                        {['all', 'Open', 'Fulfilled', 'Fake'].map((f) => (
+                            <button
+                                key={f}
+                                onClick={() => setRequestFilter(f as any)}
+                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                    requestFilter === f ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                                }`}
+                            >
+                                {f}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => downloadExcel(activeTab)}
@@ -195,9 +245,13 @@ export default function BloodBankAdmin() {
                         transition={{ duration: 0.2 }}
                     >
                         {activeTab === 'donors' ? (
-                            <DonorsTable donors={donors} />
+                            <DonorsTable donors={donors} onDelete={handleDeleteDonor} />
                         ) : (
-                            <RequestsTable requests={requests} />
+                            <RequestsTable 
+                                requests={filteredRequests} 
+                                onUpdateStatus={handleUpdateStatus}
+                                onDelete={handleDeleteRequest}
+                            />
                         )}
                     </motion.div>
                 </AnimatePresence>
@@ -206,7 +260,7 @@ export default function BloodBankAdmin() {
     );
 }
 
-function DonorsTable({ donors }: { donors: any[] }) {
+function DonorsTable({ donors, onDelete }: { donors: any[], onDelete: (id: string) => void }) {
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -216,6 +270,7 @@ function DonorsTable({ donors }: { donors: any[] }) {
                         <th className="px-6 py-4">Group</th>
                         <th className="px-6 py-4">Contact & Location</th>
                         <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4">Actions</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -224,7 +279,7 @@ function DonorsTable({ donors }: { donors: any[] }) {
                             <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black">
-                                        {donor.name.charAt(0)}
+                                        {donor.name?.charAt(0) || '?'}
                                     </div>
                                     <div>
                                         <p className="font-bold text-gray-900">{donor.name}</p>
@@ -254,11 +309,19 @@ function DonorsTable({ donors }: { donors: any[] }) {
                                     {donor.isAvailable ? 'Available' : 'Busy'}
                                 </span>
                             </td>
+                            <td className="px-6 py-4">
+                                <button
+                                    onClick={() => onDelete(donor._id)}
+                                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </td>
                         </tr>
                     ))}
                     {donors.length === 0 && (
                         <tr>
-                            <td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-medium">No registered donors found.</td>
+                            <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-medium">No registered donors found.</td>
                         </tr>
                     )}
                 </tbody>
@@ -267,7 +330,11 @@ function DonorsTable({ donors }: { donors: any[] }) {
     );
 }
 
-function RequestsTable({ requests }: { requests: any[] }) {
+function RequestsTable({ requests, onUpdateStatus, onDelete }: { 
+    requests: any[], 
+    onUpdateStatus: (id: string, status: string) => void,
+    onDelete: (id: string) => void 
+}) {
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -277,6 +344,7 @@ function RequestsTable({ requests }: { requests: any[] }) {
                         <th className="px-6 py-4">Blood Needed</th>
                         <th className="px-6 py-4">Facility & Contact</th>
                         <th className="px-6 py-4">Verification</th>
+                        <th className="px-6 py-4 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -292,14 +360,17 @@ function RequestsTable({ requests }: { requests: any[] }) {
                                             {request.patientName}
                                             {request.isUrgent && <span className="animate-pulse w-2 h-2 rounded-full bg-rose-500" />}
                                         </p>
-                                        <p className="text-xs text-gray-500">Requested by {request.requestedBy}</p>
+                                        <p className="text-xs text-gray-500 text-truncate max-w-[150px]">Requested by {request.user?.name || 'User'}</p>
                                     </div>
                                 </div>
                             </td>
                             <td className="px-6 py-4">
                                 <p className="font-black text-gray-900 text-lg">{request.units} <span className="text-[10px] uppercase text-gray-400">Units</span></p>
                                 <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                                    request.status === 'Open' ? 'text-blue-500 bg-blue-50' : 'text-gray-400 bg-gray-50'
+                                    request.status === 'Open' ? 'text-blue-500 bg-blue-50' : 
+                                    request.status === 'Fulfilled' ? 'text-emerald-500 bg-emerald-50' :
+                                    request.status === 'Fake' ? 'text-rose-600 bg-rose-50' :
+                                    'text-gray-400 bg-gray-50'
                                 }`}>{request.status}</span>
                             </td>
                             <td className="px-6 py-4">
@@ -324,11 +395,40 @@ function RequestsTable({ requests }: { requests: any[] }) {
                                 </div>
                                 <p className="text-[9px] text-gray-400 font-mono mt-1">{request.kycDocumentId || 'NO_ID'}</p>
                             </td>
+                            <td className="px-6 py-4">
+                                <div className="flex items-center justify-end gap-2">
+                                    {request.status === 'Open' && (
+                                        <>
+                                            <button
+                                                onClick={() => onUpdateStatus(request._id, 'Fulfilled')}
+                                                className="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+                                                title="Mark as Fulfilled"
+                                            >
+                                                Fulfill
+                                            </button>
+                                            <button
+                                                onClick={() => onUpdateStatus(request._id, 'Fake')}
+                                                className="px-3 py-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all"
+                                                title="Mark as Fake"
+                                            >
+                                                Fake
+                                            </button>
+                                        </>
+                                    )}
+                                    <button
+                                        onClick={() => onDelete(request._id)}
+                                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     ))}
                     {requests.length === 0 && (
                         <tr>
-                            <td colSpan={4} className="px-6 py-12 text-center text-gray-400 font-medium">No pending requests.</td>
+                            <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-medium">No requests found in this category.</td>
                         </tr>
                     )}
                 </tbody>
