@@ -3,10 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  signInWithPopup
-} from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
 import { setToken, setUser as setStoredUser, getToken, getUser } from "@/lib/tokenStorage";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ArrowRight, Lock, Mail, KeyRound } from "lucide-react";
@@ -18,7 +14,7 @@ export default function LoginPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState("admin@pillora.in");
     const [password, setPassword] = useState("");
 
     // MFA state for admin login
@@ -132,45 +128,6 @@ export default function LoginPage() {
     };
 
 
-    const handleGoogleLogin = async () => {
-        setLoading(true);
-        setError("");
-
-        try {
-            if (!auth || !googleProvider) {
-                throw new Error("Auth not initialized");
-            }
-
-            const result = await signInWithPopup(auth, googleProvider);
-            const user = result.user;
-            const idToken = await user.getIdToken();
-
-            // Mock backend verification for this demo
-            const response = await api.post("/auth/login", { 
-                email: user.email, 
-                googleToken: idToken,
-                name: user.displayName,
-                profilePicture: user.photoURL
-            });
-
-            const data = response.data;
-            setStoredUser(JSON.stringify(data));
-            setToken(data.token);
-            window.dispatchEvent(new Event('storage'));
-
-            if (data.role === 'admin') {
-                router.push("/");
-            } else {
-                localStorage.clear();
-                setError("Access Denied. Admin account required.");
-            }
-        } catch (err: any) {
-            console.error("Error with Google Login:", err);
-            setError(err.message || "Google Sign-In failed. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] p-6 relative overflow-hidden">
@@ -288,31 +245,9 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <div className="relative my-8">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100"></div></div>
-                    <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest"><span className="bg-white px-4 text-gray-400">Or continue with</span></div>
-                </div>
-
-                <button
-                    onClick={handleGoogleLogin}
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-3 bg-white border border-gray-100 py-4 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm active:scale-[0.98] disabled:opacity-70"
-                >
-                    <Image src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width={20} height={20} />
-                    Google Account
-                </button>
-                
-                <p className="text-[10px] text-gray-400 text-center mt-8 font-medium">
-                    By continuing, you agree to our 
-                    <Link href="/terms" className="text-primary font-bold"> Terms</Link> & 
-                    <Link href="/privacy" className="text-primary font-bold"> Privacy</Link>
-                </p>
-
-                <div className="mt-8 text-center border-t border-gray-50 pt-6">
-                    <p className="text-gray-500 text-xs font-bold">
-                        New here? <Link href="/register" className="text-primary hover:underline">Create Account</Link>
+                    <p className="text-[10px] text-gray-400 text-center mt-8 font-medium">
+                        Secure Super Admin Portal
                     </p>
-                </div>
                     </motion.div>
                 )}
                 </AnimatePresence>
