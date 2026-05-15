@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.pillora.in
+
+# Sitemaps
+Sitemap: https://www.pillora.in/sitemap.xml
