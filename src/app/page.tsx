@@ -121,42 +121,49 @@ export default function AdminDashboard() {
     }, [router]);
 
     useEffect(() => {
+        let socketInstance: any = null;
+
+        const initSocket = async () => {
+            const { socket } = await import("@/lib/socket");
+            socketInstance = socket;
+            socket.connect();
+            
+            socket.on("platform_activity", (newActivity: any) => {
+                setActivities(prev => [newActivity, ...prev].slice(0, 20));
+                setStats((prev: any) => {
+                    if (!prev) return prev;
+                    return {
+                        ...prev,
+                        counts: {
+                            ...prev.counts,
+                            activity: (prev.counts?.activity || 0) + 1
+                        }
+                    };
+                });
+            });
+        };
+
         const fetchData = async () => {
             try {
                 fetchStats();
                 fetchPendingUsers();
                 fetchActivities();
-
-                // Socket.io integration for real-time activities
-                const { socket } = await import("@/lib/socket");
-                socket.connect();
-                
-                socket.on("platform_activity", (newActivity: any) => {
-                    setActivities(prev => [newActivity, ...prev].slice(0, 20));
-                    // Optional: Play a subtle notification sound or update stats
-                    setStats((prev: any) => {
-                        if (!prev) return prev;
-                        return {
-                            ...prev,
-                            counts: {
-                                ...prev.counts,
-                                activity: (prev.counts?.activity || 0) + 1
-                            }
-                        };
-                    });
-                });
-
-                return () => {
-                    socket.off("platform_activity");
-                    socket.disconnect();
-                };
+                await initSocket();
             } catch (error) {
                 console.error("Error fetching admin data", error);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchData();
+
+        return () => {
+            if (socketInstance) {
+                socketInstance.off("platform_activity");
+                socketInstance.disconnect();
+            }
+        };
     }, [fetchStats, fetchPendingUsers, fetchActivities]);
 
     const formatTimeAgo = (date: string) => {
