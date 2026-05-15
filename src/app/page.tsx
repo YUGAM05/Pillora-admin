@@ -78,8 +78,16 @@ export default function AdminDashboard() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [showAddHospital, setShowAddHospital] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [activities, setActivities] = useState<any[]>([]);
 
-    const fetchPendingUsers = useCallback(async () => {
+    const fetchActivities = useCallback(async () => {
+        try {
+            const res = await api.get("/admin/activities");
+            setActivities(res.data);
+        } catch (err) {
+            console.error("Failed to fetch activities", err);
+        }
+    }, []);
         const token = getToken();
         try {
             const res = await api.get("/admin/users?status=pending");
@@ -114,7 +122,33 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                await Promise.all([fetchStats(), fetchPendingUsers()]);
+                fetchStats();
+                fetchPendingUsers();
+                fetchActivities();
+
+                // Socket.io integration for real-time activities
+                const { socket } = await import("@/lib/socket");
+                socket.connect();
+                
+                socket.on("platform_activity", (newActivity: any) => {
+                    setActivities(prev => [newActivity, ...prev].slice(0, 20));
+                    // Optional: Play a subtle notification sound or update stats
+                    setStats((prev: any) => {
+                        if (!prev) return prev;
+                        return {
+                            ...prev,
+                            counts: {
+                                ...prev.counts,
+                                activity: (prev.counts?.activity || 0) + 1
+                            }
+                        };
+                    });
+                });
+
+                return () => {
+                    socket.off("platform_activity");
+                    socket.disconnect();
+                };
             } catch (error) {
                 console.error("Error fetching admin data", error);
             } finally {
@@ -122,7 +156,17 @@ export default function AdminDashboard() {
             }
         };
         fetchData();
-    }, [fetchStats, fetchPendingUsers]);
+    }, [fetchStats, fetchPendingUsers, fetchActivities]);
+
+    const formatTimeAgo = (date: string) => {
+        const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
+        if (seconds < 60) return "Just now";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        return new Date(date).toLocaleDateString();
+    };
 
     const handleStatusUpdate = async (userId: string, status: 'approved' | 'rejected') => {
         const token = getToken();
@@ -342,28 +386,54 @@ export default function AdminDashboard() {
                                                     View Detailed Log <ArrowUpRight className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                            <div className="space-y-4">
-                                                {[
-                                                    { title: "New Hospital Registered", desc: "Apollo Healthcare successfully added to the network.", time: "14 mins ago", tag: "Registry" },
-                                                    { title: "Database Sync Complete", desc: "Global blood donor indices optimized and synced.", time: "2 hours ago", tag: "System" },
-                                                    { title: "Security Patch v2.1", desc: "Aadhaar verification middleware updated for faster processing.", time: "5 hours ago", tag: "Security" }
-                                                ].map((log, i) => (
-                                                    <div key={i} className="flex items-center justify-between p-6 bg-[#FDFDFF] hover:bg-blue-50/30 rounded-3xl border border-slate-50 transition-all group">
-                                                        <div className="flex items-center gap-6">
-                                                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 group-hover:scale-110 group-hover:text-blue-600 transition-all">
-                                                                <Package className="w-5 h-5" />
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-bold text-slate-900 text-base mb-0.5">{log.title}</p>
-                                                                <p className="text-sm text-slate-500 font-medium">{log.desc}</p>
-                                                            </div>
+                                            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                                                {activities.length === 0 ? (
+                                                    <div className="py-20 text-center">
+                                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                                            <Activity className="w-8 h-8 text-slate-200" />
                                                         </div>
-                                                        <div className="text-right hidden sm:block">
-                                                            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">{log.tag}</p>
-                                                            <p className="text-[11px] font-semibold text-slate-400">{log.time}</p>
-                                                        </div>
+                                                        <p className="text-slate-400 font-medium">No recent activities detected.</p>
                                                     </div>
-                                                ))}
+                                                ) : (
+                                                    activities.map((log, i) => (
+                                                        <motion.div 
+                                                            key={log._id || i} 
+                                                            initial={{ opacity: 0, x: -10 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            className="flex items-center justify-between p-6 bg-[#FDFDFF] hover:bg-blue-50/30 rounded-3xl border border-slate-50 transition-all group"
+                                                        >
+                                                            <div className="flex items-center gap-6">
+                                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border transition-all ${
+                                                                    log.type === 'blood_request' ? 'bg-rose-50 text-rose-500 border-rose-100' :
+                                                                    log.type === 'blood_donor' ? 'bg-emerald-50 text-emerald-500 border-emerald-100' :
+                                                                    log.type === 'hospital' ? 'bg-blue-50 text-blue-500 border-blue-100' :
+                                                                    log.type === 'partner' ? 'bg-purple-50 text-purple-500 border-purple-100' :
+                                                                    'bg-slate-50 text-slate-400 border-slate-100'
+                                                                } group-hover:scale-110`}>
+                                                                    {log.type === 'blood_request' ? <Droplets className="w-5 h-5" /> :
+                                                                     log.type === 'blood_donor' ? <Heart className="w-5 h-5" /> :
+                                                                     log.type === 'hospital' ? <Building2 className="w-5 h-5" /> :
+                                                                     log.type === 'partner' ? <Handshake className="w-5 h-5" /> :
+                                                                     <Package className="w-5 h-5" />}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="font-bold text-slate-900 text-base mb-0.5">{log.title}</p>
+                                                                    <p className="text-sm text-slate-500 font-medium line-clamp-1">{log.description}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right hidden sm:block">
+                                                                <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${
+                                                                    log.type === 'blood_request' ? 'text-rose-600' :
+                                                                    log.type === 'blood_donor' ? 'text-emerald-600' :
+                                                                    log.type === 'hospital' ? 'text-blue-600' :
+                                                                    log.type === 'partner' ? 'text-purple-600' :
+                                                                    'text-slate-400'
+                                                                }`}>{log.type?.replace('_', ' ') || 'System'}</p>
+                                                                <p className="text-[11px] font-semibold text-slate-400">{formatTimeAgo(log.timestamp)}</p>
+                                                            </div>
+                                                        </motion.div>
+                                                    ))
+                                                )}
                                             </div>
                                         </div>
 
