@@ -88,6 +88,7 @@ export default function AdminDashboard() {
             console.error("Failed to fetch activities", err);
         }
     }, []);
+    const fetchPendingUsers = useCallback(async () => {
         const token = getToken();
         try {
             const res = await api.get("/admin/users?status=pending");
