@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
 import { getToken } from "@/lib/tokenStorage";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import { 
@@ -209,6 +210,18 @@ export default function AdminDashboard() {
                             )}
                         </button>
                     ))}
+
+                    <div className="pt-4 mt-4 border-t border-slate-50">
+                        <Link
+                            href="/analytics"
+                            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 text-slate-500 hover:bg-blue-50 hover:text-blue-600 group"
+                        >
+                            <TrendingUp className="w-5 h-5 shrink-0 text-indigo-600 group-hover:scale-110 transition-transform" />
+                            {isSidebarOpen && (
+                                <span className="font-bold text-[15px] tracking-tight">BI Reporting</span>
+                            )}
+                        </Link>
+                    </div>
                 </nav>
 
                 {/* User Profile Area */}
