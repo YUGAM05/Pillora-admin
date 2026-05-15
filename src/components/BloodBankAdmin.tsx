@@ -12,7 +12,13 @@ export default function BloodBankAdmin() {
     const [donors, setDonors] = useState<any[]>([]);
     const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [stats, setStats] = useState({ totalDonors: 0, totalRequests: 0, urgentRequests: 0, availableDonors: 0 });
+
+    const stats = {
+        totalDonors: donors.length,
+        totalRequests: requests.length,
+        urgentRequests: requests.filter((r: any) => r.isUrgent).length,
+        availableDonors: donors.filter((d: any) => d.isAvailable).length
+    };
 
     useEffect(() => {
         fetchData();
@@ -29,12 +35,8 @@ export default function BloodBankAdmin() {
             setDonors(donorsRes.data);
             setRequests(requestsRes.data);
 
-            setStats({
-                totalDonors: donorsRes.data.length,
-                totalRequests: requestsRes.data.length,
-                urgentRequests: requestsRes.data.filter((r: any) => r.isUrgent).length,
-                availableDonors: donorsRes.data.filter((d: any) => d.isAvailable).length
-            });
+            setDonors(donorsRes.data);
+            setRequests(requestsRes.data);
         } catch (error) {
             console.error('Failed to fetch blood bank data', error);
         } finally {
@@ -46,9 +48,11 @@ export default function BloodBankAdmin() {
         if (!window.confirm('Are you sure you want to delete this donor?')) return;
         try {
             await api.delete(`/blood-bank/admin/donors/${id}`);
-            setDonors(donors.filter(d => d._id !== id));
-        } catch (error) {
+            setDonors(prev => prev.filter(d => d._id !== id));
+            alert('Donor deleted successfully');
+        } catch (error: any) {
             console.error('Failed to delete donor', error);
+            alert(`Delete failed: ${error.response?.data?.message || error.message}`);
         }
     };
 
@@ -56,9 +60,11 @@ export default function BloodBankAdmin() {
         if (!window.confirm('Are you sure you want to delete this request?')) return;
         try {
             await api.delete(`/blood-bank/admin/requests/${id}`);
-            setRequests(requests.filter(r => r._id !== id));
-        } catch (error) {
+            setRequests(prev => prev.filter(r => r._id !== id));
+            alert('Request deleted successfully');
+        } catch (error: any) {
             console.error('Failed to delete request', error);
+            alert(`Delete failed: ${error.response?.data?.message || error.message}`);
         }
     };
 
