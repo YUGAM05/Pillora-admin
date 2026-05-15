@@ -40,6 +40,8 @@ export default function BloodBankAdmin() {
         } finally {
             setLoading(false);
         }
+    };
+
     const handleDeleteDonor = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this donor?')) return;
         try {
@@ -198,7 +200,6 @@ export default function BloodBankAdmin() {
                     </button>
                 </div>
 
-                </div>
 
                 {activeTab === 'requests' && (
                     <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
