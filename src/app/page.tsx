@@ -36,6 +36,7 @@ import AddHospitalForm from "@/components/AddHospitalForm";
 import HospitalListAdmin from "@/components/HospitalListAdmin";
 import PartnerInquiriesAdmin from "@/components/PartnerInquiriesAdmin";
 import BlogAdmin from "@/components/BlogAdmin";
+import AnalyticsAdmin from "@/components/AnalyticsAdmin";
 
 // Premium Font Configuration
 const jakarta = Plus_Jakarta_Sans({ 
@@ -64,7 +65,7 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
 };
 
-type TabId = 'overview' | 'approvals' | 'bloodbank' | 'hospitals' | 'partners' | 'blogs';
+type TabId = 'overview' | 'analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'partners' | 'blogs';
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -153,6 +154,7 @@ export default function AdminDashboard() {
 
     const navigation = [
         { id: 'overview', label: 'Overview', icon: BarChart3, color: 'text-blue-600' },
+        { id: 'analytics', label: 'Web Analytics', icon: Activity, color: 'text-blue-600' },
         { id: 'approvals', label: 'User Approvals', icon: Lock, color: 'text-amber-500', badge: pendingUsers.length },
         { id: 'bloodbank', label: 'Blood Connect', icon: Droplets, color: 'text-rose-500' },
         { id: 'hospitals', label: 'Hospitals', icon: Building2, color: 'text-indigo-600' },
@@ -386,6 +388,10 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                 </div>
+                            )}
+
+                            {activeTab === 'analytics' && (
+                                <AnalyticsAdmin />
                             )}
 
                             {activeTab === 'approvals' && (
