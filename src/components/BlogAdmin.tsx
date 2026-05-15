@@ -212,6 +212,7 @@ export default function BlogAdmin() {
                                 <div key={blog._id} className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 group flex flex-col">
                                     {blog.imageUrl && (
                                         <div className="h-48 overflow-hidden bg-slate-100">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img src={blog.imageUrl} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                         </div>
                                     )}
