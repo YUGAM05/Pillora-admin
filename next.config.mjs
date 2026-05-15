@@ -2,7 +2,7 @@
 const nextConfig = {
   async redirects() {
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/hospitals` : 'http://localhost:5000/api/hospitals');
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/hospitals` : 'https://apex-backend-theta.vercel.app/api/hospitals');
       const hospitals = await res.json();
       if (!Array.isArray(hospitals)) return [];
       return hospitals.map((h) => ({
