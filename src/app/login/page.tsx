@@ -89,7 +89,11 @@ export default function LoginPage() {
             }
 
         } catch (err: any) {
-            setError(err.response?.data?.message || "Invalid email or password");
+            if (err.message === "Network Error" || err.code === "ERR_NETWORK") {
+                setError("Unable to connect to the server. Please check your internet connection or try again later.");
+            } else {
+                setError(err.response?.data?.message || "Invalid email or password");
+            }
         } finally {
             setLoading(false);
         }
