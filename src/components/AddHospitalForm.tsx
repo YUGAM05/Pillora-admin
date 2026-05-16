@@ -29,6 +29,7 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
         image: "", // Main image
         images: [] as string[],
         phoneNumbers: [] as string[],
+        plan: "Standard" as "Standard" | "Premium" | "Enterprise",
         doctors: [] as { name: string; specialization: string; timing: string; daysAvailable: string[] }[],
     });
 
@@ -331,6 +332,38 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
                                 <label htmlFor="isOnlinePaymentAvailable" className="text-sm font-bold text-gray-700 cursor-pointer flex items-center gap-2">
                                     <CreditCard className="w-4 h-4" /> Online Pay
                                 </label>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Subscription Plan</label>
+                            <div className="grid grid-cols-1 gap-3">
+                                {[
+                                    { id: 'Standard', price: '2,000', label: 'Standard Listing', desc: 'Small Clinics, Individual Doctors', color: 'blue' },
+                                    { id: 'Premium', price: '5,000', label: 'Premium Feature', desc: 'Mid-Size & Multi-specialist', color: 'purple' },
+                                    { id: 'Enterprise', price: '10,000', label: 'Enterprise Feature', desc: 'Large Hospital Chains', color: 'amber' }
+                                ].map((p) => (
+                                    <div 
+                                        key={p.id}
+                                        onClick={() => setFormData(prev => ({ ...prev, plan: p.id as any }))}
+                                        className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer group ${
+                                            formData.plan === p.id 
+                                            ? `border-${p.color}-500 bg-${p.color}-50/50 shadow-lg shadow-${p.color}-900/5` 
+                                            : 'border-gray-100 hover:border-gray-200 bg-white'
+                                        }`}
+                                    >
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className={`text-sm font-black uppercase tracking-wider ${formData.plan === p.id ? `text-${p.color}-600` : 'text-gray-900'}`}>{p.label}</span>
+                                            <span className={`text-xs font-black ${formData.plan === p.id ? `text-${p.color}-700` : 'text-gray-400'}`}>₹{p.price}/mo</span>
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 font-medium">{p.desc}</p>
+                                        {formData.plan === p.id && (
+                                            <motion.div layoutId="plan-check" className={`absolute -top-2 -right-2 w-6 h-6 bg-${p.color}-500 text-white rounded-full flex items-center justify-center shadow-lg`}>
+                                                <CheckCircle2 className="w-4 h-4" />
+                                            </motion.div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
