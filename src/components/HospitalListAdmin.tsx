@@ -177,6 +177,17 @@ export default function HospitalListAdmin() {
                                                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter">
                                                     <User className="w-3.5 h-3.5 text-indigo-500" /> {hospital.doctors?.length || 0} Doctors
                                                 </div>
+                                                <div className="flex gap-2 ml-2">
+                                                    {hospital.is_featured && (
+                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md text-[8px] font-black uppercase tracking-widest border border-indigo-100">Top Results</span>
+                                                    )}
+                                                    {hospital.has_govt_schemes && (
+                                                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md text-[8px] font-black uppercase tracking-widest border border-emerald-100">Govt Schemes</span>
+                                                    )}
+                                                    {hospital.is_spotlight && (
+                                                        <span className="px-2 py-0.5 bg-amber-50 text-amber-600 rounded-md text-[8px] font-black uppercase tracking-widest border border-amber-100">Spotlight</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
