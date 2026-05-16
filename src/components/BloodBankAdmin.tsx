@@ -28,8 +28,8 @@ export default function BloodBankAdmin() {
         try {
             const token = getToken();
             const [donorsRes, requestsRes] = await Promise.all([
-                api.get('/blood-bank/admin/donors', { headers: { Authorization: `Bearer ${token}` } }),
-                api.get('/blood-bank/admin/requests', { headers: { Authorization: `Bearer ${token}` } })
+                api.get('blood-bank/admin/donors', { headers: { Authorization: `Bearer ${token}` } }),
+                api.get('blood-bank/admin/requests', { headers: { Authorization: `Bearer ${token}` } })
             ]);
 
             setDonors(donorsRes.data);
@@ -47,7 +47,7 @@ export default function BloodBankAdmin() {
     const handleDeleteDonor = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this donor?')) return;
         try {
-            await api.delete(`/blood-bank/admin/donors/${id}`);
+            await api.delete(`blood-bank/admin/donors/${id}`);
             setDonors(prev => prev.filter(d => d._id !== id));
             alert('Donor deleted successfully');
         } catch (error: any) {
@@ -57,9 +57,12 @@ export default function BloodBankAdmin() {
     };
 
     const handleDeleteRequest = async (id: string) => {
+        console.log(`[DEBUG] Attempting to delete blood request with ID: ${id}`);
         if (!window.confirm('Are you sure you want to delete this request?')) return;
         try {
-            await api.delete(`/blood-bank/admin/requests/${id}`);
+            const deleteUrl = `blood-bank/admin/requests/${id}`;
+            console.log(`[DEBUG] DELETE URL: ${deleteUrl}`);
+            await api.delete(deleteUrl);
             setRequests(prev => prev.filter(r => r._id !== id));
             alert('Request deleted successfully');
         } catch (error: any) {
@@ -70,7 +73,7 @@ export default function BloodBankAdmin() {
 
     const handleUpdateStatus = async (id: string, status: string) => {
         try {
-            await api.patch(`/blood-bank/admin/requests/${id}/status`, { status });
+            await api.patch(`blood-bank/admin/requests/${id}/status`, { status });
             setRequests(requests.map(r => r._id === id ? { ...r, status } : r));
         } catch (error) {
             console.error('Failed to update status', error);
