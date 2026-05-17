@@ -24,7 +24,10 @@ import {
     ExternalLink,
     Mail,
     PlusCircle,
-    XCircle
+    XCircle,
+    Lock,
+    Eye,
+    EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -41,6 +44,7 @@ export default function HospitalListAdmin() {
     const [showSlotGen, setShowSlotGen] = useState<any>(null);
     const [showAddDoctor, setShowAddDoctor] = useState<string | null>(null); // hospitalId
     const [newDoctor, setNewDoctor] = useState({ name: "", specialization: "", fee: 200 });
+    const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
 
     const fetchHospitals = useCallback(async () => {
         try {
@@ -244,6 +248,35 @@ export default function HospitalListAdmin() {
                                                             <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
                                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Management</p>
                                                                 <p className="font-black text-slate-900 uppercase tracking-tighter text-lg">{hospital.management_type || "SELF"}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Administrative Credentials Card */}
+                                                        <div className="p-6 bg-slate-900 text-white rounded-[2rem] border border-slate-800 shadow-xl relative overflow-hidden group">
+                                                            <div className="absolute -right-12 -top-12 w-32 h-32 rounded-full bg-blue-600/20 blur-2xl group-hover:scale-110 transition-transform duration-500" />
+                                                            <div className="flex items-center gap-2 text-blue-400 font-bold mb-4 uppercase tracking-widest text-[10px]">
+                                                                <Lock className="w-4 h-4" /> Administrative Access
+                                                            </div>
+                                                            <div className="space-y-4">
+                                                                <div>
+                                                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Hospital Email / Login ID</label>
+                                                                    <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl font-mono text-xs break-all mt-1">
+                                                                        <span>{hospital.user?.email || "N/A"}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Access Password</label>
+                                                                    <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl font-mono text-xs tracking-wider mt-1">
+                                                                        <span>{showPasswords[hospital._id] ? (hospital.tempPassword || "Saved Securely (Encrypted)") : "••••••••"}</span>
+                                                                        <button 
+                                                                            onClick={() => setShowPasswords(prev => ({ ...prev, [hospital._id]: !prev[hospital._id] }))}
+                                                                            className="ml-2 text-slate-400 hover:text-white transition-colors"
+                                                                            type="button"
+                                                                        >
+                                                                            {showPasswords[hospital._id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
 
