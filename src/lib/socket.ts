@@ -1,7 +1,7 @@
 
 import { io } from "socket.io-client";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || (process.env.NODE_ENV === 'production' ? 'https://apex-backend-theta.vercel.app' : 'http://localhost:5000');
 
 export const socket = io(SOCKET_URL, {
     autoConnect: false,
