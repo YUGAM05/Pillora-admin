@@ -87,7 +87,8 @@ function getCookie(name: string): string | null {
 
 
 function removeCookie(name: string): void {
-    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+    const domain = window.location.hostname.includes('pillora.in') ? '; domain=.pillora.in' : '';
+    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domain}`;
 }
 
 // ---------------------------------------------------------------------------

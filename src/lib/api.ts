@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken } from '@/lib/tokenStorage';
+import { getToken, clearAuth } from '@/lib/tokenStorage';
 
 // IMPORTANT: In production (Vercel), NEXT_PUBLIC_API_URL must be set in Vercel Dashboard.
 // If not set, fallback to the localhost backend URL.
@@ -35,7 +35,7 @@ api.interceptors.response.use(
             if (error.response?.status === 401) {
                 // Prevent any further API error handling from showing error screens
                 isRedirecting = true;
-                localStorage.clear();
+                clearAuth();
                 window.location.href = '/login';
                 // Return a promise that never resolves — stops all downstream catch blocks
                 return new Promise(() => {});

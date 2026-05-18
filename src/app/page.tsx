@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
-import { getToken } from "@/lib/tokenStorage";
+import { getToken, clearAuth } from "@/lib/tokenStorage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -290,7 +290,7 @@ export default function AdminDashboard() {
                     <button 
                         onClick={() => {
                             if(confirm("Terminate administrative session?")) {
-                                localStorage.clear();
+                                clearAuth();
                                 window.location.href = '/login';
                             }
                         }}

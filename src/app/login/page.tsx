@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { setToken, setUser as setStoredUser, getToken, getUser } from "@/lib/tokenStorage";
+import { setToken, setUser as setStoredUser, getToken, getUser, clearAuth } from "@/lib/tokenStorage";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ArrowRight, Lock, Mail, KeyRound } from "lucide-react";
 import api from "@/lib/api";
@@ -84,7 +84,7 @@ export default function LoginPage() {
                 router.push("/");
             } else {
                 // Not an admin, don't allow login here
-                localStorage.clear();
+                clearAuth();
                 setError("Access Denied. Admin account required.");
             }
 
