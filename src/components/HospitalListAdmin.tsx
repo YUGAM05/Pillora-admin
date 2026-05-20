@@ -34,7 +34,7 @@ import Image from "next/image";
 import { useCallback } from "react";
 import SlotGenTool from "./SlotGenTool";
 
-export default function HospitalListAdmin() {
+export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) => void }) {
     const [hospitals, setHospitals] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -197,12 +197,20 @@ export default function HospitalListAdmin() {
                                     </div>
 
                                     <div className="flex items-center gap-3">
-                                        <button 
-                                            onClick={() => handleDelete(hospital._id, hospital.name)}
-                                            className="p-4 bg-slate-50 text-slate-300 hover:bg-rose-50 hover:text-rose-600 rounded-2xl transition-all group/del"
-                                        >
-                                            <Trash2 className="w-5 h-5 group-hover/del:rotate-12 transition-transform" />
-                                        </button>
+                                         <button 
+                                             onClick={() => onEdit(hospital)}
+                                             className="p-4 bg-slate-50 text-slate-300 hover:bg-blue-50 hover:text-blue-600 rounded-2xl transition-all group/edit"
+                                             title="Edit Hospital Details"
+                                         >
+                                             <Edit3 className="w-5 h-5 group-hover/edit:scale-110 transition-transform" />
+                                         </button>
+                                         <button 
+                                             onClick={() => handleDelete(hospital._id, hospital.name)}
+                                             className="p-4 bg-slate-50 text-slate-300 hover:bg-rose-50 hover:text-rose-600 rounded-2xl transition-all group/del"
+                                             title="Delete Hospital"
+                                         >
+                                             <Trash2 className="w-5 h-5 group-hover/del:rotate-12 transition-transform" />
+                                         </button>
                                         <button 
                                             onClick={() => toggleExpand(hospital._id)}
                                             className={`p-4 rounded-2xl transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest ${

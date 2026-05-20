@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
+export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?: () => void; hospitalToEdit?: any }) {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
@@ -16,20 +16,20 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
     const [uploadingSecondary, setUploadingSecondary] = useState(false);
 
     const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        city: "",
-        address: "",
-        consultationFee: "",
-        ambulanceContact: "",
-        description: "",
-        isOpen24Hours: false,
-        isOnlinePaymentAvailable: false,
-        management_type: "SELF" as "SELF" | "PILLORA",
-        image: "", // Main image
-        images: [] as string[],
-        phoneNumbers: [] as string[],
-        plan: "Standard" as "Standard" | "Premium" | "Enterprise",
+        name: hospitalToEdit?.name || "",
+        email: hospitalToEdit?.user?.email || hospitalToEdit?.email || "",
+        city: hospitalToEdit?.city || "",
+        address: hospitalToEdit?.address || "",
+        consultationFee: hospitalToEdit?.consultationFee?.toString() || "",
+        ambulanceContact: hospitalToEdit?.ambulanceContact || "",
+        description: hospitalToEdit?.description || "",
+        isOpen24Hours: hospitalToEdit?.isOpen24Hours || false,
+        isOnlinePaymentAvailable: hospitalToEdit?.isOnlinePaymentAvailable || false,
+        management_type: hospitalToEdit?.management_type || "SELF" as "SELF" | "PILLORA",
+        image: hospitalToEdit?.image || "", // Main image
+        images: hospitalToEdit?.images || [] as string[],
+        phoneNumbers: hospitalToEdit?.phoneNumbers || [] as string[],
+        plan: hospitalToEdit?.plan || "Standard" as "Standard" | "Premium" | "Enterprise",
         doctors: [] as { name: string; specialization: string; timing: string; daysAvailable: string[] }[],
     });
 
@@ -49,7 +49,7 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
     };
 
     const handleRemoveListItem = (field: 'images' | 'phoneNumbers', index: number) => {
-        setFormData(prev => ({ ...prev, [field]: prev[field].filter((_, i) => i !== index) }));
+        setFormData(prev => ({ ...prev, [field]: prev[field].filter((_: any, i: number) => i !== index) }));
     };
 
     const handleListItemChange = (field: 'images' | 'phoneNumbers', index: number, value: string) => {
@@ -151,13 +151,17 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
                 ...formData,
                 slug: formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
                 consultationFee: Number(formData.consultationFee),
-                images: formData.images.filter(img => img.trim() !== ""),
-                phoneNumbers: formData.phoneNumbers.filter(ph => ph.trim() !== ""),
+                images: formData.images.filter((img: string) => img.trim() !== ""),
+                phoneNumbers: formData.phoneNumbers.filter((ph: string) => ph.trim() !== ""),
             };
 
-            const res = await api.post("/admin/hospitals/register", payload);
+            let res;
+            if (hospitalToEdit) {
+                res = await api.put(`/hospitals/${hospitalToEdit._id}`, payload);
+            } else {
+                res = await api.post("/admin/hospitals/register", payload);
+            }
 
-            
             if (res.data.credentials) {
                 setCredentials(res.data.credentials);
             }
@@ -172,7 +176,7 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
             }
             
         } catch (err: any) {
-            setError(err.response?.data?.message || "Failed to add hospital");
+            setError(err.response?.data?.message || (hospitalToEdit ? "Failed to update hospital" : "Failed to register hospital"));
         } finally {
             setLoading(false);
         }
@@ -182,8 +186,12 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
         return (
             <div className="flex flex-col items-center justify-center p-8 md:p-12 text-center bg-emerald-50 rounded-2xl border border-emerald-100">
                 <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-4" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Hospital Registered!</h3>
-                <p className="text-gray-600 mb-8">The hospital directory has been successfully updated and a welcome kit was triggered.</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{hospitalToEdit ? "Hospital Updated!" : "Hospital Registered!"}</h3>
+                <p className="text-gray-600 mb-8">
+                    {hospitalToEdit 
+                        ? "The medical facility details have been successfully saved and synchronized." 
+                        : "The hospital directory has been successfully updated and a welcome kit was triggered."}
+                </p>
                 
                 {credentials && (
                     <div className="w-full max-w-md bg-white p-6 rounded-2xl border border-emerald-200 shadow-xl shadow-emerald-900/5 mb-8">
@@ -220,8 +228,10 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 md:p-8 space-y-8 max-h-[80vh] overflow-y-auto custom-scrollbar shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div>
-                    <h2 className="text-2xl font-black text-gray-900">Hospital Details</h2>
-                    <p className="text-sm text-gray-500 font-medium">Provide comprehensive facility information</p>
+                    <h2 className="text-2xl font-black text-gray-900">{hospitalToEdit ? "Edit Hospital Details" : "Hospital Details"}</h2>
+                    <p className="text-sm text-gray-500 font-medium">
+                        {hospitalToEdit ? "Modify and update healthcare facility parameters" : "Provide comprehensive facility information"}
+                    </p>
                 </div>
             </div>
 
@@ -252,15 +262,16 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Official Email (for credentials)</label>
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Official Email (credentials login)</label>
                             <input
                                 required
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
+                                disabled={!!hospitalToEdit}
                                 placeholder="admin@hospital.com"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900 disabled:opacity-60 disabled:cursor-not-allowed"
                             />
                         </div>
 
@@ -433,7 +444,7 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
                             </div>
                             
                             <div className="grid grid-cols-3 gap-3">
-                                {formData.images.map((url, idx) => (
+                                {formData.images.map((url: string, idx: number) => (
                                     <div key={idx} className="relative h-24 rounded-xl overflow-hidden group border border-gray-100">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
@@ -479,7 +490,7 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
                                     />
                                     <div className="px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-[10px] font-black uppercase flex items-center">SOS</div>
                                 </div>
-                                {formData.phoneNumbers.map((ph, idx) => (
+                                {formData.phoneNumbers.map((ph: string, idx: number) => (
                                     <div key={idx} className="flex gap-2">
                                         <input
                                             value={ph}
@@ -513,104 +524,106 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
             </div>
 
             {/* Available Doctors Section */}
-            <div className="space-y-6 pt-4">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <User className="w-5 h-5 text-blue-500" /> Available Doctors
-                    </h3>
-                    <button
-                        type="button"
-                        onClick={handleAddDoctor}
-                        className="flex items-center gap-1 text-sm font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-lg hover:bg-primary/10 transition-all"
-                    >
-                        <Plus className="w-4 h-4" /> Add Doctor
-                    </button>
-                </div>
+            {!hospitalToEdit && (
+                <div className="space-y-6 pt-4">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <User className="w-5 h-5 text-blue-500" /> Available Doctors
+                        </h3>
+                        <button
+                            type="button"
+                            onClick={handleAddDoctor}
+                            className="flex items-center gap-1 text-sm font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-lg hover:bg-primary/10 transition-all"
+                        >
+                            <Plus className="w-4 h-4" /> Add Doctor
+                        </button>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                    <AnimatePresence>
-                        {formData.doctors.map((doc, docIdx) => (
-                            <motion.div
-                                key={docIdx}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="p-5 bg-gray-50 border border-gray-200 rounded-[1.5rem] space-y-4 relative group"
-                            >
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveDoctor(docIdx)}
-                                    className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        <AnimatePresence>
+                            {formData.doctors.map((doc, docIdx) => (
+                                <motion.div
+                                    key={docIdx}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className="p-5 bg-gray-50 border border-gray-200 rounded-[1.5rem] space-y-4 relative group"
                                 >
-                                    <Trash2 className="w-5 h-5" />
-                                </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveDoctor(docIdx)}
+                                        className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </button>
 
-                                <div className="space-y-3">
-                                    <div className="flex gap-3">
-                                        <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0">
-                                            <User className="w-5 h-5 text-gray-400" />
-                                        </div>
-                                        <div className="flex-1 space-y-1">
-                                            <input
-                                                required
-                                                value={doc.name}
-                                                onChange={(e) => handleDoctorChange(docIdx, 'name', e.target.value)}
-                                                placeholder="Doctor's Name"
-                                                className="w-full bg-transparent border-b border-gray-200 focus:border-primary outline-none font-bold text-gray-800"
-                                            />
-                                            <div className="flex items-center gap-1 text-xs text-primary font-bold">
-                                                <GraduationCap className="w-3 h-3" />
+                                    <div className="space-y-3">
+                                        <div className="flex gap-3">
+                                            <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0">
+                                                <User className="w-5 h-5 text-gray-400" />
+                                            </div>
+                                            <div className="flex-1 space-y-1">
                                                 <input
                                                     required
-                                                    value={doc.specialization}
-                                                    onChange={(e) => handleDoctorChange(docIdx, 'specialization', e.target.value)}
-                                                    placeholder="Degree / Specialization"
-                                                    className="bg-transparent outline-none w-full"
+                                                    value={doc.name}
+                                                    onChange={(e) => handleDoctorChange(docIdx, 'name', e.target.value)}
+                                                    placeholder="Doctor's Name"
+                                                    className="w-full bg-transparent border-b border-gray-200 focus:border-primary outline-none font-bold text-gray-800"
                                                 />
+                                                <div className="flex items-center gap-1 text-xs text-primary font-bold">
+                                                    <GraduationCap className="w-3 h-3" />
+                                                    <input
+                                                        required
+                                                        value={doc.specialization}
+                                                        onChange={(e) => handleDoctorChange(docIdx, 'specialization', e.target.value)}
+                                                        placeholder="Degree / Specialization"
+                                                        className="bg-transparent outline-none w-full"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest">
+                                                <Clock className="w-3 h-3" /> Timing
+                                            </div>
+                                            <input
+                                                required
+                                                value={doc.timing}
+                                                onChange={(e) => handleDoctorChange(docIdx, 'timing', e.target.value)}
+                                                placeholder="e.g. 10:00 AM - 04:00 PM"
+                                                className="w-full px-3 py-2 bg-white border border-gray-100 rounded-lg text-sm font-medium outline-none focus:border-primary text-gray-900"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest">
+                                                <Calendar className="w-3 h-3" /> Available Days
+                                            </div>
+                                            <div className="flex flex-wrap gap-1">
+                                                {DAYS.map(day => (
+                                                    <button
+                                                        type="button"
+                                                        key={day}
+                                                        onClick={() => handleDayToggle(docIdx, day)}
+                                                        className={`px-2 py-1 text-[10px] font-black rounded-md border transition-all ${
+                                                            doc.daysAvailable.includes(day)
+                                                                ? 'bg-primary border-primary text-white shadow-sm'
+                                                                : 'bg-white border-gray-200 text-gray-400 hover:border-primary/30'
+                                                        }`}
+                                                    >
+                                                        {day.slice(0, 3)}
+                                                    </button>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest">
-                                            <Clock className="w-3 h-3" /> Timing
-                                        </div>
-                                        <input
-                                            required
-                                            value={doc.timing}
-                                            onChange={(e) => handleDoctorChange(docIdx, 'timing', e.target.value)}
-                                            placeholder="e.g. 10:00 AM - 04:00 PM"
-                                            className="w-full px-3 py-2 bg-white border border-gray-100 rounded-lg text-sm font-medium outline-none focus:border-primary text-gray-900"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest">
-                                            <Calendar className="w-3 h-3" /> Available Days
-                                        </div>
-                                        <div className="flex flex-wrap gap-1">
-                                            {DAYS.map(day => (
-                                                <button
-                                                    type="button"
-                                                    key={day}
-                                                    onClick={() => handleDayToggle(docIdx, day)}
-                                                    className={`px-2 py-1 text-[10px] font-black rounded-md border transition-all ${
-                                                        doc.daysAvailable.includes(day)
-                                                            ? 'bg-primary border-primary text-white shadow-sm'
-                                                            : 'bg-white border-gray-200 text-gray-400 hover:border-primary/30'
-                                                    }`}
-                                                >
-                                                    {day.slice(0, 3)}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
                 {onClose && (
@@ -627,7 +640,7 @@ export default function AddHospitalForm({ onClose }: { onClose?: () => void }) {
                     disabled={loading}
                     className="flex items-center gap-2 px-10 py-3 font-bold text-white bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-70 disabled:pointer-events-none"
                 >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Publish Hospital"}
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (hospitalToEdit ? "Update Hospital" : "Publish Hospital")}
                 </button>
             </div>
         </form>

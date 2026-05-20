@@ -77,6 +77,7 @@ export default function AdminDashboard() {
     const [error, setError] = useState("");
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [showAddHospital, setShowAddHospital] = useState(false);
+    const [editingHospital, setEditingHospital] = useState<any | null>(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [activities, setActivities] = useState<any[]>([]);
 
@@ -585,42 +586,56 @@ export default function AdminDashboard() {
                                             <p className="text-slate-500 font-medium text-lg italic">Manage healthcare infrastructure and system registration</p>
                                         </div>
                                         <button
-                                            onClick={() => setShowAddHospital(!showAddHospital)}
-                                            className={`px-10 py-5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-3 shadow-2xl ${
-                                                showAddHospital 
-                                                ? 'bg-slate-900 text-white hover:bg-slate-800' 
-                                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/40 hover:-translate-y-2 active:scale-95'
-                                            }`}
-                                        >
-                                            {showAddHospital ? <XCircle className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
-                                            {showAddHospital ? 'Exit Form' : 'Register Hospital'}
-                                        </button>
+                                             onClick={() => {
+                                                 if (showAddHospital || editingHospital) {
+                                                     setShowAddHospital(false);
+                                                     setEditingHospital(null);
+                                                 } else {
+                                                     setShowAddHospital(true);
+                                                 }
+                                             }}
+                                             className={`px-10 py-5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-3 shadow-2xl ${
+                                                 showAddHospital || editingHospital 
+                                                 ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                                                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/40 hover:-translate-y-2 active:scale-95'
+                                             }`}
+                                         >
+                                             {showAddHospital || editingHospital ? <XCircle className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+                                             {showAddHospital || editingHospital ? 'Exit Form' : 'Register Hospital'}
+                                         </button>
                                     </div>
 
                                     <AnimatePresence mode="wait">
-                                        {showAddHospital ? (
-                                            <motion.div
-                                                key="hospital-form"
-                                                initial={{ opacity: 0, scale: 0.99, y: 20 }}
-                                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                exit={{ opacity: 0, scale: 0.99, y: -20 }}
-                                                className="bg-white rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden"
-                                            >
-                                                <AddHospitalForm onClose={() => {
-                                                    setShowAddHospital(false);
-                                                    setRefreshTrigger(prev => prev + 1);
-                                                }} />
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div 
-                                                key="hospital-list"
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                className="bg-white p-12 rounded-[3.5rem] shadow-xl shadow-blue-900/5 border border-slate-50"
-                                            >
-                                                <HospitalListAdmin key={refreshTrigger} />
-                                            </motion.div>
-                                        )}
+                                        {showAddHospital || editingHospital ? (
+                                             <motion.div
+                                                 key="hospital-form"
+                                                 initial={{ opacity: 0, scale: 0.99, y: 20 }}
+                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                 exit={{ opacity: 0, scale: 0.99, y: -20 }}
+                                                 className="bg-white rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden"
+                                             >
+                                                 <AddHospitalForm 
+                                                     hospitalToEdit={editingHospital}
+                                                     onClose={() => {
+                                                         setShowAddHospital(false);
+                                                         setEditingHospital(null);
+                                                         setRefreshTrigger(prev => prev + 1);
+                                                     }} 
+                                                 />
+                                             </motion.div>
+                                         ) : (
+                                             <motion.div 
+                                                 key="hospital-list"
+                                                 initial={{ opacity: 0 }}
+                                                 animate={{ opacity: 1 }}
+                                                 className="bg-white p-12 rounded-[3.5rem] shadow-xl shadow-blue-900/5 border border-slate-50"
+                                             >
+                                                 <HospitalListAdmin 
+                                                     key={refreshTrigger} 
+                                                     onEdit={(hospital) => setEditingHospital(hospital)}
+                                                 />
+                                             </motion.div>
+                                         )}
                                     </AnimatePresence>
                                 </div>
                             )}
