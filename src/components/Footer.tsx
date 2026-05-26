@@ -6,7 +6,7 @@ export default function Footer() {
     return (
         <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                     {/* Brand */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
@@ -53,15 +53,6 @@ export default function Footer() {
                             <li><Link href="/careers" className="hover:text-blue-600 transition-colors">Careers</Link></li>
                             <li><Link href="/blog" className="hover:text-blue-600 transition-colors">Blog</Link></li>
                             <li><Link href="/partners" className="hover:text-blue-600 transition-colors">Partner with us</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Services */}
-                    <div>
-                        <h3 className="font-bold text-gray-900 mb-4">Services</h3>
-                        <ul className="space-y-3 text-sm text-gray-500">
-                            <li><Link href="/blood-bank" className="hover:text-blue-600 transition-colors">Blood Connect</Link></li>
-                            <li><Link href="/hospitals" className="hover:text-blue-600 transition-colors">Hospitals</Link></li>
                         </ul>
                     </div>
 
