@@ -12,12 +12,17 @@ export default function BloodBankAdmin() {
     const [donors, setDonors] = useState<any[]>([]);
     const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [totalDonors, setTotalDonors] = useState(0);
+    const [availableDonors, setAvailableDonors] = useState(0);
+    const [loadingMore, setLoadingMore] = useState(false);
 
     const stats = {
-        totalDonors: donors.length,
+        totalDonors: totalDonors,
         totalRequests: requests.length,
         urgentRequests: requests.filter((r: any) => r.isUrgent).length,
-        availableDonors: donors.filter((d: any) => d.isAvailable).length
+        availableDonors: availableDonors
     };
 
     useEffect(() => {
@@ -28,14 +33,16 @@ export default function BloodBankAdmin() {
         try {
             const token = getToken();
             const [donorsRes, requestsRes] = await Promise.all([
-                api.get('blood-bank/admin/donors', { headers: { Authorization: `Bearer ${token}` } }),
+                api.get('blood-bank/admin/donors?page=1&limit=50', { headers: { Authorization: `Bearer ${token}` } }),
                 api.get('blood-bank/admin/requests', { headers: { Authorization: `Bearer ${token}` } })
             ]);
 
-            setDonors(donorsRes.data);
-            setRequests(requestsRes.data);
+            setDonors(donorsRes.data.donors);
+            setTotalDonors(donorsRes.data.pagination.total);
+            setAvailableDonors(donorsRes.data.pagination.available);
+            setHasMore(donorsRes.data.pagination.hasMore);
+            setPage(1);
 
-            setDonors(donorsRes.data);
             setRequests(requestsRes.data);
         } catch (error) {
             console.error('Failed to fetch blood bank data', error);
@@ -44,11 +51,35 @@ export default function BloodBankAdmin() {
         }
     };
 
+    const handleLoadMore = async () => {
+        if (loadingMore) return;
+        setLoadingMore(true);
+        try {
+            const token = getToken();
+            const nextPage = page + 1;
+            const res = await api.get(`blood-bank/admin/donors?page=${nextPage}&limit=50`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setDonors(prev => [...prev, ...res.data.donors]);
+            setHasMore(res.data.pagination.hasMore);
+            setPage(nextPage);
+        } catch (error) {
+            console.error('Failed to load more donors', error);
+        } finally {
+            setLoadingMore(false);
+        }
+    };
+
     const handleDeleteDonor = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this donor?')) return;
         try {
             await api.delete(`blood-bank/admin/donors/${id}`);
+            const deletedDonor = donors.find(d => d._id === id);
+            if (deletedDonor && deletedDonor.isAvailable) {
+                setAvailableDonors(prev => Math.max(0, prev - 1));
+            }
             setDonors(prev => prev.filter(d => d._id !== id));
+            setTotalDonors(prev => Math.max(0, prev - 1));
             alert('Donor deleted successfully');
         } catch (error: any) {
             console.error('Failed to delete donor', error);
@@ -255,7 +286,27 @@ export default function BloodBankAdmin() {
                         transition={{ duration: 0.2 }}
                     >
                         {activeTab === 'donors' ? (
-                            <DonorsTable donors={donors} onDelete={handleDeleteDonor} />
+                            <div className="space-y-4">
+                                <DonorsTable donors={donors} onDelete={handleDeleteDonor} />
+                                {hasMore && (
+                                    <div className="flex justify-center pb-6">
+                                        <button
+                                            onClick={handleLoadMore}
+                                            disabled={loadingMore}
+                                            className="px-6 py-3 bg-blue-50 text-blue-600 hover:bg-blue-100 disabled:bg-gray-50 disabled:text-gray-400 font-bold rounded-2xl text-xs uppercase tracking-widest transition-all shadow-sm border border-blue-100 flex items-center gap-2"
+                                        >
+                                            {loadingMore ? (
+                                                <>
+                                                    <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                                                    Loading...
+                                                </>
+                                            ) : (
+                                                'Load More Donors'
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <RequestsTable 
                                 requests={filteredRequests} 
