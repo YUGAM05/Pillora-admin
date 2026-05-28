@@ -39,10 +39,13 @@ export default function BloodBankAdmin() {
 
             console.log('Donors from API:', donorsRes.data);
 
-            setDonors(donorsRes.data.donors);
-            setTotalDonors(donorsRes.data.pagination.total);
-            setAvailableDonors(donorsRes.data.pagination.available);
-            setHasMore(donorsRes.data.pagination.hasMore);
+            const donorsList = donorsRes.data.donors || [];
+            const pagination = donorsRes.data.pagination || {};
+
+            setDonors(donorsList);
+            setTotalDonors(pagination.total || 0);
+            setAvailableDonors(pagination.available !== undefined ? pagination.available : donorsList.filter((d: any) => d.isAvailable).length);
+            setHasMore(pagination.hasMore || false);
             setPage(1);
 
             setRequests(requestsRes.data);
@@ -289,6 +292,9 @@ export default function BloodBankAdmin() {
                     >
                         {activeTab === 'donors' ? (
                             <div className="space-y-4">
+                                <div className="px-6 pt-4">
+                                    <p className="text-sm text-gray-600 font-bold">Total Donors in Database: {totalDonors}</p>
+                                </div>
                                 <DonorsTable donors={donors} onDelete={handleDeleteDonor} />
                                 {hasMore && (
                                     <div className="flex justify-center pb-6">
