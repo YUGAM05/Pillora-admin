@@ -37,6 +37,8 @@ export default function BloodBankAdmin() {
                 api.get('blood-bank/admin/requests', { headers: { Authorization: `Bearer ${token}` } })
             ]);
 
+            console.log('Donors from API:', donorsRes.data);
+
             setDonors(donorsRes.data.donors);
             setTotalDonors(donorsRes.data.pagination.total);
             setAvailableDonors(donorsRes.data.pagination.available);
