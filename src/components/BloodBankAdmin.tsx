@@ -33,7 +33,7 @@ export default function BloodBankAdmin() {
         try {
             const token = getToken();
             const [donorsRes, requestsRes] = await Promise.all([
-                api.get('blood-bank/admin/donors?page=1&limit=50', { headers: { Authorization: `Bearer ${token}` } }),
+                api.get('blood-bank/admin/donors?page=1&limit=100', { headers: { Authorization: `Bearer ${token}` } }),
                 api.get('blood-bank/admin/requests', { headers: { Authorization: `Bearer ${token}` } })
             ]);
 
@@ -57,7 +57,7 @@ export default function BloodBankAdmin() {
         try {
             const token = getToken();
             const nextPage = page + 1;
-            const res = await api.get(`blood-bank/admin/donors?page=${nextPage}&limit=50`, {
+            const res = await api.get(`blood-bank/admin/donors?page=${nextPage}&limit=100`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDonors(prev => [...prev, ...res.data.donors]);
@@ -230,13 +230,13 @@ export default function BloodBankAdmin() {
                         onClick={() => setActiveTab('donors')}
                         className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'donors' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     >
-                        Donors
+                        Donors ({totalDonors})
                     </button>
                     <button
                         onClick={() => setActiveTab('requests')}
                         className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'requests' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     >
-                        Requests
+                        Requests ({requests.length})
                     </button>
                 </div>
 
