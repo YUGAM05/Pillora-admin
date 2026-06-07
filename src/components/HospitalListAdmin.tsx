@@ -246,11 +246,17 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                             </div>
                                                         </div>
 
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                                             <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
                                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Emergency Contact</p>
                                                                 <a href={`tel:${hospital.ambulanceContact}`} className="flex items-center gap-3 text-lg font-black text-rose-600 hover:underline">
                                                                     <Phone className="w-5 h-5" /> {hospital.ambulanceContact || "N/A"}
+                                                                </a>
+                                                            </div>
+                                                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Hospital Phone No</p>
+                                                                <a href={`tel:${hospital.contactNumber}`} className="flex items-center gap-3 text-lg font-black text-blue-600 hover:underline">
+                                                                    <Phone className="w-5 h-5" /> {hospital.contactNumber || "N/A"}
                                                                 </a>
                                                             </div>
                                                             <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
@@ -313,6 +319,11 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                                 {hospital.isOnlinePaymentAvailable && (
                                                                     <div className="px-5 py-3 bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-600/20 text-xs font-black uppercase tracking-widest flex items-center gap-2">
                                                                         <CreditCard className="w-4 h-4" /> Digital Pay
+                                                                    </div>
+                                                                )}
+                                                                {hospital.contactNumber && (
+                                                                    <div className="px-5 py-3 bg-blue-50 text-blue-700 rounded-2xl border border-blue-200 text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                                                                        <Phone className="w-4 h-4 text-blue-500" /> {hospital.contactNumber} (Primary)
                                                                     </div>
                                                                 )}
                                                                 {hospital.phoneNumbers?.map((ph: string, idx: number) => (

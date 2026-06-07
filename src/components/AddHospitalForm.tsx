@@ -22,6 +22,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
         address: hospitalToEdit?.address || "",
         consultationFee: hospitalToEdit?.consultationFee?.toString() || "",
         ambulanceContact: hospitalToEdit?.ambulanceContact || "",
+        contactNumber: hospitalToEdit?.contactNumber || "",
         description: hospitalToEdit?.description || "",
         isOpen24Hours: hospitalToEdit?.isOpen24Hours || false,
         isOnlinePaymentAvailable: hospitalToEdit?.isOnlinePaymentAvailable || false,
@@ -478,7 +479,18 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                     <Plus className="w-4 h-4" />
                                 </button>
                             </div>
-                            <div className="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                                <div className="flex gap-2">
+                                    <input
+                                        required
+                                        name="contactNumber"
+                                        value={formData.contactNumber}
+                                        onChange={handleChange}
+                                        placeholder="Hospital Phone Number"
+                                        className="flex-1 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm font-bold text-blue-700 outline-none focus:border-primary"
+                                    />
+                                    <div className="px-3 py-2 bg-blue-100 text-blue-600 rounded-lg text-[10px] font-black uppercase flex items-center">Phone</div>
+                                </div>
                                 <div className="flex gap-2">
                                     <input
                                         required
