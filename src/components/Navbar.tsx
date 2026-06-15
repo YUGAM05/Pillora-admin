@@ -65,13 +65,13 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-20 gap-2 lg:gap-1 xl:gap-8">
 
                     {/* 1. Logo */}
-                    <Link href="/" className="flex-shrink-0 flex items-center gap-2 group -ml-2 sm:-ml-4 xl:-ml-8">
+                    <Link href="/" className="flex-shrink-0 flex items-center group">
                         <Image
                             src="/logo.png"
                             alt="Pillora"
                             width={72}
                             height={72}
-                            className="w-14 h-14 xl:w-16 xl:h-16 object-contain object-right "
+                            className="w-14 h-14 xl:w-16 xl:h-16 object-contain object-right"
                             unoptimized
                         />
                         <Image
@@ -79,7 +79,7 @@ export default function Navbar() {
                             alt="Pillora"
                             width={240}
                             height={80}
-                            className="block h-14 sm:h-16 xl:h-[4.5rem] w-auto object-contain object-left mt-0.5 xl:mt-1"
+                            className="block h-14 sm:h-16 xl:h-[4.5rem] w-auto object-contain object-left -ml-1 sm:-ml-2 xl:-ml-3"
                             unoptimized
                         />
                     </Link>
