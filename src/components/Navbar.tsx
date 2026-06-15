@@ -65,7 +65,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-20 gap-2 lg:gap-1 xl:gap-8">
 
                     {/* 1. Logo */}
-                    <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
+                    <Link href="/" className="flex-shrink-0 flex items-center gap-2 group -ml-1 sm:-ml-2 xl:-ml-4">
                         <Image
                             src="/logo.png"
                             alt="Pillora"
