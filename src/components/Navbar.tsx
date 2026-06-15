@@ -79,7 +79,7 @@ export default function Navbar() {
                             alt="Pillora"
                             width={240}
                             height={80}
-                            className="block h-12 sm:h-14 xl:h-[4rem] w-auto object-contain object-left mt-0.5 xl:mt-1"
+                            className="block h-14 sm:h-16 xl:h-[4.5rem] w-auto object-contain object-left mt-0.5 xl:mt-1"
                             unoptimized
                         />
                     </Link>
