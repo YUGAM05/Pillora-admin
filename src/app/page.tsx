@@ -41,6 +41,7 @@ import BlogAdmin from "@/components/BlogAdmin";
 import AnalyticsAdmin from "@/components/AnalyticsAdmin";
 import LoginAnalyticsAdmin from "@/components/LoginAnalyticsAdmin";
 import SupportTicketsAdmin from "@/components/SupportTicketsAdmin";
+import HealthHubAdmin from "@/components/HealthHubAdmin";
 
 // Premium Font Configuration
 const jakarta = Plus_Jakarta_Sans({ 
@@ -69,7 +70,7 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
 };
 
-type TabId = 'overview' | 'analytics' | 'login-analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'partners' | 'blogs' | 'tickets';
+type TabId = 'overview' | 'analytics' | 'login-analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'partners' | 'blogs' | 'tickets' | 'health-hub';
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -218,6 +219,7 @@ export default function AdminDashboard() {
         { id: 'hospitals', label: 'Hospitals', icon: Building2, color: 'text-indigo-600' },
         { id: 'partners', label: 'Partnerships', icon: Handshake, color: 'text-emerald-600' },
         { id: 'blogs', label: 'Blog Posts', icon: FileText, color: 'text-purple-600' },
+        { id: 'health-hub', label: 'Health Hub', icon: Heart, color: 'text-rose-500' },
         { id: 'tickets', label: 'Support Tickets', icon: MessageSquare, color: 'text-blue-600' },
     ];
 
@@ -667,6 +669,10 @@ export default function AdminDashboard() {
 
                             {activeTab === 'blogs' && (
                                 <BlogAdmin />
+                            )}
+
+                            {activeTab === 'health-hub' && (
+                                <HealthHubAdmin />
                             )}
 
                             {activeTab === 'tickets' && (

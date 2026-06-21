@@ -189,9 +189,13 @@ export default function SupportTicketsAdmin() {
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 font-medium">
-                                                <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {ticket.userId?.name || 'Unknown User'}</span>
+                                                <span className="flex items-center gap-1">
+                                                    <User className="w-3.5 h-3.5" /> 
+                                                    {ticket.guestName || ticket.userId?.name || 'Guest User'}
+                                                    {ticket.guestName && <span className="ml-1.5 px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[9px] font-bold uppercase tracking-wider">Guest</span>}
+                                                </span>
                                                 <span className="text-gray-300">•</span>
-                                                <span className="text-xs">{ticket.userId?.email || 'No Email'}</span>
+                                                <span className="text-xs">{ticket.guestEmail || ticket.userId?.email || 'No Email'}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -232,14 +236,14 @@ export default function SupportTicketsAdmin() {
                                                     <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
                                                         <div>
                                                             <p className="text-xs font-bold text-gray-400 uppercase">User Name</p>
-                                                            <p className="font-black text-gray-900">{ticket.userId?.name || 'N/A'}</p>
+                                                            <p className="font-black text-gray-900">{ticket.guestName || ticket.userId?.name || 'Guest User'}</p>
                                                         </div>
                                                         <div className="pt-3 border-t border-gray-50 flex flex-col gap-2">
                                                             <span className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                                                <Mail className="w-4 h-4 text-blue-500" /> {ticket.userId?.email || 'N/A'}
+                                                                <Mail className="w-4 h-4 text-blue-500" /> {ticket.guestEmail || ticket.userId?.email || 'N/A'}
                                                             </span>
                                                             <span className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                                                <Phone className="w-4 h-4 text-emerald-500" /> {ticket.userId?.phone || 'N/A'}
+                                                                <Phone className="w-4 h-4 text-emerald-500" /> {ticket.guestPhone || ticket.userId?.phone || 'N/A'}
                                                             </span>
                                                         </div>
                                                     </div>
