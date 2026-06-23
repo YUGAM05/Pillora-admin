@@ -31,7 +31,8 @@ import {
     TrendingUp,
     Settings,
     FileText,
-    MessageSquare
+    MessageSquare,
+    DollarSign
 } from "lucide-react";
 import BloodBankAdmin from "@/components/BloodBankAdmin";
 import AddHospitalForm from "@/components/AddHospitalForm";
@@ -42,6 +43,7 @@ import AnalyticsAdmin from "@/components/AnalyticsAdmin";
 import LoginAnalyticsAdmin from "@/components/LoginAnalyticsAdmin";
 import SupportTicketsAdmin from "@/components/SupportTicketsAdmin";
 import HealthHubAdmin from "@/components/HealthHubAdmin";
+import RevenueAdmin from "@/components/RevenueAdmin";
 
 // Premium Font Configuration
 const jakarta = Plus_Jakarta_Sans({ 
@@ -70,7 +72,7 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
 };
 
-type TabId = 'overview' | 'analytics' | 'login-analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'partners' | 'blogs' | 'tickets' | 'health-hub';
+type TabId = 'overview' | 'analytics' | 'login-analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'partners' | 'blogs' | 'tickets' | 'health-hub' | 'revenue';
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -221,6 +223,7 @@ export default function AdminDashboard() {
         { id: 'blogs', label: 'Blog Posts', icon: FileText, color: 'text-purple-600' },
         { id: 'health-hub', label: 'Health Hub', icon: Heart, color: 'text-rose-500' },
         { id: 'tickets', label: 'Support Tickets', icon: MessageSquare, color: 'text-blue-600' },
+        { id: 'revenue', label: 'Revenue & Settlements', icon: DollarSign, color: 'text-emerald-600' },
     ];
 
     return (
@@ -677,6 +680,10 @@ export default function AdminDashboard() {
 
                             {activeTab === 'tickets' && (
                                 <SupportTicketsAdmin />
+                            )}
+
+                            {activeTab === 'revenue' && (
+                                <RevenueAdmin />
                             )}
                         </motion.div>
                     </AnimatePresence>
