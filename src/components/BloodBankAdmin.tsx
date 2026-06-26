@@ -17,6 +17,8 @@ export default function BloodBankAdmin() {
     const [totalDonors, setTotalDonors] = useState(0);
     const [availableDonors, setAvailableDonors] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [editingDonor, setEditingDonor] = useState<any>(null);
+    const [editLastDonationDate, setEditLastDonationDate] = useState<string>('');
 
     const stats = {
         totalDonors: totalDonors,
@@ -89,6 +91,34 @@ export default function BloodBankAdmin() {
         } catch (error: any) {
             console.error('Failed to delete donor', error);
             alert(`Delete failed: ${error.response?.data?.message || error.message}`);
+        }
+    };
+
+    const handleEditDonor = (donor: any) => {
+        setEditingDonor(donor);
+        setEditLastDonationDate(
+            donor.lastDonationDate
+                ? new Date(donor.lastDonationDate).toISOString().split('T')[0]
+                : ''
+        );
+    };
+
+    const handleSaveDonorDate = async () => {
+        if (!editingDonor) return;
+        try {
+            const token = getToken();
+            await api.patch(
+                `blood-bank/admin/donors/${editingDonor._id}`,
+                { lastDonationDate: editLastDonationDate || null },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            await fetchData();
+            setEditingDonor(null);
+            alert('Donor donation record updated successfully.');
+        } catch (error: any) {
+            console.error('Failed to update donor donation date:', error);
+            alert(`Failed to save: ${error.response?.data?.message || error.message}`);
         }
     };
 
@@ -295,7 +325,7 @@ export default function BloodBankAdmin() {
                                 <div className="px-6 pt-4">
                                     <p className="text-sm text-gray-600 font-bold">Total Donors in Database: {totalDonors}</p>
                                 </div>
-                                <DonorsTable donors={donors} onDelete={handleDeleteDonor} />
+                                <DonorsTable donors={donors} onDelete={handleDeleteDonor} onEdit={handleEditDonor} />
                                 {hasMore && (
                                     <div className="flex justify-center pb-6">
                                         <button
@@ -325,11 +355,61 @@ export default function BloodBankAdmin() {
                     </motion.div>
                 </AnimatePresence>
             </div>
+
+            {/* Edit Donor Modal */}
+            <AnimatePresence>
+                {editingDonor && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
+                            onClick={() => setEditingDonor(null)}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl relative z-10 border border-slate-100 flex flex-col space-y-4"
+                        >
+                            <h3 className="font-extrabold text-lg text-slate-900">Update Last Blood Donation Date</h3>
+                            <p className="text-sm text-slate-500 font-bold">Donor: <span className="text-slate-900">{editingDonor.name}</span></p>
+                            
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Last Blood Donation Date</label>
+                                <input
+                                    type="date"
+                                    value={editLastDonationDate}
+                                    onChange={(e) => setEditLastDonationDate(e.target.value)}
+                                    className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-800 font-bold shadow-sm"
+                                />
+                                <p className="text-xs text-slate-400 mt-1">Leave empty if the donor has not donated before.</p>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    onClick={() => setEditingDonor(null)}
+                                    className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold rounded-xl transition-all text-sm active:scale-95"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSaveDonorDate}
+                                    className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-100 transition-all text-sm active:scale-95"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
 
-function DonorsTable({ donors, onDelete }: { donors: any[], onDelete: (id: string) => void }) {
+function DonorsTable({ donors, onDelete, onEdit }: { donors: any[], onDelete: (id: string) => void, onEdit: (donor: any) => void }) {
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -338,7 +418,8 @@ function DonorsTable({ donors, onDelete }: { donors: any[], onDelete: (id: strin
                         <th className="px-6 py-4">Donor Profile</th>
                         <th className="px-6 py-4">Group</th>
                         <th className="px-6 py-4">Contact & Location</th>
-                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4">Eligibility Status</th>
+                        <th className="px-6 py-4">Availability</th>
                         <th className="px-6 py-4">Actions</th>
                     </tr>
                 </thead>
@@ -372,6 +453,30 @@ function DonorsTable({ donors, onDelete }: { donors: any[], onDelete: (id: strin
                                 </div>
                             </td>
                             <td className="px-6 py-4">
+                                <div className="space-y-1">
+                                    <span className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider ${
+                                        donor.eligibilityStatus === 'Eligible' ? 'text-emerald-700 bg-emerald-50 border border-emerald-100' : 'text-rose-700 bg-rose-50 border border-rose-100'
+                                    }`}>
+                                        {donor.eligibilityStatus || 'Eligible'}
+                                    </span>
+                                    {donor.lastDonationDate && (
+                                        <p className="text-[10px] text-slate-500 font-medium">
+                                            Last Donated: {new Date(donor.lastDonationDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </p>
+                                    )}
+                                    {donor.eligibleFromDate && (
+                                        <p className="text-[10px] text-slate-700 font-bold">
+                                            Eligible From: {new Date(donor.eligibleFromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </p>
+                                    )}
+                                    {donor.eligibilityStatus === 'Not Eligible' && donor.daysRemaining > 0 && (
+                                        <p className="text-[10px] text-rose-600 font-black animate-pulse">
+                                            ({donor.daysRemaining} days remaining)
+                                        </p>
+                                    )}
+                                </div>
+                            </td>
+                            <td className="px-6 py-4">
                                 <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
                                     donor.isAvailable ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
                                 }`}>
@@ -379,12 +484,22 @@ function DonorsTable({ donors, onDelete }: { donors: any[], onDelete: (id: strin
                                 </span>
                             </td>
                             <td className="px-6 py-4">
-                                <button
-                                    onClick={() => onDelete(donor._id)}
-                                    className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={() => onEdit(donor)}
+                                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Edit Donation Date"
+                                    >
+                                        <Calendar className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => onDelete(donor._id)}
+                                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                                        title="Delete Donor"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
