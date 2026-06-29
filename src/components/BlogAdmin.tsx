@@ -11,6 +11,8 @@ export default function BlogAdmin() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
 
+    const [migrating, setMigrating] = useState(false);
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -19,8 +21,73 @@ export default function BlogAdmin() {
         imageUrl: "",
         author: "",
         authorRole: "",
-        readTime: ""
+        readTime: "",
+        slug: ""
     });
+
+    const generateSlug = (title: string): string => {
+        return title
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')   // remove special chars
+            .replace(/\s+/g, '-')       // spaces to hyphens
+            .replace(/-+/g, '-')        // collapse multiple hyphens
+            .trim()
+            .slice(0, 80);              // max 80 characters
+    };
+
+    const handleTitleBlur = () => {
+        if (!formData.slug && formData.title) {
+            setFormData(prev => ({ ...prev, slug: generateSlug(formData.title) }));
+        }
+    };
+
+    const handleMigrateSlugs = async () => {
+        setMigrating(true);
+        try {
+            const token = getToken();
+            const headers = { Authorization: `Bearer ${token}` };
+
+            const res = await api.get("/blogs");
+            const allBlogs = res.data;
+            const postsToMigrate = allBlogs.filter((b: any) => !b.slug);
+
+            if (postsToMigrate.length === 0) {
+                alert("All existing blog posts already have slugs set!");
+                setMigrating(false);
+                return;
+            }
+
+            let successCount = 0;
+            let failureCount = 0;
+
+            for (const blog of postsToMigrate) {
+                const MAPPED_SLUGS: Record<string, string> = {
+                    "6a21c6b1fa1460edddd50e97": "pillora-platform-india-health-emergencies",
+                    "6a27ad5093de437bdc02a83c": "how-to-find-blood-donors-emergency-india",
+                    "6a2e514b7232fc73de4196c5": "ayushman-bharat-pm-jay-eligibility-guide-2026",
+                    "6a3684159f9c77ef71f660a4": "hospital-hidden-charges-patient-rights-india",
+                    "6a3c1f805a466b1ae5cdf1f7": "top-5-government-health-schemes-india-2026",
+                    "6a41e6f1450f74e133c7ce80": "indias-digital-health-revolution-2026-abha-telemedicine"
+                };
+                const generated = MAPPED_SLUGS[blog._id] || generateSlug(blog.title);
+                try {
+                    await api.patch(`/blogs/${blog._id}/slug`, { slug: generated }, { headers });
+                    successCount++;
+                } catch (error) {
+                    console.error(`Failed to migrate slug for blog ${blog._id}:`, error);
+                    failureCount++;
+                }
+            }
+
+            alert(`Migration completed!\nSuccess: ${successCount}\nFailure: ${failureCount}`);
+            fetchBlogs();
+        } catch (error) {
+            console.error("Migration failed:", error);
+            alert("Failed to complete migration");
+        } finally {
+            setMigrating(false);
+        }
+    };
 
     useEffect(() => {
         fetchBlogs();
@@ -51,7 +118,8 @@ export default function BlogAdmin() {
             imageUrl: blog.imageUrl || "",
             author: blog.author,
             authorRole: blog.authorRole || "",
-            readTime: blog.readTime
+            readTime: blog.readTime,
+            slug: blog.slug || ""
         });
         setEditingId(blog._id);
         setIsFormOpen(true);
@@ -85,7 +153,7 @@ export default function BlogAdmin() {
             }
 
             setFormData({
-                title: "", description: "", content: "", category: "", imageUrl: "", author: "", authorRole: "", readTime: ""
+                title: "", description: "", content: "", category: "", imageUrl: "", author: "", authorRole: "", readTime: "", slug: ""
             });
             setEditingId(null);
             setIsFormOpen(false);
@@ -111,17 +179,27 @@ export default function BlogAdmin() {
                     </div>
                 </div>
                 {!isFormOpen && (
-                    <button
-                        onClick={() => {
-                            setFormData({ title: "", description: "", content: "", category: "", imageUrl: "", author: "", authorRole: "", readTime: "" });
-                            setEditingId(null);
-                            setIsFormOpen(true);
-                        }}
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest shadow-xl shadow-blue-600/30 transition-all active:scale-95"
-                    >
-                        <Plus className="w-5 h-5" />
-                        Create Post
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={handleMigrateSlugs}
+                            disabled={loading || migrating}
+                            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-all active:scale-95 disabled:opacity-70"
+                        >
+                            {migrating ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                            Generate Slugs
+                        </button>
+                        <button
+                            onClick={() => {
+                                setFormData({ title: "", description: "", content: "", category: "", imageUrl: "", author: "", authorRole: "", readTime: "", slug: "" });
+                                setEditingId(null);
+                                setIsFormOpen(true);
+                            }}
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest shadow-xl shadow-blue-600/30 transition-all active:scale-95"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Create Post
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -147,7 +225,14 @@ export default function BlogAdmin() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Title</label>
-                                    <input required name="title" value={formData.title} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="Enter article title" />
+                                    <input required name="title" value={formData.title} onChange={handleInputChange} onBlur={handleTitleBlur} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="Enter article title" />
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">URL Slug</label>
+                                    <input name="slug" value={formData.slug} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="e.g. how-to-find-blood-donors-india" />
+                                    <p className="text-xs text-slate-500 font-medium mt-1">
+                                        Preview: <span className="text-blue-600 font-semibold font-jakarta">pillora.in/blog/{formData.slug || '[slug]'}</span>
+                                    </p>
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Description Summary</label>
