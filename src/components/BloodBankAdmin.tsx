@@ -553,7 +553,7 @@ export default function BloodBankAdmin() {
                                         Processed <span className="text-slate-950 font-black">{importResult.totalRows}</span> total rows from the Excel sheet.
                                     </p>
                                     <p className="text-[10px] text-slate-400 mt-1 font-semibold">
-                                        Expected Column Headers: Name, Age, Blood Group, Last Blood Donate Date, Address, City, Area
+                                        Expected Column Headers: Name, Age, Blood Group, Last Blood Donate Date, Phone Number, Address, City, Area
                                     </p>
                                 </div>
 
