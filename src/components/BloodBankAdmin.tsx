@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { getToken } from '@/lib/tokenStorage';
-import { Download, FileSpreadsheet, FileText, Users, Droplet, Calendar, Phone, MapPin, AlertCircle, Search, ChevronRight, Trash2 } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Users, Droplet, Calendar, Phone, MapPin, AlertCircle, Search, ChevronRight, Trash2, Upload } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -19,6 +19,9 @@ export default function BloodBankAdmin() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [editingDonor, setEditingDonor] = useState<any>(null);
     const [editLastDonationDate, setEditLastDonationDate] = useState<string>('');
+    const [importing, setImporting] = useState(false);
+    const [importResult, setImportResult] = useState<any>(null);
+    const [showImportModal, setShowImportModal] = useState(false);
 
     const stats = {
         totalDonors: totalDonors,
@@ -199,14 +202,27 @@ export default function BloodBankAdmin() {
             if (type === 'donors') {
                 headers = ['Name', 'Email', 'Blood Group', 'Age', 'Gender', 'Phone', 'City', 'Area', 'Available', 'Last Donation'];
                 rows = data.map((d: any) => [
-                    d.name, d.email, d.bloodGroup, d.age, d.gender,
-                    d.phone, d.city, d.area, d.isAvailable ? 'Yes' : 'No', d.lastDonationDate || 'N/A'
+                    d.name,
+                    d.email || 'N/A',
+                    d.bloodGroup,
+                    d.age,
+                    d.gender,
+                    d.phone || 'N/A',
+                    d.city,
+                    d.area,
+                    d.isAvailable ? 'Yes' : 'No',
+                    d.lastDonationDate ? new Date(d.lastDonationDate).toLocaleDateString() : 'N/A'
                 ]);
             } else {
-                headers = ['Patient', 'Requested By', 'Blood Group', 'Units', 'Hospital', 'City', 'Contact', 'Status', 'Urgent'];
+                headers = ['Patient Name', 'Blood Group', 'Units Needed', 'Location', 'Contact', 'Status', 'Date Required'];
                 rows = data.map((r: any) => [
-                    r.patientName, r.requestedBy, r.bloodGroup, r.units,
-                    r.hospitalAddress, r.city, r.contactNumber, r.status, r.isUrgent ? 'Yes' : 'No'
+                    r.patientName,
+                    r.bloodGroup,
+                    r.unitsRequired,
+                    `${r.hospitalName}, ${r.city}`,
+                    r.contactPhone,
+                    r.status,
+                    new Date(r.neededByDate).toLocaleDateString()
                 ]);
             }
 
@@ -214,16 +230,60 @@ export default function BloodBankAdmin() {
                 head: [headers],
                 body: rows,
                 startY: 28,
-                theme: 'grid',
-                headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
-                alternateRowStyles: { fillColor: [249, 250, 251] },
-                margin: { top: 28 }
+                theme: 'striped',
+                headStyles: { fillColor: [220, 20, 60] }
             });
 
             doc.save(`blood-${type}-${Date.now()}.pdf`);
         } catch (error) {
             console.error('PDF export failed:', error);
             alert('Failed to export to PDF');
+        }
+    };
+
+    const handleImportExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setImporting(true);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const token = getToken();
+            const res = await api.post('admin/donors/bulk-import', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            setImportResult(res.data);
+            setShowImportModal(true);
+            await fetchData();
+        } catch (error: any) {
+            console.error('Import failed:', error);
+            const errMsg = error.response?.data?.message || error.message || 'Unknown error occurred';
+            alert(`Import failed: ${errMsg}`);
+        } finally {
+            setImporting(false);
+            e.target.value = ''; // Reset file input
+        }
+    };
+
+    const handleDownloadTemplate = async () => {
+        try {
+            const token = getToken();
+            const response = await api.get('admin/donors/bulk-import/template', {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob'
+            });
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            saveAs(blob, 'bulk_donor_import_template.xlsx');
+        } catch (error: any) {
+            console.error('Failed to download template:', error);
+            alert('Failed to download template');
         }
     };
 
@@ -293,6 +353,44 @@ export default function BloodBankAdmin() {
                 )}
 
                 <div className="flex items-center gap-2">
+                    {activeTab === 'donors' && (
+                        <>
+                            <input
+                                type="file"
+                                id="bulk-import-input"
+                                accept=".xlsx"
+                                onChange={handleImportExcel}
+                                className="hidden"
+                            />
+                            <button
+                                onClick={() => document.getElementById('bulk-import-input')?.click()}
+                                disabled={importing}
+                                className="px-4 py-2.5 bg-purple-50 text-purple-600 border border-purple-100 rounded-xl hover:bg-purple-100 transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-wider disabled:opacity-50"
+                                title="Import from Excel (.xlsx)"
+                            >
+                                {importing ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        Importing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Upload className="w-4 h-4" />
+                                        Import Excel
+                                    </>
+                                )}
+                            </button>
+                            <button
+                                onClick={handleDownloadTemplate}
+                                className="px-4 py-2.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-wider"
+                                title="Download Sample Excel Template"
+                            >
+                                <Download className="w-4 h-4" />
+                                Sample Excel
+                            </button>
+                            <div className="w-[1px] h-6 bg-slate-200 mx-1" />
+                        </>
+                    )}
                     <button
                         onClick={() => downloadExcel(activeTab)}
                         className="p-2.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-colors"
@@ -399,6 +497,101 @@ export default function BloodBankAdmin() {
                                     className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-100 transition-all text-sm active:scale-95"
                                 >
                                     Save Changes
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Import Results Modal */}
+            <AnimatePresence>
+                {showImportModal && importResult && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
+                            onClick={() => setShowImportModal(false)}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="bg-white rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl relative z-10 border border-slate-100 flex flex-col max-h-[90vh]"
+                        >
+                            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                                <h3 className="font-extrabold text-xl text-slate-900">Bulk Donor Import Results</h3>
+                                <button 
+                                    onClick={() => setShowImportModal(false)}
+                                    className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                    <span className="font-bold text-lg">&times;</span>
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto py-6 space-y-6">
+                                {/* Statistics Summary Cards */}
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-center">
+                                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-wider mb-1">Imported</p>
+                                        <p className="text-3xl font-black text-emerald-950">{importResult.inserted}</p>
+                                    </div>
+                                    <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl text-center">
+                                        <p className="text-[10px] font-black text-amber-500 uppercase tracking-wider mb-1">Skipped (Exists)</p>
+                                        <p className="text-3xl font-black text-amber-950">{importResult.skipped}</p>
+                                    </div>
+                                    <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-center">
+                                        <p className="text-[10px] font-black text-rose-500 uppercase tracking-wider mb-1">Errors</p>
+                                        <p className="text-3xl font-black text-rose-950">{importResult.errors.length}</p>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                    <p className="text-xs text-slate-600 font-bold">
+                                        Processed <span className="text-slate-950 font-black">{importResult.totalRows}</span> total rows from the Excel sheet.
+                                    </p>
+                                    <p className="text-[10px] text-slate-400 mt-1 font-semibold">
+                                        Expected Column Headers: Name, Age, Blood Group, Last Blood Donate Date, Address, City, Area
+                                    </p>
+                                </div>
+
+                                {/* Errors Table */}
+                                {importResult.errors.length > 0 && (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-rose-600 font-black text-xs uppercase tracking-wider font-bold">
+                                            <AlertCircle className="w-4 h-4 text-rose-500" />
+                                            Import Errors Breakdown
+                                        </div>
+                                        <div className="border border-slate-100 rounded-2xl overflow-hidden max-h-[300px] overflow-y-auto">
+                                            <table className="w-full text-left border-collapse">
+                                                <thead>
+                                                    <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                        <th className="px-4 py-3 w-20">Row</th>
+                                                        <th className="px-4 py-3">Reason / Details</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-50 text-xs font-semibold text-slate-700">
+                                                    {importResult.errors.map((err: any, idx: number) => (
+                                                        <tr key={idx} className="hover:bg-rose-50/20">
+                                                            <td className="px-4 py-3 font-bold text-rose-600">Row {err.row}</td>
+                                                            <td className="px-4 py-3 text-slate-600 font-medium">{err.reason}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="pt-4 border-t border-slate-100 flex justify-end">
+                                <button
+                                    onClick={() => setShowImportModal(false)}
+                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-100 transition-all text-sm active:scale-95"
+                                >
+                                    Close Results
                                 </button>
                             </div>
                         </motion.div>
