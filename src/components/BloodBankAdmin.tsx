@@ -22,6 +22,11 @@ export default function BloodBankAdmin() {
     const [importing, setImporting] = useState(false);
     const [importResult, setImportResult] = useState<any>(null);
     const [showImportModal, setShowImportModal] = useState(false);
+    const [selectedDonors, setSelectedDonors] = useState<string[]>([]);
+
+    useEffect(() => {
+        setSelectedDonors([]);
+    }, [activeTab]);
 
     const stats = {
         totalDonors: totalDonors,
@@ -90,9 +95,37 @@ export default function BloodBankAdmin() {
             }
             setDonors(prev => prev.filter(d => d._id !== id));
             setTotalDonors(prev => Math.max(0, prev - 1));
+            setSelectedDonors(prev => prev.filter(sid => sid !== id));
             alert('Donor deleted successfully');
         } catch (error: any) {
             console.error('Failed to delete donor', error);
+            alert(`Delete failed: ${error.response?.data?.message || error.message}`);
+        }
+    };
+
+    const handleDeleteSelectedDonors = async () => {
+        if (selectedDonors.length === 0) return;
+        if (!window.confirm(`Are you sure you want to delete the ${selectedDonors.length} selected donor(s)?`)) return;
+        try {
+            const token = getToken();
+            await api.post(
+                'blood-bank/admin/donors/delete-many',
+                { ids: selectedDonors },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const deletedList = donors.filter(d => selectedDonors.includes(d._id));
+            const availableCount = deletedList.filter(d => d.isAvailable).length;
+
+            if (availableCount > 0) {
+                setAvailableDonors(prev => Math.max(0, prev - availableCount));
+            }
+            setDonors(prev => prev.filter(d => !selectedDonors.includes(d._id)));
+            setTotalDonors(prev => Math.max(0, prev - selectedDonors.length));
+            setSelectedDonors([]);
+            alert('Selected donors deleted successfully');
+        } catch (error: any) {
+            console.error('Failed to delete selected donors:', error);
             alert(`Delete failed: ${error.response?.data?.message || error.message}`);
         }
     };
@@ -420,10 +453,32 @@ export default function BloodBankAdmin() {
                     >
                         {activeTab === 'donors' ? (
                             <div className="space-y-4">
-                                <div className="px-6 pt-4">
+                                <div className="px-6 pt-4 flex justify-between items-center h-10">
                                     <p className="text-sm text-gray-600 font-bold">Total Donors in Database: {totalDonors}</p>
+                                    {selectedDonors.length > 0 && (
+                                        <button
+                                            onClick={handleDeleteSelectedDonors}
+                                            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-rose-100 active:scale-95 animate-in fade-in slide-in-from-top-2 duration-200"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            Delete Selected ({selectedDonors.length})
+                                        </button>
+                                    )}
                                 </div>
-                                <DonorsTable donors={donors} onDelete={handleDeleteDonor} onEdit={handleEditDonor} />
+                                <DonorsTable 
+                                    donors={donors} 
+                                    onDelete={handleDeleteDonor} 
+                                    onEdit={handleEditDonor} 
+                                    selectedDonors={selectedDonors}
+                                    onSelect={(id) => {
+                                        setSelectedDonors(prev => 
+                                            prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+                                        );
+                                    }}
+                                    onSelectAll={(ids) => {
+                                        setSelectedDonors(ids);
+                                    }}
+                                />
                                 {hasMore && (
                                     <div className="flex justify-center pb-6">
                                         <button
@@ -602,12 +657,42 @@ export default function BloodBankAdmin() {
     );
 }
 
-function DonorsTable({ donors, onDelete, onEdit }: { donors: any[], onDelete: (id: string) => void, onEdit: (donor: any) => void }) {
+function DonorsTable({ 
+    donors, 
+    onDelete, 
+    onEdit, 
+    selectedDonors, 
+    onSelect, 
+    onSelectAll 
+}: { 
+    donors: any[], 
+    onDelete: (id: string) => void, 
+    onEdit: (donor: any) => void, 
+    selectedDonors: string[], 
+    onSelect: (id: string) => void, 
+    onSelectAll: (ids: string[]) => void 
+}) {
+    const allSelected = donors.length > 0 && selectedDonors.length === donors.length;
+
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left">
                 <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <th className="px-6 py-4 w-12">
+                            <input
+                                type="checkbox"
+                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                                checked={allSelected}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        onSelectAll(donors.map(d => d._id));
+                                    } else {
+                                        onSelectAll([]);
+                                    }
+                                }}
+                            />
+                        </th>
                         <th className="px-6 py-4">Donor Profile</th>
                         <th className="px-6 py-4">Group</th>
                         <th className="px-6 py-4">Contact & Location</th>
@@ -619,6 +704,14 @@ function DonorsTable({ donors, onDelete, onEdit }: { donors: any[], onDelete: (i
                 <tbody className="divide-y divide-gray-50">
                     {donors.map((donor) => (
                         <tr key={donor._id} className="hover:bg-blue-50/30 transition-colors">
+                            <td className="px-6 py-4 w-12">
+                                <input
+                                    type="checkbox"
+                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                                    checked={selectedDonors.includes(donor._id)}
+                                    onChange={() => onSelect(donor._id)}
+                                />
+                            </td>
                             <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black">
@@ -698,7 +791,7 @@ function DonorsTable({ donors, onDelete, onEdit }: { donors: any[], onDelete: (i
                     ))}
                     {donors.length === 0 && (
                         <tr>
-                            <td colSpan={5} className="px-6 py-12 text-center text-gray-400 font-medium">No registered donors found.</td>
+                            <td colSpan={7} className="px-6 py-12 text-center text-gray-400 font-medium">No registered donors found.</td>
                         </tr>
                     )}
                 </tbody>
