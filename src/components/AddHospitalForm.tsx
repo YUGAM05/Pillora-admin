@@ -21,6 +21,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
         city: hospitalToEdit?.city || "",
         address: hospitalToEdit?.address || "",
         consultationFee: hospitalToEdit?.consultationFee?.toString() || "",
+        bedCapacity: hospitalToEdit?.bedCapacity?.toString() || "50",
         ambulanceContact: hospitalToEdit?.ambulanceContact || "",
         contactNumber: hospitalToEdit?.contactNumber || "",
         description: hospitalToEdit?.description || "",
@@ -152,6 +153,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                 ...formData,
                 slug: formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
                 consultationFee: Number(formData.consultationFee),
+                bedCapacity: Number(formData.bedCapacity),
                 images: formData.images.filter((img: string) => img.trim() !== ""),
                 phoneNumbers: formData.phoneNumbers.filter((ph: string) => ph.trim() !== ""),
             };
@@ -276,8 +278,8 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="space-y-2 col-span-2 md:col-span-1">
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-wider">City</label>
                                 <input
                                     required
@@ -302,6 +304,18 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                         className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900"
                                     />
                                 </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Total Beds</label>
+                                <input
+                                    required
+                                    type="number"
+                                    name="bedCapacity"
+                                    value={formData.bedCapacity}
+                                    onChange={handleChange}
+                                    placeholder="50"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900"
+                                />
                             </div>
                         </div>
 
