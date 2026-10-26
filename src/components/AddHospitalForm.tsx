@@ -15,6 +15,8 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
     const [uploadingPrimary, setUploadingPrimary] = useState(false);
     const [uploadingSecondary, setUploadingSecondary] = useState(false);
 
+    const todayStr = new Date().toISOString().split('T')[0];
+
     const [formData, setFormData] = useState({
         name: hospitalToEdit?.name || "",
         email: hospitalToEdit?.user?.email || hospitalToEdit?.email || "",
@@ -32,6 +34,13 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
         images: hospitalToEdit?.images || [] as string[],
         phoneNumbers: hospitalToEdit?.phoneNumbers || [] as string[],
         plan: hospitalToEdit?.plan || "Standard" as "Standard" | "Premium" | "Enterprise",
+        joiningDate: hospitalToEdit?.joiningDate ? new Date(hospitalToEdit.joiningDate).toISOString().split('T')[0] : todayStr,
+        paymentStatus: hospitalToEdit?.paymentStatus || "Pending" as "Pending" | "Paid",
+        paymentReceivedDate: todayStr,
+        paymentAmount: "5000",
+        paymentMethod: "UPI",
+        transactionReference: "",
+        adminNotes: "",
         doctors: [] as { name: string; specialization: string; timing: string; daysAvailable: string[] }[],
     });
 
@@ -154,6 +163,8 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                 slug: formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
                 consultationFee: Number(formData.consultationFee),
                 bedCapacity: Number(formData.bedCapacity),
+                paymentAmount: Number(formData.paymentAmount) || 0,
+                subscriptionDurationDays: 30,
                 images: formData.images.filter((img: string) => img.trim() !== ""),
                 phoneNumbers: formData.phoneNumbers.filter((ph: string) => ph.trim() !== ""),
             };
@@ -532,6 +543,184 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Subscription & Payment Management Section */}
+            <div className="p-6 bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/40 rounded-2xl border border-indigo-100 shadow-sm space-y-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-indigo-100/70 pb-4">
+                    <div>
+                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <CreditCard className="w-5 h-5 text-indigo-600" />
+                            Hospital Subscription & 30-Day Payment Setup
+                        </h3>
+                        <p className="text-xs text-gray-500 font-medium mt-0.5">
+                            Each hospital operates on a strict 30-day payment cycle. Slot generation requires an active subscription.
+                        </p>
+                    </div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-100/70 text-indigo-700 rounded-xl text-xs font-black uppercase tracking-wider self-start md:self-auto">
+                        <Clock className="w-3.5 h-3.5" />
+                        30-Day Cycle
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Joining Date */}
+                    <div className="space-y-2">
+                        <label className="text-xs font-black text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-indigo-600" />
+                            Hospital Joining Date <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="date"
+                            required
+                            name="joiningDate"
+                            value={formData.joiningDate}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-medium text-gray-900 shadow-sm"
+                        />
+                        <p className="text-[11px] text-gray-400">Official onboarding date with Pillora network</p>
+                    </div>
+
+                    {/* Subscription Duration */}
+                    <div className="space-y-2">
+                        <label className="text-xs font-black text-gray-700 uppercase tracking-wider">
+                            Subscription Duration
+                        </label>
+                        <div className="w-full px-4 py-3 bg-gray-100/80 border border-gray-200 rounded-xl font-bold text-gray-700 flex items-center justify-between">
+                            <span>30 Calendar Days</span>
+                            <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-gray-200 text-gray-600 rounded">Standard</span>
+                        </div>
+                        <p className="text-[11px] text-gray-400">Automatically calculated upon payment confirmation</p>
+                    </div>
+
+                    {/* Payment Status Selector */}
+                    <div className="space-y-2">
+                        <label className="text-xs font-black text-gray-700 uppercase tracking-wider">
+                            Initial Payment Status <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="paymentStatus"
+                            value={formData.paymentStatus}
+                            onChange={handleChange}
+                            className={`w-full px-4 py-3 border rounded-xl font-bold transition-all outline-none shadow-sm ${
+                                formData.paymentStatus === 'Paid'
+                                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 focus:ring-emerald-500/20'
+                                    : 'bg-amber-50 border-amber-300 text-amber-800 focus:ring-amber-500/20'
+                            }`}
+                        >
+                            <option value="Pending">Pending Payment (Default)</option>
+                            <option value="Paid">Payment Received (Activate 30 Days)</option>
+                        </select>
+                        <p className="text-[11px] text-gray-400">
+                            {formData.paymentStatus === 'Pending' ? 'Slot generation blocked until confirmed' : 'Activates immediate 30-day cycle'}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Conditional Payment Details if Paid */}
+                {formData.paymentStatus === 'Paid' && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="p-5 bg-white border border-emerald-200 rounded-xl space-y-4 shadow-sm"
+                    >
+                        <div className="flex items-center gap-2 text-xs font-black text-emerald-700 uppercase tracking-wider border-b border-emerald-100 pb-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            Confirmed Payment Details (Separate from Joining Date)
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-600 uppercase">Payment Received Date *</label>
+                                <input
+                                    type="date"
+                                    required={formData.paymentStatus === 'Paid'}
+                                    name="paymentReceivedDate"
+                                    value={formData.paymentReceivedDate}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-600 uppercase">Amount (₹) *</label>
+                                <input
+                                    type="number"
+                                    required={formData.paymentStatus === 'Paid'}
+                                    name="paymentAmount"
+                                    value={formData.paymentAmount}
+                                    onChange={handleChange}
+                                    placeholder="5000"
+                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-600 uppercase">Payment Method *</label>
+                                <select
+                                    name="paymentMethod"
+                                    value={formData.paymentMethod}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                >
+                                    <option value="UPI">UPI / QR</option>
+                                    <option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Card">Credit / Debit Card</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-600 uppercase">Transaction Ref / UTR</label>
+                                <input
+                                    type="text"
+                                    name="transactionReference"
+                                    value={formData.transactionReference}
+                                    onChange={handleChange}
+                                    placeholder="e.g. UTR12345678"
+                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-gray-600 uppercase">Admin Notes / Receipt Remarks</label>
+                            <input
+                                type="text"
+                                name="adminNotes"
+                                value={formData.adminNotes}
+                                onChange={handleChange}
+                                placeholder="e.g. Initial 30-day subscription payment confirmed via HDFC UPI"
+                                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                            />
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Status Indicator Summary */}
+                <div className={`p-3 rounded-xl border flex items-center justify-between text-xs font-bold ${
+                    formData.paymentStatus === 'Paid'
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                        : 'bg-amber-50 border-amber-200 text-amber-800'
+                }`}>
+                    <div className="flex items-center gap-2">
+                        {formData.paymentStatus === 'Paid' ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                            <Clock className="w-4 h-4 text-amber-600" />
+                        )}
+                        <span>
+                            {formData.paymentStatus === 'Paid'
+                                ? 'Subscription Status will be Active: Hospital can immediately generate & publish appointment slots.'
+                                : 'Subscription Status will be Pending Payment: Hospital slot generation will be locked until payment is recorded.'}
+                        </span>
+                    </div>
+                    <span className="uppercase text-[10px] tracking-wider px-2 py-0.5 rounded font-black bg-white/70">
+                        {formData.paymentStatus === 'Paid' ? 'Active (30 Days)' : 'Pending Payment'}
+                    </span>
                 </div>
             </div>
 

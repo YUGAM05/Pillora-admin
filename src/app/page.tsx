@@ -32,11 +32,13 @@ import {
     Settings,
     FileText,
     MessageSquare,
-    DollarSign
+    DollarSign,
+    CreditCard
 } from "lucide-react";
 import BloodBankAdmin from "@/components/BloodBankAdmin";
 import AddHospitalForm from "@/components/AddHospitalForm";
 import HospitalListAdmin from "@/components/HospitalListAdmin";
+import HospitalSubscriptionsAdmin from "@/components/HospitalSubscriptionsAdmin";
 import PartnerInquiriesAdmin from "@/components/PartnerInquiriesAdmin";
 import BlogAdmin from "@/components/BlogAdmin";
 import AnalyticsAdmin from "@/components/AnalyticsAdmin";
@@ -72,7 +74,7 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
 };
 
-type TabId = 'overview' | 'analytics' | 'login-analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'partners' | 'blogs' | 'tickets' | 'health-hub' | 'revenue';
+type TabId = 'overview' | 'analytics' | 'login-analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'subscriptions' | 'partners' | 'blogs' | 'tickets' | 'health-hub' | 'revenue';
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -219,6 +221,7 @@ export default function AdminDashboard() {
         { id: 'approvals', label: 'User Approvals', icon: Lock, color: 'text-amber-500', badge: pendingUsers.length },
         { id: 'bloodbank', label: 'Blood Connect', icon: Droplets, color: 'text-rose-500' },
         { id: 'hospitals', label: 'Hospitals', icon: Building2, color: 'text-indigo-600' },
+        { id: 'subscriptions', label: 'Subscriptions & Payments', icon: CreditCard, color: 'text-blue-600' },
         { id: 'partners', label: 'Partnerships', icon: Handshake, color: 'text-emerald-600' },
         { id: 'blogs', label: 'Blog Posts', icon: FileText, color: 'text-purple-600' },
         { id: 'health-hub', label: 'Health Hub', icon: Heart, color: 'text-rose-500' },
@@ -651,6 +654,12 @@ export default function AdminDashboard() {
                                              </motion.div>
                                          )}
                                     </AnimatePresence>
+                                </div>
+                            )}
+
+                            {activeTab === 'subscriptions' && (
+                                <div className="space-y-8">
+                                    <HospitalSubscriptionsAdmin />
                                 </div>
                             )}
 
