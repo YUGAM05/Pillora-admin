@@ -123,9 +123,11 @@ export default function HospitalSubscriptionsAdmin() {
     const fetchSummary = useCallback(async () => {
         try {
             const res = await api.get("/admin/subscriptions/summary");
-            setSummary(res.data);
+            if (res.data) {
+                setSummary(res.data);
+            }
         } catch (err: any) {
-            console.error("Failed to fetch subscription summary", err);
+            console.error("Failed to fetch subscription summary, will compute from hospitals if needed", err);
         }
     }, []);
 
@@ -139,10 +141,88 @@ export default function HospitalSubscriptionsAdmin() {
             if (paymentFilter !== "all") params.paymentStatus = paymentFilter;
 
             const res = await api.get("/admin/subscriptions", { params });
-            setHospitals(res.data.hospitals || []);
+            const list = Array.isArray(res.data) 
+                ? res.data 
+                : (Array.isArray(res.data?.hospitals) ? res.data.hospitals : []);
+            setHospitals(list);
         } catch (err: any) {
-            console.error("Failed to fetch hospital subscriptions", err);
-            setError(err.response?.data?.message || "Failed to load hospital subscriptions");
+            console.warn("Direct /admin/subscriptions endpoint returned error, trying fallback to /hospitals", err);
+            try {
+                // Resilient fallback to /hospitals so admin panel never shows blank/error during transitions
+                const fallbackRes = await api.get("/hospitals");
+                const rawList = Array.isArray(fallbackRes.data) ? fallbackRes.data : [];
+                const now = new Date();
+                
+                const mapped: IHospitalSub[] = rawList.map((h: any) => {
+                    const pStatus = (h.paymentStatus === 'Paid' ? 'Paid' : 'Pending') as 'Paid' | 'Pending';
+                    const jDate = h.joiningDate || h.createdAt;
+                    const sExpiry = h.subscriptionExpiryDate ? new Date(h.subscriptionExpiryDate) : null;
+                    let sStatus: 'Active' | 'Pending Payment' | 'Expiring Soon' | 'Expired' = 'Pending Payment';
+                    let daysRem = 0;
+
+                    if (pStatus === 'Pending' || !sExpiry) {
+                        sStatus = 'Pending Payment';
+                        daysRem = 0;
+                    } else {
+                        daysRem = Math.ceil((sExpiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                        if (daysRem <= 0) {
+                            sStatus = 'Expired';
+                            daysRem = 0;
+                        } else if (daysRem <= 5) {
+                            sStatus = 'Expiring Soon';
+                        } else {
+                            sStatus = 'Active';
+                        }
+                    }
+
+                    return {
+                        _id: h._id,
+                        name: h.name,
+                        city: h.city || '',
+                        contactNumber: h.contactNumber,
+                        joiningDate: jDate,
+                        subscriptionDurationDays: h.subscriptionDurationDays || 30,
+                        paymentStatus: pStatus,
+                        subscriptionStatus: sStatus,
+                        lastPaymentDate: h.lastPaymentDate,
+                        subscriptionStartDate: h.subscriptionStartDate,
+                        subscriptionExpiryDate: h.subscriptionExpiryDate,
+                        daysRemaining: daysRem,
+                        lastPaymentAmount: h.lastPaymentAmount,
+                        lastPaymentMethod: h.lastPaymentMethod,
+                        lastPaymentReference: h.lastPaymentReference,
+                        adminNotes: h.adminNotes || '',
+                    };
+                });
+
+                // Apply search and filter on fallback data if needed
+                let filtered = mapped;
+                if (search.trim()) {
+                    const term = search.trim().toLowerCase();
+                    filtered = filtered.filter(h => h.name.toLowerCase().includes(term) || h.city.toLowerCase().includes(term));
+                }
+                if (statusFilter !== "all") {
+                    filtered = filtered.filter(h => h.subscriptionStatus.toLowerCase() === statusFilter.toLowerCase());
+                }
+                if (paymentFilter !== "all") {
+                    filtered = filtered.filter(h => h.paymentStatus.toLowerCase() === paymentFilter.toLowerCase());
+                }
+
+                setHospitals(filtered);
+
+                // Populate summary if summary endpoint had failed
+                setSummary(prev => prev || {
+                    totalHospitals: mapped.length,
+                    activeSubscriptions: mapped.filter(m => m.subscriptionStatus === 'Active').length,
+                    pendingPayments: mapped.filter(m => m.paymentStatus === 'Pending').length,
+                    expiringWithin5Days: mapped.filter(m => m.subscriptionStatus === 'Expiring Soon').length,
+                    expiredSubscriptions: mapped.filter(m => m.subscriptionStatus === 'Expired').length,
+                    paymentsReceivedThisMonth: 0
+                });
+            } catch (fallbackErr: any) {
+                console.error("Both subscription endpoint and hospitals fallback failed", fallbackErr);
+                setError(err.response?.data?.message || "Failed to load hospital subscriptions. Please check backend connection.");
+            }
         } finally {
             setLoading(false);
         }
