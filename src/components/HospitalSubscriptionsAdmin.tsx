@@ -124,7 +124,15 @@ export default function HospitalSubscriptionsAdmin() {
         try {
             const res = await api.get("/admin/subscriptions/summary");
             if (res.data) {
-                setSummary(res.data);
+                const raw = res.data;
+                setSummary({
+                    totalHospitals: raw.totalHospitals ?? raw.totalRegisteredHospitals ?? 0,
+                    activeSubscriptions: raw.activeSubscriptions ?? 0,
+                    pendingPayments: raw.pendingPayments ?? 0,
+                    expiringWithin5Days: raw.expiringWithin5Days ?? 0,
+                    expiredSubscriptions: raw.expiredSubscriptions ?? 0,
+                    paymentsReceivedThisMonth: raw.paymentsReceivedThisMonth ?? raw.paymentsThisMonth?.totalAmount ?? 0,
+                });
             }
         } catch (err: any) {
             console.error("Failed to fetch subscription summary, will compute from hospitals if needed", err);
@@ -235,7 +243,7 @@ export default function HospitalSubscriptionsAdmin() {
 
     // Handle Sorting
     const sortedHospitals = useMemo(() => {
-        const list = [...hospitals];
+        const list = Array.isArray(hospitals) ? [...hospitals] : [];
         if (sortBy === "expiry_asc") {
             return list.sort((a, b) => {
                 if (!a.subscriptionExpiryDate) return 1;
@@ -251,10 +259,10 @@ export default function HospitalSubscriptionsAdmin() {
             });
         }
         if (sortBy === "days_asc") {
-            return list.sort((a, b) => a.daysRemaining - b.daysRemaining);
+            return list.sort((a, b) => (a.daysRemaining || 0) - (b.daysRemaining || 0));
         }
         if (sortBy === "name_asc") {
-            return list.sort((a, b) => a.name.localeCompare(b.name));
+            return list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
         }
         if (sortBy === "joining_desc") {
             return list.sort((a, b) => {
@@ -397,7 +405,9 @@ export default function HospitalSubscriptionsAdmin() {
     const formatDate = (dateStr?: string) => {
         if (!dateStr) return "—";
         try {
-            return new Date(dateStr).toLocaleDateString("en-IN", {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return "—";
+            return d.toLocaleDateString("en-IN", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric"
@@ -511,7 +521,7 @@ export default function HospitalSubscriptionsAdmin() {
                             <span className="text-[11px] font-bold uppercase tracking-wider">Total Hospitals</span>
                             <Building2 className="w-4 h-4 text-slate-400" />
                         </div>
-                        <p className="text-2xl font-black text-slate-900">{summary.totalHospitals}</p>
+                        <p className="text-2xl font-black text-slate-900">{summary.totalHospitals ?? 0}</p>
                         <p className="text-[10px] text-slate-400 font-medium">Registered in network</p>
                     </div>
 
@@ -520,7 +530,7 @@ export default function HospitalSubscriptionsAdmin() {
                             <span className="text-[11px] font-bold uppercase tracking-wider">Active</span>
                             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                         </div>
-                        <p className="text-2xl font-black text-emerald-700">{summary.activeSubscriptions}</p>
+                        <p className="text-2xl font-black text-emerald-700">{summary.activeSubscriptions ?? 0}</p>
                         <p className="text-[10px] text-emerald-600 font-medium">Slots enabled</p>
                     </div>
 
@@ -529,7 +539,7 @@ export default function HospitalSubscriptionsAdmin() {
                             <span className="text-[11px] font-bold uppercase tracking-wider">Pending Pay</span>
                             <Clock className="w-4 h-4 text-amber-500" />
                         </div>
-                        <p className="text-2xl font-black text-amber-700">{summary.pendingPayments}</p>
+                        <p className="text-2xl font-black text-amber-700">{summary.pendingPayments ?? 0}</p>
                         <p className="text-[10px] text-amber-600 font-medium">Awaiting confirmation</p>
                     </div>
 
@@ -538,7 +548,7 @@ export default function HospitalSubscriptionsAdmin() {
                             <span className="text-[11px] font-bold uppercase tracking-wider">Expiring &le; 5 Days</span>
                             <AlertTriangle className="w-4 h-4 text-orange-500" />
                         </div>
-                        <p className="text-2xl font-black text-orange-700">{summary.expiringWithin5Days}</p>
+                        <p className="text-2xl font-black text-orange-700">{summary.expiringWithin5Days ?? 0}</p>
                         <p className="text-[10px] text-orange-600 font-medium">Needs renewal soon</p>
                     </div>
 
@@ -547,7 +557,7 @@ export default function HospitalSubscriptionsAdmin() {
                             <span className="text-[11px] font-bold uppercase tracking-wider">Expired</span>
                             <CalendarX className="w-4 h-4 text-rose-500" />
                         </div>
-                        <p className="text-2xl font-black text-rose-700">{summary.expiredSubscriptions}</p>
+                        <p className="text-2xl font-black text-rose-700">{summary.expiredSubscriptions ?? 0}</p>
                         <p className="text-[10px] text-rose-600 font-medium">Slot gen blocked</p>
                     </div>
 
@@ -556,7 +566,7 @@ export default function HospitalSubscriptionsAdmin() {
                             <span className="text-[11px] font-bold uppercase tracking-wider">Paid This Month</span>
                             <IndianRupee className="w-4 h-4 text-indigo-500" />
                         </div>
-                        <p className="text-2xl font-black text-indigo-700">₹{summary.paymentsReceivedThisMonth.toLocaleString('en-IN')}</p>
+                        <p className="text-2xl font-black text-indigo-700">₹{(Number(summary.paymentsReceivedThisMonth) || 0).toLocaleString('en-IN')}</p>
                         <p className="text-[10px] text-indigo-600 font-medium">Current cycle revenue</p>
                     </div>
                 </div>
@@ -676,7 +686,7 @@ export default function HospitalSubscriptionsAdmin() {
                                             </div>
                                             {h.lastPaymentAmount ? (
                                                 <div className="text-[11px] text-emerald-600 font-bold">
-                                                    ₹{h.lastPaymentAmount.toLocaleString('en-IN')} via {h.lastPaymentMethod || 'UPI'}
+                                                    ₹{(Number(h.lastPaymentAmount) || 0).toLocaleString('en-IN')} via {h.lastPaymentMethod || 'UPI'}
                                                 </div>
                                             ) : (
                                                 <div className="text-[10px] text-amber-600 font-semibold">No payment on file</div>
@@ -937,7 +947,7 @@ export default function HospitalSubscriptionsAdmin() {
                                                         {formatDate(rec.paymentDate)}
                                                     </td>
                                                     <td className="py-3 px-3 whitespace-nowrap font-black text-emerald-600">
-                                                        ₹{rec.amount.toLocaleString('en-IN')}
+                                                        ₹{(Number(rec.amount) || 0).toLocaleString('en-IN')}
                                                     </td>
                                                     <td className="py-3 px-3">
                                                         <div className="font-semibold text-slate-800">{rec.paymentMethod}</div>
