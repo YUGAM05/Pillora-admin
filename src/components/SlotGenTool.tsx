@@ -69,7 +69,7 @@ export default function SlotGenTool({ doctor, hospitalId, onClose }: SlotGenTool
                 />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                         <Clock className="w-3 h-3" /> Start
@@ -98,7 +98,7 @@ export default function SlotGenTool({ doctor, hospitalId, onClose }: SlotGenTool
 
             <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Consultation Duration</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {[5, 10, 15, 20, 30, 45, 60].map((mins) => (
                         <button
                             key={mins}

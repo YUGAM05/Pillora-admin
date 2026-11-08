@@ -134,14 +134,14 @@ export default function LoginPage() {
 
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] p-6 relative overflow-hidden">
+        <div className="flex min-h-screen items-center justify-center bg-[#f8fafc] p-4 sm:p-6 relative overflow-hidden">
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-400/5 blur-[120px] rounded-full" />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md bg-white border border-gray-100 p-10 rounded-[2.5rem] shadow-2xl relative z-10"
+                className="w-full max-w-md bg-white border border-gray-100 p-6 sm:p-10 rounded-3xl sm:rounded-[2.5rem] shadow-2xl relative z-10"
             >
                 <div className="text-center mb-8">
                     <div className="mb-6 flex justify-center">
@@ -149,7 +149,7 @@ export default function LoginPage() {
                             <Image src="/pillora-logo-v2.svg" alt="Pillora" fill className="object-contain" />
                         </div>
                     </div>
-                    <h2 className="text-3xl font-black text-gray-900 tracking-tight">
+                    <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
                         {mfaStep ? 'Admin Verification' : 'Welcome Back'}
                     </h2>
                     <p className="text-gray-500 mt-2 text-sm font-medium">

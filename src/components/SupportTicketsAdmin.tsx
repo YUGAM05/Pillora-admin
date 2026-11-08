@@ -122,7 +122,7 @@ export default function SupportTicketsAdmin() {
     return (
         <div className="space-y-8 font-sans">
             {/* Status Tabs */}
-            <div className="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+            <div className="flex items-center gap-2 bg-slate-50 p-1.5 sm:p-2 rounded-2xl border border-slate-100 overflow-x-auto no-scrollbar">
                 {[
                     { id: 'all', label: 'All Tickets', icon: BookOpen },
                     { id: 'Open', label: 'Open', icon: AlertCircle },
@@ -133,7 +133,7 @@ export default function SupportTicketsAdmin() {
                     <button
                         key={tab.id}
                         onClick={() => setFilter(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
                             filter === tab.id 
                             ? 'bg-white text-blue-600 shadow-lg shadow-blue-900/5' 
                             : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/50'
@@ -171,36 +171,36 @@ export default function SupportTicketsAdmin() {
                             >
                                 {/* Header Bar */}
                                 <div 
-                                    className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                    className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
                                     onClick={() => toggleExpand(ticket._id)}
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner bg-blue-50 text-blue-600`}>
-                                            <MessageSquare className="w-7 h-7" />
+                                    <div className="flex items-center gap-3 sm:gap-4">
+                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner bg-blue-50 text-blue-600">
+                                            <MessageSquare className="w-6 h-6 sm:w-7 sm:h-7" />
                                         </div>
                                         <div>
-                                            <div className="flex items-center gap-3">
-                                                <h4 className="font-black text-gray-900 text-lg leading-tight">{ticket.subject}</h4>
-                                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(ticket.status)}`}>
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                                <h4 className="font-black text-gray-900 text-base sm:text-lg leading-tight">{ticket.subject}</h4>
+                                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(ticket.status)}`}>
                                                     {ticket.status}
                                                 </span>
                                                 <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-semibold">
                                                     {ticket.type || 'Refund Inquiry'}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 font-medium">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs sm:text-sm text-gray-500 font-medium">
                                                 <span className="flex items-center gap-1">
                                                     <User className="w-3.5 h-3.5" /> 
                                                     {ticket.guestName || ticket.userId?.name || 'Guest User'}
                                                     {ticket.guestName && <span className="ml-1.5 px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[9px] font-bold uppercase tracking-wider">Guest</span>}
                                                 </span>
                                                 <span className="text-gray-300">•</span>
-                                                <span className="text-xs">{ticket.guestEmail || ticket.userId?.email || 'No Email'}</span>
+                                                <span className="text-xs truncate">{ticket.guestEmail || ticket.userId?.email || 'No Email'}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 self-end md:self-auto">
                                         <div className="text-right hidden md:block">
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Created On</p>
                                             <p className="text-xs font-bold text-gray-700">
@@ -214,8 +214,8 @@ export default function SupportTicketsAdmin() {
                                             </p>
                                         </div>
                                         <div className="h-10 w-[1px] bg-gray-100 mx-2 hidden md:block" />
-                                        <button className="p-3 bg-gray-50 rounded-2xl text-gray-400 hover:text-blue-600 transition-colors">
-                                            {expandedId === ticket._id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                        <button className="p-2.5 sm:p-3 bg-gray-50 rounded-xl sm:rounded-2xl text-gray-400 hover:text-blue-600 transition-colors">
+                                            {expandedId === ticket._id ? <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />}
                                         </button>
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ export default function SupportTicketsAdmin() {
                                             exit={{ height: 0, opacity: 0 }}
                                             className="border-t border-gray-50 bg-slate-50/30"
                                         >
-                                            <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
+                                            <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
                                                 {/* User Info Card */}
                                                 <div>
                                                     <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Requester Details</h5>

@@ -168,24 +168,24 @@ export default function BlogAdmin() {
 
     return (
         <div className="space-y-8 font-inter">
-            <div className="flex justify-between items-center bg-white p-8 rounded-3xl shadow-xl shadow-blue-900/5 border border-slate-100">
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
-                        <FileText className="w-7 h-7 text-blue-600" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl shadow-blue-900/5 border border-slate-100">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0">
+                        <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900 font-jakarta">Content Management</h2>
-                        <p className="text-slate-500 text-sm font-medium">Manage articles, updates, and medical blogs</p>
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-jakarta">Content Management</h2>
+                        <p className="text-slate-500 text-xs sm:text-sm font-medium">Manage articles, updates, and medical blogs</p>
                     </div>
                 </div>
                 {!isFormOpen && (
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap sm:flex-nowrap gap-2.5 sm:gap-4 w-full sm:w-auto">
                         <button
                             onClick={handleMigrateSlugs}
                             disabled={loading || migrating}
-                            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-all active:scale-95 disabled:opacity-70"
+                            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all active:scale-95 disabled:opacity-70 whitespace-nowrap"
                         >
-                            {migrating ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                            {migrating ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : null}
                             Generate Slugs
                         </button>
                         <button
@@ -194,9 +194,9 @@ export default function BlogAdmin() {
                                 setEditingId(null);
                                 setIsFormOpen(true);
                             }}
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest shadow-xl shadow-blue-600/30 transition-all active:scale-95"
+                            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-blue-600/30 transition-all active:scale-95 whitespace-nowrap"
                         >
-                            <Plus className="w-5 h-5" />
+                            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                             Create Post
                         </button>
                     </div>
@@ -210,7 +210,7 @@ export default function BlogAdmin() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-100"
+                        className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-2xl border border-slate-100"
                     >
                         <div className="flex justify-between items-center mb-8">
                             <h3 className="text-xl font-bold text-slate-900">{editingId ? 'Edit Blog Post' : 'New Blog Post'}</h3>

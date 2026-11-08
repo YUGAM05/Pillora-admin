@@ -99,7 +99,7 @@ export default function PartnerInquiriesAdmin() {
     return (
         <div className="space-y-8">
             {/* Status Tabs */}
-            <div className="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+            <div className="flex items-center gap-2 bg-slate-50 p-1.5 sm:p-2 rounded-2xl border border-slate-100 overflow-x-auto no-scrollbar">
                 {[
                     { id: 'all', label: 'All Proposals', icon: Database },
                     { id: 'pending', label: 'Pending', icon: Clock },
@@ -110,7 +110,7 @@ export default function PartnerInquiriesAdmin() {
                     <button
                         key={tab.id}
                         onClick={() => setFilter(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
                             filter === tab.id 
                             ? 'bg-white text-blue-600 shadow-lg shadow-blue-900/5' 
                             : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/50'
@@ -148,38 +148,38 @@ export default function PartnerInquiriesAdmin() {
                             >
                                 {/* Main Header Bar */}
                                 <div 
-                                    className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                    className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
                                     onClick={() => toggleExpand(inquiry._id)}
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${inquiry.type === 'hospital' ? 'bg-blue-100 text-blue-600' : 'bg-rose-100 text-rose-600'}`}>
-                                            {inquiry.type === 'hospital' ? <Building2 className="w-7 h-7" /> : <Heart className="w-7 h-7" />}
+                                    <div className="flex items-center gap-3 sm:gap-4">
+                                        <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${inquiry.type === 'hospital' ? 'bg-blue-100 text-blue-600' : 'bg-rose-100 text-rose-600'}`}>
+                                            {inquiry.type === 'hospital' ? <Building2 className="w-6 h-6 sm:w-7 sm:h-7" /> : <Heart className="w-6 h-6 sm:w-7 sm:h-7" />}
                                         </div>
                                         <div>
-                                            <div className="flex items-center gap-3">
-                                                <h4 className="font-black text-gray-900 text-lg leading-tight">{inquiry.organizationName}</h4>
-                                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(inquiry.status)}`}>
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                                <h4 className="font-black text-gray-900 text-base sm:text-lg leading-tight">{inquiry.organizationName}</h4>
+                                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(inquiry.status)}`}>
                                                     {inquiry.status}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 font-medium">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs sm:text-sm text-gray-500 font-medium">
                                                 <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {inquiry.city}, {inquiry.area}</span>
                                                 <span className="text-gray-300">•</span>
-                                                <span className="flex items-center gap-1 uppercase text-xs tracking-tighter">
+                                                <span className="flex items-center gap-1 uppercase text-[10px] sm:text-xs tracking-tighter">
                                                     {inquiry.type === 'hospital' ? 'Healthcare Partner' : 'NGO / Blood Bank'}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 self-end md:self-auto">
                                         <div className="text-right hidden md:block">
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Received On</p>
                                             <p className="text-xs font-bold text-gray-700">{new Date(inquiry.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                                         </div>
                                         <div className="h-10 w-[1px] bg-gray-100 mx-2 hidden md:block" />
-                                        <button className="p-3 bg-gray-50 rounded-2xl text-gray-400 hover:text-primary transition-colors">
-                                            {expandedId === inquiry._id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                        <button className="p-2.5 sm:p-3 bg-gray-50 rounded-xl sm:rounded-2xl text-gray-400 hover:text-primary transition-colors">
+                                            {expandedId === inquiry._id ? <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />}
                                         </button>
                                     </div>
                                 </div>
@@ -193,7 +193,7 @@ export default function PartnerInquiriesAdmin() {
                                             exit={{ height: 0, opacity: 0 }}
                                             className="border-t border-gray-50 bg-slate-50/30"
                                         >
-                                            <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
+                                            <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
                                                 {/* Column 1: Contact Info */}
                                                 <div className="space-y-6">
                                                     <div>

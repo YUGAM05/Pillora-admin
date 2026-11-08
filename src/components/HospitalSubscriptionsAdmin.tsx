@@ -495,10 +495,10 @@ export default function HospitalSubscriptionsAdmin() {
             {/* Header Title Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight font-jakarta">
-                        Hospital Subscriptions & 30-Day Payment Cycles
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight font-jakarta">
+                        Hospital Subscriptions & 30-Day Cycles
                     </h2>
-                    <p className="text-slate-500 font-medium text-sm mt-1">
+                    <p className="text-slate-500 font-medium text-xs sm:text-sm mt-1">
                         Automated 30-day billing enforcement. Hospitals require an active subscription to generate and publish appointment slots.
                     </p>
                 </div>
@@ -515,66 +515,66 @@ export default function HospitalSubscriptionsAdmin() {
 
             {/* Section 7 Summary Cards */}
             {summary && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm space-y-1">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                    <div className="p-3.5 sm:p-5 bg-white border border-slate-100 rounded-2xl shadow-sm space-y-1">
                         <div className="flex items-center justify-between text-slate-400">
-                            <span className="text-[11px] font-bold uppercase tracking-wider">Total Hospitals</span>
+                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Hospitals</span>
                             <Building2 className="w-4 h-4 text-slate-400" />
                         </div>
-                        <p className="text-2xl font-black text-slate-900">{summary.totalHospitals ?? 0}</p>
+                        <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.totalHospitals ?? 0}</p>
                         <p className="text-[10px] text-slate-400 font-medium">Registered in network</p>
                     </div>
 
-                    <div className="p-5 bg-emerald-50/50 border border-emerald-100 rounded-2xl shadow-sm space-y-1">
+                    <div className="p-3.5 sm:p-5 bg-emerald-50/50 border border-emerald-100 rounded-2xl shadow-sm space-y-1">
                         <div className="flex items-center justify-between text-emerald-600">
-                            <span className="text-[11px] font-bold uppercase tracking-wider">Active</span>
+                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Active</span>
                             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                         </div>
-                        <p className="text-2xl font-black text-emerald-700">{summary.activeSubscriptions ?? 0}</p>
+                        <p className="text-xl sm:text-2xl font-black text-emerald-700">{summary.activeSubscriptions ?? 0}</p>
                         <p className="text-[10px] text-emerald-600 font-medium">Slots enabled</p>
                     </div>
 
-                    <div className="p-5 bg-amber-50/50 border border-amber-100 rounded-2xl shadow-sm space-y-1">
+                    <div className="p-3.5 sm:p-5 bg-amber-50/50 border border-amber-100 rounded-2xl shadow-sm space-y-1">
                         <div className="flex items-center justify-between text-amber-600">
-                            <span className="text-[11px] font-bold uppercase tracking-wider">Pending Pay</span>
+                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Pending Pay</span>
                             <Clock className="w-4 h-4 text-amber-500" />
                         </div>
-                        <p className="text-2xl font-black text-amber-700">{summary.pendingPayments ?? 0}</p>
+                        <p className="text-xl sm:text-2xl font-black text-amber-700">{summary.pendingPayments ?? 0}</p>
                         <p className="text-[10px] text-amber-600 font-medium">Awaiting confirmation</p>
                     </div>
 
-                    <div className="p-5 bg-orange-50/50 border border-orange-100 rounded-2xl shadow-sm space-y-1">
+                    <div className="p-3.5 sm:p-5 bg-orange-50/50 border border-orange-100 rounded-2xl shadow-sm space-y-1">
                         <div className="flex items-center justify-between text-orange-600">
-                            <span className="text-[11px] font-bold uppercase tracking-wider">Expiring &le; 5 Days</span>
+                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Expiring &le; 5 Days</span>
                             <AlertTriangle className="w-4 h-4 text-orange-500" />
                         </div>
-                        <p className="text-2xl font-black text-orange-700">{summary.expiringWithin5Days ?? 0}</p>
+                        <p className="text-xl sm:text-2xl font-black text-orange-700">{summary.expiringWithin5Days ?? 0}</p>
                         <p className="text-[10px] text-orange-600 font-medium">Needs renewal soon</p>
                     </div>
 
-                    <div className="p-5 bg-rose-50/50 border border-rose-100 rounded-2xl shadow-sm space-y-1">
+                    <div className="p-3.5 sm:p-5 bg-rose-50/50 border border-rose-100 rounded-2xl shadow-sm space-y-1">
                         <div className="flex items-center justify-between text-rose-600">
-                            <span className="text-[11px] font-bold uppercase tracking-wider">Expired</span>
+                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Expired</span>
                             <CalendarX className="w-4 h-4 text-rose-500" />
                         </div>
-                        <p className="text-2xl font-black text-rose-700">{summary.expiredSubscriptions ?? 0}</p>
+                        <p className="text-xl sm:text-2xl font-black text-rose-700">{summary.expiredSubscriptions ?? 0}</p>
                         <p className="text-[10px] text-rose-600 font-medium">Slot gen blocked</p>
                     </div>
 
-                    <div className="p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl shadow-sm space-y-1">
+                    <div className="p-3.5 sm:p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl shadow-sm space-y-1">
                         <div className="flex items-center justify-between text-indigo-600">
-                            <span className="text-[11px] font-bold uppercase tracking-wider">Paid This Month</span>
+                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Paid This Month</span>
                             <IndianRupee className="w-4 h-4 text-indigo-500" />
                         </div>
-                        <p className="text-2xl font-black text-indigo-700">₹{(Number(summary.paymentsReceivedThisMonth) || 0).toLocaleString('en-IN')}</p>
+                        <p className="text-xl sm:text-2xl font-black text-indigo-700">₹{(Number(summary.paymentsReceivedThisMonth) || 0).toLocaleString('en-IN')}</p>
                         <p className="text-[10px] text-indigo-600 font-medium">Current cycle revenue</p>
                     </div>
                 </div>
             )}
 
             {/* Filter & Search Bar */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     {/* Search */}
                     <div className="relative md:col-span-1">
                         <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
@@ -654,7 +654,7 @@ export default function HospitalSubscriptionsAdmin() {
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                        <table className="w-full text-left text-sm min-w-[760px]">
                             <thead className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-black uppercase text-slate-500 tracking-wider">
                                 <tr>
                                     <th className="py-4 px-6">Hospital Details</th>
@@ -754,11 +754,11 @@ export default function HospitalSubscriptionsAdmin() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-3xl max-w-xl w-full p-8 shadow-2xl space-y-6 relative border border-slate-100 max-h-[90vh] overflow-y-auto"
+                            className="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl space-y-6 relative border border-slate-100 max-h-[90vh] overflow-y-auto"
                         >
                             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                                 <div>
-                                    <h3 className="text-xl font-bold text-slate-900 font-jakarta">
+                                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta">
                                         Record Payment & Renew Subscription
                                     </h3>
                                     <p className="text-xs text-slate-500 font-medium">
@@ -780,7 +780,7 @@ export default function HospitalSubscriptionsAdmin() {
                                         <span>Renewal Policy: {previewRenewal.type}</span>
                                         <Clock className="w-4 h-4" />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4 text-xs pt-1">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs pt-1">
                                         <div>
                                             <span className="text-slate-400 font-semibold">Start Date:</span>
                                             <p className="font-bold text-slate-800">{previewRenewal.startDate}</p>
@@ -798,7 +798,7 @@ export default function HospitalSubscriptionsAdmin() {
 
                             {/* Payment Input Form */}
                             <form onSubmit={handleRecordPayment} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-700 uppercase">Payment Received Date *</label>
                                         <input
@@ -823,7 +823,7 @@ export default function HospitalSubscriptionsAdmin() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-700 uppercase">Payment Method *</label>
                                         <select
@@ -929,7 +929,7 @@ export default function HospitalSubscriptionsAdmin() {
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-xs">
+                                    <table className="w-full text-left text-xs min-w-[650px]">
                                         <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-500 tracking-wider">
                                             <tr>
                                                 <th className="py-3 px-3">Date</th>
@@ -1001,11 +1001,11 @@ export default function HospitalSubscriptionsAdmin() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl space-y-6 relative border border-slate-100"
+                            className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl space-y-6 relative border border-slate-100 max-h-[90vh] overflow-y-auto"
                         >
                             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                                 <div>
-                                    <h3 className="text-xl font-bold text-slate-900 font-jakarta">
+                                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta">
                                         Edit Subscription Details
                                     </h3>
                                     <p className="text-xs text-slate-500 font-medium">
@@ -1033,7 +1033,7 @@ export default function HospitalSubscriptionsAdmin() {
                                     <p className="text-[10px] text-slate-400">Official onboarding date</p>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     <div className="space-y-1.5">
                                         <label className="text-xs font-bold text-slate-700 uppercase">Start Date</label>
                                         <input

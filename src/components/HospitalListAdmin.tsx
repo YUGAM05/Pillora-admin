@@ -144,18 +144,18 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                 }`}
                             >
                                 {/* Header Section */}
-                                <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0 shadow-inner relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                                <div className="p-4 sm:p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0 shadow-inner relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
                                             {hospital.image ? (
                                                 <Image src={hospital.image} alt={hospital.name} fill className="object-cover" unoptimized />
                                             ) : (
-                                                <Building2 className="w-10 h-10 text-blue-600" />
+                                                <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
                                             )}
                                         </div>
                                         <div>
-                                            <div className="flex items-center gap-3">
-                                                <h4 className="font-black text-slate-900 text-xl tracking-tight leading-tight">{hospital.name}</h4>
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                                <h4 className="font-black text-slate-900 text-lg sm:text-xl tracking-tight leading-tight">{hospital.name}</h4>
                                                 {hospital.plan && (
                                                     <div className={`px-2 py-0.5 rounded-lg text-[10px] font-black border uppercase tracking-widest ${
                                                         hospital.plan === 'Enterprise' ? 'bg-amber-50 text-amber-600 border-amber-100' :
@@ -171,7 +171,7 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-4 mt-2">
+                                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2">
                                                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter">
                                                     <MapPin className="w-3.5 h-3.5 text-blue-500" /> {hospital.city}
                                                 </div>
@@ -181,7 +181,7 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter">
                                                     <User className="w-3.5 h-3.5 text-indigo-500" /> {hospital.doctors?.length || 0} Doctors
                                                 </div>
-                                                <div className="flex gap-2 ml-2">
+                                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                                     {hospital.is_featured && (
                                                         <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md text-[8px] font-black uppercase tracking-widest border border-indigo-100">Top Results</span>
                                                     )}
@@ -196,24 +196,24 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2 sm:gap-3 self-end md:self-auto">
                                          <button 
                                              onClick={() => onEdit(hospital)}
-                                             className="p-4 bg-slate-50 text-slate-300 hover:bg-blue-50 hover:text-blue-600 rounded-2xl transition-all group/edit"
+                                             className="p-3 sm:p-4 bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 rounded-xl sm:rounded-2xl transition-all group/edit"
                                              title="Edit Hospital Details"
                                          >
-                                             <Edit3 className="w-5 h-5 group-hover/edit:scale-110 transition-transform" />
+                                             <Edit3 className="w-4 h-4 sm:w-5 sm:h-5 group-hover/edit:scale-110 transition-transform" />
                                          </button>
                                          <button 
                                              onClick={() => handleDelete(hospital._id, hospital.name)}
-                                             className="p-4 bg-slate-50 text-slate-300 hover:bg-rose-50 hover:text-rose-600 rounded-2xl transition-all group/del"
+                                             className="p-3 sm:p-4 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 rounded-xl sm:rounded-2xl transition-all group/del"
                                              title="Delete Hospital"
                                          >
-                                             <Trash2 className="w-5 h-5 group-hover/del:rotate-12 transition-transform" />
+                                             <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 group-hover/del:rotate-12 transition-transform" />
                                          </button>
                                         <button 
                                             onClick={() => toggleExpand(hospital._id)}
-                                            className={`p-4 rounded-2xl transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
+                                            className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
                                                 expandedId === hospital._id 
                                                 ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' 
                                                 : 'bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600'
@@ -235,9 +235,9 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                             transition={{ duration: 0.4, ease: "circOut" }}
                                             className="border-t border-slate-50 bg-slate-50/30"
                                         >
-                                            <div className="p-8 md:p-12 space-y-12">
+                                            <div className="p-4 sm:p-8 md:p-12 space-y-6 sm:space-y-12">
                                                 {/* Top Grid: Info & Description */}
-                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12">
                                                     <div className="space-y-8">
                                                         <div>
                                                             <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Official Bio</h5>
@@ -362,24 +362,24 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                     </div>
 
                                                     {showAddDoctor === hospital._id && (
-                                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-8 bg-white rounded-[2rem] border-2 border-blue-100 shadow-xl shadow-blue-900/5">
-                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-4 sm:p-8 bg-white rounded-2xl sm:rounded-[2rem] border-2 border-blue-100 shadow-xl shadow-blue-900/5">
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
                                                                 <div className="space-y-2">
                                                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Doctor Name</label>
-                                                                    <input type="text" placeholder="Dr. Jane Smith" value={newDoctor.name} onChange={e => setNewDoctor({...newDoctor, name: e.target.value})} className="w-full p-4 bg-slate-50 border-none rounded-2xl font-bold outline-none" />
+                                                                    <input type="text" placeholder="Dr. Jane Smith" value={newDoctor.name} onChange={e => setNewDoctor({...newDoctor, name: e.target.value})} className="w-full p-3.5 sm:p-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl font-bold outline-none text-sm" />
                                                                 </div>
                                                                 <div className="space-y-2">
                                                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Specialization</label>
-                                                                    <input type="text" placeholder="Cardiologist" value={newDoctor.specialization} onChange={e => setNewDoctor({...newDoctor, specialization: e.target.value})} className="w-full p-4 bg-slate-50 border-none rounded-2xl font-bold outline-none" />
+                                                                    <input type="text" placeholder="Cardiologist" value={newDoctor.specialization} onChange={e => setNewDoctor({...newDoctor, specialization: e.target.value})} className="w-full p-3.5 sm:p-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl font-bold outline-none text-sm" />
                                                                 </div>
                                                                 <div className="space-y-2">
                                                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Consultation Fee</label>
-                                                                    <input type="number" value={newDoctor.fee} onChange={e => setNewDoctor({...newDoctor, fee: Number(e.target.value)})} className="w-full p-4 bg-slate-50 border-none rounded-2xl font-bold outline-none" />
+                                                                    <input type="number" value={newDoctor.fee} onChange={e => setNewDoctor({...newDoctor, fee: Number(e.target.value)})} className="w-full p-3.5 sm:p-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl font-bold outline-none text-sm" />
                                                                 </div>
                                                             </div>
-                                                            <div className="flex gap-3">
-                                                                <button onClick={() => handleAddDoctor(hospital._id)} className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-100">Confirm Appointment</button>
-                                                                <button onClick={() => setShowAddDoctor(null)} className="px-8 py-4 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200">Cancel</button>
+                                                            <div className="flex flex-col sm:flex-row gap-3">
+                                                                <button onClick={() => handleAddDoctor(hospital._id)} className="flex-1 py-3.5 sm:py-4 bg-blue-600 text-white rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-100">Confirm Appointment</button>
+                                                                <button onClick={() => setShowAddDoctor(null)} className="px-6 sm:px-8 py-3.5 sm:py-4 bg-slate-100 text-slate-500 rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200">Cancel</button>
                                                             </div>
                                                         </motion.div>
                                                     )}
@@ -452,9 +452,9 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
             {/* Slot Gen Modal for Admin */}
             {showSlotGen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl relative">
-                        <button onClick={() => setShowSlotGen(null)} className="absolute top-8 right-8 text-slate-300 hover:text-slate-900"><XCircle className="w-6 h-6" /></button>
-                        <h3 className="text-2xl font-black mb-8">System Slot Generator</h3>
+                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white w-full max-w-lg rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                        <button onClick={() => setShowSlotGen(null)} className="absolute top-5 right-5 sm:top-8 sm:right-8 text-slate-300 hover:text-slate-900"><XCircle className="w-6 h-6" /></button>
+                        <h3 className="text-xl sm:text-2xl font-black mb-6 sm:mb-8 pr-8">System Slot Generator</h3>
                         <SlotGenTool 
                             doctor={showSlotGen} 
                             hospitalId={showSlotGen.hospital} 

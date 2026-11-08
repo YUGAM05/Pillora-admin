@@ -239,11 +239,11 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 md:p-8 space-y-8 max-h-[80vh] overflow-y-auto custom-scrollbar shadow-2xl">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div>
-                    <h2 className="text-2xl font-black text-gray-900">{hospitalToEdit ? "Edit Hospital Details" : "Hospital Details"}</h2>
-                    <p className="text-sm text-gray-500 font-medium">
+                    <h2 className="text-xl sm:text-2xl font-black text-gray-900">{hospitalToEdit ? "Edit Hospital Details" : "Hospital Details"}</h2>
+                    <p className="text-xs sm:text-sm text-gray-500 font-medium">
                         {hospitalToEdit ? "Modify and update healthcare facility parameters" : "Provide comprehensive facility information"}
                     </p>
                 </div>
@@ -255,7 +255,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                 </motion.div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                 {/* Basic Info Section */}
                 <div className="space-y-6">
                     <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
@@ -630,7 +630,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                             Confirmed Payment Details (Separate from Joining Date)
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-bold text-gray-600 uppercase">Payment Received Date *</label>
                                 <input

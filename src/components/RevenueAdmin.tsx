@@ -373,38 +373,38 @@ export default function RevenueAdmin() {
         <div className="space-y-8 font-sans pb-20">
             {/* Header / Tabs */}
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-slate-100 pb-6">
-                <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100 overflow-x-auto max-w-full no-scrollbar">
                     <button
                         onClick={() => { setSelectedHospitalId(null); setActiveTab("dashboard"); }}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
                             activeTab === "dashboard" && !selectedHospitalId
                             ? 'bg-white text-blue-600 shadow-md border border-slate-100'
                             : 'text-slate-400 hover:text-slate-600'
                         }`}
                     >
-                        <Building2 className="w-4 h-4" />
+                        <Building2 className="w-4 h-4 shrink-0" />
                         Dashboard
                     </button>
                     <button
                         onClick={() => { setSelectedHospitalId(null); setActiveTab("history"); }}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
                             activeTab === "history" && !selectedHospitalId
                             ? 'bg-white text-blue-600 shadow-md border border-slate-100'
                             : 'text-slate-400 hover:text-slate-600'
                         }`}
                     >
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="w-4 h-4 shrink-0" />
                         History Log
                     </button>
                     <button
                         onClick={() => { setSelectedHospitalId(null); setActiveTab("analytics"); }}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all ${
                             activeTab === "analytics" && !selectedHospitalId
                             ? 'bg-white text-blue-600 shadow-md border border-slate-100'
                             : 'text-slate-400 hover:text-slate-600'
                         }`}
                     >
-                        <TrendingUp className="w-4 h-4" />
+                        <TrendingUp className="w-4 h-4 shrink-0" />
                         Analytics
                     </button>
                 </div>
@@ -413,8 +413,8 @@ export default function RevenueAdmin() {
                 {!selectedHospitalId && (
                     <div className="flex flex-wrap items-center gap-3.5 w-full xl:w-auto">
                         {/* Search */}
-                        <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-100 focus-within:bg-white focus-within:border-blue-200 transition-all w-full md:w-64">
-                            <Search className="w-4 h-4 text-slate-400" />
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-100 focus-within:bg-white focus-within:border-blue-200 transition-all w-full sm:w-64">
+                            <Search className="w-4 h-4 text-slate-400 shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Search by name, ID..."
@@ -425,36 +425,38 @@ export default function RevenueAdmin() {
                         </div>
 
                         {/* Date Filter selector */}
-                        <div className="flex items-center gap-2 bg-slate-50 rounded-2xl border border-slate-100 px-3 py-2">
-                            <Filter className="w-3.5 h-3.5 text-slate-400" />
-                            <select
-                                value={dateFilter}
-                                onChange={(e) => setDateFilter(e.target.value)}
-                                className="bg-transparent text-xs font-bold text-slate-700 outline-none cursor-pointer"
-                            >
-                                <option value="today">Today</option>
-                                <option value="yesterday">Yesterday</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                                <option value="custom">Custom Range</option>
-                            </select>
+                        <div className="flex items-center gap-2 bg-slate-50 rounded-2xl border border-slate-100 px-3 py-2 w-full sm:w-auto justify-between sm:justify-start">
+                            <div className="flex items-center gap-2">
+                                <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                <select
+                                    value={dateFilter}
+                                    onChange={(e) => setDateFilter(e.target.value)}
+                                    className="bg-transparent text-xs font-bold text-slate-700 outline-none cursor-pointer"
+                                >
+                                    <option value="today">Today</option>
+                                    <option value="yesterday">Yesterday</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                            </div>
                         </div>
 
                         {/* Custom Date Inputs */}
                         {dateFilter === "custom" && (
-                            <div className="flex items-center gap-2 animate-fadeIn">
+                            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 animate-fadeIn w-full sm:w-auto">
                                 <input
                                     type="date"
                                     value={customStart}
                                     onChange={(e) => setCustomStart(e.target.value)}
-                                    className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold"
+                                    className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold flex-1 sm:flex-none"
                                 />
                                 <span className="text-xs text-slate-400 font-bold">to</span>
                                 <input
                                     type="date"
                                     value={customEnd}
                                     onChange={(e) => setCustomEnd(e.target.value)}
-                                    className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold"
+                                    className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold flex-1 sm:flex-none"
                                 />
                             </div>
                         )}
@@ -492,12 +494,12 @@ export default function RevenueAdmin() {
                             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
                         </button>
 
-                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6">
                             <div>
                                 <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-black uppercase tracking-wider rounded-xl">
                                     Hospital Ledger
                                 </span>
-                                <h2 className="text-3xl font-extrabold tracking-tight font-jakarta mt-2">{hospitalDetails.hospitalName}</h2>
+                                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-jakarta mt-2 break-words">{hospitalDetails.hospitalName}</h2>
                             </div>
 
                             {/* Payout initiate button */}
@@ -509,55 +511,55 @@ export default function RevenueAdmin() {
                                     }
                                     setIsTransferModalOpen(true);
                                 }}
-                                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2.5 shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
+                                className="w-full sm:w-auto justify-center px-6 sm:px-8 py-3.5 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2.5 shadow-xl shadow-blue-500/20 active:scale-95 transition-all"
                             >
-                                <PlusCircle className="w-4.5 h-4.5" /> Transfer Payment ({selectedPaymentsForPayout.length} Selected)
+                                <PlusCircle className="w-4.5 h-4.5 shrink-0" /> Transfer Payment ({selectedPaymentsForPayout.length} Selected)
                             </button>
                         </div>
 
                         {/* Summary metrics cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Bookings</p>
-                                <h3 className="text-3xl font-black text-slate-900 mt-2">{hospitalDetails.dailySummary?.totalBookings}</h3>
+                                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">{hospitalDetails.dailySummary?.totalBookings}</h3>
                                 <p className="text-[10px] text-slate-400 font-semibold mt-1">Processed appointments</p>
                             </div>
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gross Online Advance</p>
-                                <h3 className="text-3xl font-black text-slate-900 mt-2">{formatCurrency(hospitalDetails.dailySummary?.grossCollection)}</h3>
-                                <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-400 font-semibold">
+                                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">{formatCurrency(hospitalDetails.dailySummary?.grossCollection)}</h3>
+                                <div className="flex flex-wrap items-center gap-2 mt-1 text-[10px] text-slate-400 font-semibold">
                                     <span className="text-emerald-600 flex items-center">✓ {hospitalDetails.dailySummary?.successfulPayments} Success</span>
                                     <span>•</span>
                                     <span className="text-rose-500">{hospitalDetails.dailySummary?.failedPayments} Failed</span>
                                 </div>
                             </div>
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Razorpay Charges + GST</p>
-                                <h3 className="text-3xl font-black text-slate-900 mt-2">
+                                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">
                                     {formatCurrency((hospitalDetails.dailySummary?.razorpayCharges || 0) + (hospitalDetails.dailySummary?.gst || 0))}
                                 </h3>
                                 <p className="text-[10px] text-slate-400 font-semibold mt-1">2% gateway fee + 18% GST</p>
                             </div>
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5 bg-gradient-to-br from-indigo-50/20 to-blue-50/10">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5 bg-gradient-to-br from-indigo-50/20 to-blue-50/10">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Net Settlement Amount</p>
-                                <h3 className="text-3xl font-black text-indigo-700 mt-2">{formatCurrency(hospitalDetails.dailySummary?.netSettlementAmount)}</h3>
+                                <h3 className="text-2xl sm:text-3xl font-black text-indigo-700 mt-2">{formatCurrency(hospitalDetails.dailySummary?.netSettlementAmount)}</h3>
                                 <p className="text-[10px] text-indigo-500 font-semibold mt-1">Eligible Date: {hospitalDetails.dailySummary?.settlementEligibleDate}</p>
                             </div>
                         </div>
 
                         {/* Hospital Secure Bank Credentials */}
-                        <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-xl shadow-slate-900/5 space-y-6">
-                            <div className="flex justify-between items-center border-b border-slate-50 pb-4">
+                        <div className="bg-white border border-slate-100 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-xl shadow-slate-900/5 space-y-6">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-50 pb-4">
                                 <div>
                                     <h3 className="text-lg font-bold text-slate-950">Secure Bank Credentials</h3>
                                     <p className="text-xs text-slate-400 font-semibold mt-0.5">Encrypted records for IMPS/NEFT transfers</p>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                                     <button
                                         onClick={() => revealBankDetails(selectedHospitalId)}
-                                        className="px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1.5"
+                                        className="flex-1 sm:flex-none justify-center px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1.5"
                                     >
-                                        {revealedBank ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {revealedBank ? <EyeOff className="w-4 h-4 shrink-0" /> : <Eye className="w-4 h-4 shrink-0" />}
                                         {revealedBank ? "Mask Credentials" : "Reveal Credentials"}
                                     </button>
                                     <button
@@ -576,7 +578,7 @@ export default function RevenueAdmin() {
                                             }
                                             setIsEditingBank(!isEditingBank);
                                         }}
-                                        className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors"
+                                        className="flex-1 sm:flex-none justify-center px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors"
                                     >
                                         {isEditingBank ? "Close Form" : "Edit Credentials"}
                                     </button>
@@ -585,7 +587,7 @@ export default function RevenueAdmin() {
 
                             {/* Editing bank credentials form */}
                             {isEditingBank ? (
-                                <form onSubmit={handleSaveBankDetails} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slideDown">
+                                <form onSubmit={handleSaveBankDetails} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-slideDown">
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-bold text-slate-400 uppercase">Account Holder Name</label>
                                         <input required type="text" value={bankForm.accountHolderName} onChange={e => setBankForm({...bankForm, accountHolderName: e.target.value})} className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none text-xs" />
@@ -610,14 +612,14 @@ export default function RevenueAdmin() {
                                         <label className="text-[10px] font-bold text-slate-400 uppercase">UPI ID (Optional)</label>
                                         <input type="text" value={bankForm.upiId} onChange={e => setBankForm({...bankForm, upiId: e.target.value})} className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none text-xs" />
                                     </div>
-                                    <div className="md:col-span-2 lg:col-span-3 flex justify-end">
-                                        <button disabled={actionSubmitting} className="px-8 py-3.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-blue-700 shadow-md">
+                                    <div className="sm:col-span-2 lg:col-span-3 flex justify-end">
+                                        <button disabled={actionSubmitting} className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-blue-700 shadow-md">
                                             {actionSubmitting ? "Encrypting..." : "Encrypt & Save"}
                                         </button>
                                     </div>
                                 </form>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
                                     <div className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex items-center justify-between">
                                         <div>
                                             <p className="text-[9px] font-black text-slate-400 uppercase">Account Holder</p>
@@ -717,7 +719,7 @@ export default function RevenueAdmin() {
 
                         {/* Recent Settlements History for this hospital */}
                         {hospitalDetails.settlements?.length > 0 && (
-                            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-xl shadow-slate-900/5 space-y-6">
+                            <div className="bg-white border border-slate-100 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-xl shadow-slate-900/5 space-y-6">
                                 <h3 className="text-lg font-bold text-slate-950">Visual Settlement Timeline</h3>
                                 <div className="space-y-8 pl-4 border-l-2 border-slate-100 py-2">
                                     {hospitalDetails.settlements[0].timeline.map((step: any, idx: number) => (
@@ -738,14 +740,14 @@ export default function RevenueAdmin() {
                         )}
 
                         {/* Transactions table */}
-                        <div className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-xl shadow-slate-900/5 space-y-6">
+                        <div className="bg-white border border-slate-100 rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 shadow-xl shadow-slate-900/5 space-y-6">
                             <div>
                                 <h3 className="text-lg font-bold text-slate-950">Pending & Settled Transactions</h3>
                                 <p className="text-xs text-slate-400 font-semibold mt-0.5">Select eligible transaction rows to add to manual NEFT transfer</p>
                             </div>
 
                             <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
+                                <table className="w-full text-left border-collapse min-w-[760px]">
                                     <thead>
                                         <tr className="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                             <th className="py-4 px-6 text-center w-12">
@@ -829,7 +831,7 @@ export default function RevenueAdmin() {
                         key="dashboard"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-xl shadow-slate-900/5 space-y-6"
+                        className="bg-white border border-slate-100 rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 shadow-xl shadow-slate-900/5 space-y-6"
                     >
                         <div className="flex justify-between items-center border-b border-slate-50 pb-4">
                             <div>
@@ -839,7 +841,7 @@ export default function RevenueAdmin() {
                         </div>
 
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
+                            <table className="w-full text-left border-collapse min-w-[800px]">
                                 <thead>
                                     <tr className="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                         <th className="py-4 px-6">Hospital</th>
@@ -863,10 +865,10 @@ export default function RevenueAdmin() {
                                             className="border-b border-slate-50 hover:bg-slate-50/50 cursor-pointer transition-all font-semibold text-slate-800 text-xs hover:shadow-sm"
                                         >
                                             <td className="py-5 px-6 font-bold text-slate-900 flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xs">
+                                                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-black text-xs shrink-0">
                                                     {row.hospitalName.charAt(0)}
                                                 </div>
-                                                {row.hospitalName}
+                                                <span className="whitespace-nowrap">{row.hospitalName}</span>
                                             </td>
                                             <td className="py-5 px-6 text-center font-bold text-slate-500">{row.todayBookings}</td>
                                             <td className="py-5 px-6 text-right font-bold text-slate-900">{formatCurrency(row.totalOnlineAdvanceCollected)}</td>
@@ -898,25 +900,25 @@ export default function RevenueAdmin() {
                         key="history"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-xl shadow-slate-900/5 space-y-6"
+                        className="bg-white border border-slate-100 rounded-2xl sm:rounded-[2rem] p-5 sm:p-8 shadow-xl shadow-slate-900/5 space-y-6"
                     >
-                        <div className="flex justify-between items-center border-b border-slate-50 pb-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-50 pb-4">
                             <div>
                                 <h3 className="text-xl font-bold text-slate-900 font-jakarta">Permanent Settlement History</h3>
                                 <p className="text-xs text-slate-400 font-semibold mt-0.5">Audited batches transferred to hospitals</p>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                                 <button
                                     onClick={() => handleExport("csv")}
-                                    className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                                    className="flex-1 sm:flex-none justify-center px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
                                 >
-                                    <FileText className="w-4 h-4 text-rose-500" /> Export CSV
+                                    <FileText className="w-4 h-4 text-rose-500 shrink-0" /> Export CSV
                                 </button>
                                 <button
                                     onClick={() => handleExport("excel")}
-                                    className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                                    className="flex-1 sm:flex-none justify-center px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
                                 >
-                                    <FileSpreadsheet className="w-4 h-4 text-emerald-500" /> Export Excel
+                                    <FileSpreadsheet className="w-4 h-4 text-emerald-500 shrink-0" /> Export Excel
                                 </button>
                             </div>
                         </div>
@@ -928,7 +930,7 @@ export default function RevenueAdmin() {
                         )}
 
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
+                            <table className="w-full text-left border-collapse min-w-[850px]">
                                 <thead>
                                     <tr className="border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                         <th className="py-4 px-6">Settlement ID</th>
@@ -980,76 +982,78 @@ export default function RevenueAdmin() {
                         className="space-y-8 animate-fadeIn"
                     >
                         {/* Analytics Top Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Settled Amount</p>
-                                <h3 className="text-3xl font-black text-emerald-600 mt-2">{formatCurrency(analyticsData?.totalSettledAmount)}</h3>
+                                <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 mt-2">{formatCurrency(analyticsData?.totalSettledAmount)}</h3>
                                 <p className="text-[10px] text-slate-400 font-semibold mt-1">Paid out successfully to hospitals</p>
                             </div>
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Pending Settlements Pool</p>
-                                <h3 className="text-3xl font-black text-indigo-600 mt-2">{formatCurrency(analyticsData?.pendingSettlementAmount)}</h3>
+                                <h3 className="text-2xl sm:text-3xl font-black text-indigo-600 mt-2">{formatCurrency(analyticsData?.pendingSettlementAmount)}</h3>
                                 <p className="text-[10px] text-slate-400 font-semibold mt-1">Locked waiting for transfer</p>
                             </div>
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Razorpay + GST Charges</p>
-                                <h3 className="text-3xl font-black text-rose-500 mt-2">{formatCurrency(analyticsData?.totalRazorpayCharges)}</h3>
+                                <h3 className="text-2xl sm:text-3xl font-black text-rose-500 mt-2">{formatCurrency(analyticsData?.totalRazorpayCharges)}</h3>
                                 <p className="text-[10px] text-slate-400 font-semibold mt-1">Gateway processing overheads</p>
                             </div>
-                            <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-xl shadow-slate-900/5">
+                            <div className="p-5 sm:p-6 bg-white border border-slate-100 rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-900/5">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Payout Success Rate</p>
-                                <h3 className="text-3xl font-black text-slate-900 mt-2">{analyticsData?.settlementSuccessRate?.toFixed(1)}%</h3>
+                                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2">{analyticsData?.settlementSuccessRate?.toFixed(1)}%</h3>
                                 <p className="text-[10px] text-slate-400 font-semibold mt-1">Avg timing: {analyticsData?.averageSettlementTimeHours} hrs</p>
                             </div>
                         </div>
 
                         {/* Interactive Custom CSS Payout Volumes Graph */}
-                        <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-xl shadow-slate-900/5 space-y-6">
+                        <div className="bg-white border border-slate-100 p-5 sm:p-8 rounded-2xl sm:rounded-[2rem] shadow-xl shadow-slate-900/5 space-y-6">
                             <div>
                                 <h3 className="text-lg font-bold text-slate-950">Monthly Settlement Volume</h3>
                                 <p className="text-xs text-slate-400 font-semibold mt-0.5">Comparing gross online advance fees with net payouts settled</p>
                             </div>
 
                             {/* Chart representation in clean CSS */}
-                            <div className="h-64 flex items-end gap-10 border-b border-slate-200 pb-4 pt-10 px-6">
-                                {analyticsData?.monthlySettlements?.map((s: any, idx: number) => {
-                                    const col = analyticsData.monthlyCollections.find((c: any) => c.month === s.month) || { amount: 0 };
-                                    const maxAmount = Math.max(...analyticsData.monthlyCollections.map((c: any) => c.amount), 1);
-                                    
-                                    const netHeight = (s.amount / maxAmount) * 100;
-                                    const grossHeight = (col.amount / maxAmount) * 100;
+                            <div className="overflow-x-auto pb-2">
+                                <div className="h-64 flex items-end gap-6 sm:gap-10 border-b border-slate-200 pb-4 pt-10 px-4 sm:px-6 min-w-[500px]">
+                                    {analyticsData?.monthlySettlements?.map((s: any, idx: number) => {
+                                        const col = analyticsData.monthlyCollections.find((c: any) => c.month === s.month) || { amount: 0 };
+                                        const maxAmount = Math.max(...analyticsData.monthlyCollections.map((c: any) => c.amount), 1);
+                                        
+                                        const netHeight = (s.amount / maxAmount) * 100;
+                                        const grossHeight = (col.amount / maxAmount) * 100;
 
-                                    return (
-                                        <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
-                                            <div className="w-full flex justify-center items-end gap-1.5 h-full relative">
-                                                {/* Tooltip */}
-                                                <div className="absolute -top-12 bg-slate-900 text-white text-[9px] font-black p-2.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl z-20 w-32 text-center">
-                                                    <p className="text-slate-400">Gross: {formatCurrency(col.amount)}</p>
-                                                    <p className="text-emerald-400 mt-0.5">Net: {formatCurrency(s.amount)}</p>
+                                        return (
+                                            <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                                                <div className="w-full flex justify-center items-end gap-1.5 h-full relative">
+                                                    {/* Tooltip */}
+                                                    <div className="absolute -top-12 bg-slate-900 text-white text-[9px] font-black p-2.5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl z-20 w-32 text-center">
+                                                        <p className="text-slate-400">Gross: {formatCurrency(col.amount)}</p>
+                                                        <p className="text-emerald-400 mt-0.5">Net: {formatCurrency(s.amount)}</p>
+                                                    </div>
+
+                                                    {/* Bar - gross */}
+                                                    <div 
+                                                        style={{ height: `${grossHeight}%` }} 
+                                                        className="w-4 bg-indigo-200/60 rounded-t-md hover:bg-indigo-300 transition-colors"
+                                                    />
+                                                    {/* Bar - net */}
+                                                    <div 
+                                                        style={{ height: `${netHeight}%` }} 
+                                                        className="w-4 bg-emerald-500 rounded-t-md hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+                                                    />
                                                 </div>
-
-                                                {/* Bar - gross */}
-                                                <div 
-                                                    style={{ height: `${grossHeight}%` }} 
-                                                    className="w-4 bg-indigo-200/60 rounded-t-md hover:bg-indigo-300 transition-colors"
-                                                />
-                                                {/* Bar - net */}
-                                                <div 
-                                                    style={{ height: `${netHeight}%` }} 
-                                                    className="w-4 bg-emerald-500 rounded-t-md hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
-                                                />
+                                                <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-1">{s.month}</span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-1">{s.month}</span>
+                                        )}
+                                    )}
+                                    {(!analyticsData?.monthlySettlements || analyticsData.monthlySettlements.length === 0) && (
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 font-bold italic text-xs">
+                                            No monthly settlement cycles registered yet.
                                         </div>
                                     )}
-                                )}
-                                {(!analyticsData?.monthlySettlements || analyticsData.monthlySettlements.length === 0) && (
-                                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 font-bold italic text-xs">
-                                        No monthly settlement cycles registered yet.
-                                    </div>
-                                )}
+                                </div>
                             </div>
-                            <div className="flex gap-6 justify-center text-xs font-bold uppercase tracking-wider text-slate-500 pt-2">
+                            <div className="flex flex-wrap gap-4 sm:gap-6 justify-center text-xs font-bold uppercase tracking-wider text-slate-500 pt-2">
                                 <div className="flex items-center gap-2">
                                     <div className="w-3.5 h-3.5 bg-indigo-200/60 rounded" />
                                     <span>Gross Collected</span>
@@ -1072,7 +1076,7 @@ export default function RevenueAdmin() {
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-white w-full max-w-lg rounded-3xl p-8 shadow-2xl border border-slate-100 flex flex-col relative"
+                            className="bg-white w-full max-w-lg rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl border border-slate-100 flex flex-col relative max-h-[90vh] overflow-y-auto"
                         >
                             <h3 className="text-xl font-bold text-slate-900 mb-2">Transfer Settlement Payment</h3>
                             <p className="text-xs text-slate-400 font-semibold mb-6">Enter transfer reference codes to initiate manual payouts</p>
@@ -1114,18 +1118,18 @@ export default function RevenueAdmin() {
                                     />
                                 </div>
 
-                                <div className="flex gap-3 pt-4">
+                                <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
                                     <button
                                         type="button"
                                         onClick={() => setIsTransferModalOpen(false)}
-                                        className="flex-1 py-4 border border-slate-200 text-slate-600 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors"
+                                        className="w-full sm:flex-1 py-3.5 sm:py-4 border border-slate-200 text-slate-600 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-colors"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={actionSubmitting}
-                                        className="flex-1 py-4 bg-blue-600 text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-500/20 disabled:opacity-50"
+                                        className="w-full sm:flex-1 py-3.5 sm:py-4 bg-blue-600 text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-500/20 disabled:opacity-50"
                                     >
                                         {actionSubmitting ? "Initiating Payout..." : "Transfer Payment"}
                                     </button>

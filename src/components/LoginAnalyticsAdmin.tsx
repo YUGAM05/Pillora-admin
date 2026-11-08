@@ -133,31 +133,31 @@ export default function LoginAnalyticsAdmin() {
     return (
         <div className="space-y-10 px-1 md:px-2">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
                 <div>
-                    <h3 className="text-3xl font-extrabold text-slate-900 font-jakarta flex items-center gap-4 tracking-tight">
-                        <Activity className="w-8 h-8 text-blue-600" /> User Login Analytics
+                    <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-jakarta flex items-center gap-3 sm:gap-4 tracking-tight">
+                        <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" /> User Login Analytics
                     </h3>
-                    <div className="flex flex-wrap items-center gap-3 mt-1.5">
-                        <p className="text-slate-500 font-medium text-base italic">Security audits, live telemetry, and access activity logs</p>
-                        <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-200/50">
-                            <Globe className="w-3 h-3" /> Timezone Enforced: IST (+05:30)
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5">
+                        <p className="text-slate-500 font-medium text-xs sm:text-base italic">Security audits, live telemetry, and access activity logs</p>
+                        <span className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-amber-200/50">
+                            <Globe className="w-3 h-3" /> Timezone: IST (+05:30)
                         </span>
                     </div>
                 </div>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                     <button 
                         onClick={handleManualRefresh}
-                        className={`p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all text-slate-500 hover:text-blue-600 ${refreshing ? 'animate-spin text-blue-600 bg-white shadow-xl' : ''}`}
+                        className={`p-3 sm:p-4 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all text-slate-500 hover:text-blue-600 ${refreshing ? 'animate-spin text-blue-600 bg-white shadow-xl' : ''}`}
                         title="Force Refresh Data"
                     >
-                        <RefreshCw className="w-5 h-5" />
+                        <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                     <button 
                         onClick={handleExportCSV}
                         disabled={activities.length === 0}
-                        className="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all flex items-center gap-3 shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 sm:px-6 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl sm:rounded-2xl text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] transition-all flex items-center gap-2 sm:gap-3 shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                     >
                         <Download className="w-4 h-4" /> Export CSV
                     </button>
@@ -165,49 +165,49 @@ export default function LoginAnalyticsAdmin() {
             </div>
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
                 <MiniStatCard 
                     label="Total Registered Users" 
                     value={stats?.totalUsers || 0} 
-                    icon={<Users className="w-6 h-6" />} 
+                    icon={<Users className="w-5 h-5 sm:w-6 sm:h-6" />} 
                     color="blue" 
                 />
                 <MiniStatCard 
                     label="Total Logins Today" 
                     value={stats?.loginsToday || 0} 
-                    icon={<Activity className="w-6 h-6" />} 
+                    icon={<Activity className="w-5 h-5 sm:w-6 sm:h-6" />} 
                     color="emerald" 
                     pulse
                 />
                 <MiniStatCard 
                     label="Total Logins This Week" 
                     value={stats?.loginsThisWeek || 0} 
-                    icon={<Calendar className="w-6 h-6" />} 
+                    icon={<Calendar className="w-5 h-5 sm:w-6 sm:h-6" />} 
                     color="indigo" 
                 />
             </div>
 
             {/* Filters and Table Container */}
-            <div className="bg-white border border-slate-100 p-8 md:p-10 rounded-[2.5rem] shadow-xl shadow-blue-900/5">
+            <div className="bg-white border border-slate-100 p-4 sm:p-8 md:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-xl shadow-blue-900/5">
                 {/* Search & Filters */}
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-10">
-                    <div className="flex items-center gap-4 w-full lg:w-auto">
-                        <h4 className="text-xl font-bold text-slate-900 font-jakarta whitespace-nowrap">Session Telemetry</h4>
-                        <span className="px-3.5 py-1 bg-slate-50 border border-slate-100 text-slate-400 rounded-full text-[10px] font-black uppercase tracking-wider">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6 mb-6 sm:mb-10">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                        <h4 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta whitespace-nowrap">Session Telemetry</h4>
+                        <span className="px-3 py-1 bg-slate-50 border border-slate-100 text-slate-400 rounded-full text-[10px] font-black uppercase tracking-wider">
                             {filteredActivities.length} Matches
                         </span>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
                         {/* Search Input */}
-                        <div className="flex items-center gap-3 px-5 py-3.5 bg-slate-50/80 rounded-2xl border border-slate-100 focus-within:bg-white focus-within:border-blue-200 focus-within:shadow-xl focus-within:shadow-blue-900/5 transition-all w-full sm:w-80">
-                            <Search className="w-4 h-4 text-slate-400" />
+                        <div className="flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 bg-slate-50/80 rounded-xl sm:rounded-2xl border border-slate-100 focus-within:bg-white focus-within:border-blue-200 focus-within:shadow-xl focus-within:shadow-blue-900/5 transition-all w-full sm:w-80">
+                            <Search className="w-4 h-4 text-slate-400 shrink-0" />
                             <input 
                                 type="text" 
-                                placeholder="Search by name, email, blood group..." 
+                                placeholder="Search by name, email, blood..." 
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-transparent border-none outline-none text-sm font-semibold text-slate-900 placeholder:text-slate-400 w-full"
+                                className="bg-transparent border-none outline-none text-xs sm:text-sm font-semibold text-slate-900 placeholder:text-slate-400 w-full"
                             />
                         </div>
 
@@ -215,7 +215,7 @@ export default function LoginAnalyticsAdmin() {
                         <select 
                             value={selectedRole}
                             onChange={(e) => setSelectedRole(e.target.value)}
-                            className="px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-600 uppercase tracking-wider outline-none cursor-pointer focus:bg-white focus:border-blue-200 transition-all w-full sm:w-auto"
+                            className="px-4 sm:px-5 py-3 sm:py-4 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl text-xs font-bold text-slate-600 uppercase tracking-wider outline-none cursor-pointer focus:bg-white focus:border-blue-200 transition-all w-full sm:w-auto"
                         >
                             <option value="all">All Roles</option>
                             <option value="customer">Customer</option>
@@ -228,8 +228,8 @@ export default function LoginAnalyticsAdmin() {
                 </div>
 
                 {/* Login History Table */}
-                <div className="overflow-x-auto rounded-[2rem] border border-slate-50">
-                    <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto rounded-xl sm:rounded-[2rem] border border-slate-50">
+                    <table className="w-full text-left border-collapse min-w-[700px]">
                         <thead>
                             <tr className="bg-slate-50/50 border-b border-slate-100">
                                 <th className="py-5 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">User Profile</th>

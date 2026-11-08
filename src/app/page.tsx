@@ -46,6 +46,7 @@ import LoginAnalyticsAdmin from "@/components/LoginAnalyticsAdmin";
 import SupportTicketsAdmin from "@/components/SupportTicketsAdmin";
 import HealthHubAdmin from "@/components/HealthHubAdmin";
 import RevenueAdmin from "@/components/RevenueAdmin";
+import FinancialManagementAdmin from "@/components/FinancialManagementAdmin";
 
 // Premium Font Configuration
 const jakarta = Plus_Jakarta_Sans({ 
@@ -84,6 +85,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showAddHospital, setShowAddHospital] = useState(false);
     const [editingHospital, setEditingHospital] = useState<any | null>(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -226,16 +228,16 @@ export default function AdminDashboard() {
         { id: 'blogs', label: 'Blog Posts', icon: FileText, color: 'text-purple-600' },
         { id: 'health-hub', label: 'Health Hub', icon: Heart, color: 'text-rose-500' },
         { id: 'tickets', label: 'Support Tickets', icon: MessageSquare, color: 'text-blue-600' },
-        { id: 'revenue', label: 'Revenue & Settlements', icon: DollarSign, color: 'text-emerald-600' },
+        { id: 'revenue', label: 'Financial Management', icon: DollarSign, color: 'text-emerald-600' },
     ];
 
     return (
         <div className={`min-h-screen bg-[#FDFDFF] text-slate-900 ${jakarta.variable} ${inter.variable} font-sans selection:bg-blue-600/10 flex overflow-hidden`}>
-            {/* Sidebar */}
+            {/* Desktop Sidebar (visible on lg and above) */}
             <motion.aside 
                 initial={false}
                 animate={{ width: isSidebarOpen ? '320px' : '96px' }}
-                className="bg-white border-r border-slate-100 flex flex-col relative z-50 transition-all duration-500"
+                className="hidden lg:flex bg-white border-r border-slate-100 flex-col relative z-50 transition-all duration-500 shrink-0"
             >
                 {/* Logo Section */}
                 <div className="h-28 flex items-center px-8 gap-4">
@@ -324,42 +326,157 @@ export default function AdminDashboard() {
                 </button>
             </motion.aside>
 
+            {/* Mobile Navigation Drawer Backdrop & Drawer */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[90] lg:hidden"
+                        />
+                        <motion.aside
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                            className="fixed inset-y-0 left-0 w-[300px] max-w-[85vw] bg-white z-[95] lg:hidden flex flex-col shadow-2xl border-r border-slate-100"
+                        >
+                            {/* Mobile Drawer Header */}
+                            <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30">
+                                        <Shield className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div className="font-bold text-xl tracking-tight text-slate-900 font-jakarta">
+                                        Pillora <span className="text-blue-600 font-extrabold">Hub</span>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+                                    aria-label="Close menu"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            {/* Mobile Nav Items */}
+                            <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+                                {navigation.map((item) => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => {
+                                            setActiveTab(item.id as TabId);
+                                            setIsMobileMenuOpen(false);
+                                        }}
+                                        className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all duration-200 relative group ${
+                                            activeTab === item.id 
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                        }`}
+                                    >
+                                        <item.icon className={`w-5 h-5 shrink-0 ${activeTab === item.id ? 'text-white' : item.color}`} />
+                                        <span className="font-semibold text-sm tracking-tight text-left flex-1 truncate">
+                                            {item.label}
+                                        </span>
+                                        {item.badge && item.badge > 0 && (
+                                            <span className={`min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                                                activeTab === item.id ? 'bg-white text-blue-600' : 'bg-red-500 text-white'
+                                            }`}>
+                                                {item.badge}
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+
+                                <div className="pt-3 mt-3 border-t border-slate-100">
+                                    <Link
+                                        href="/analytics"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all duration-200 text-slate-600 hover:bg-blue-50 hover:text-blue-600 group"
+                                    >
+                                        <TrendingUp className="w-5 h-5 shrink-0 text-indigo-600" />
+                                        <span className="font-bold text-sm tracking-tight">BI Reporting</span>
+                                    </Link>
+                                </div>
+                            </nav>
+
+                            {/* Mobile User Profile Area */}
+                            <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 mb-3 shadow-sm">
+                                    <div className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-white font-bold text-xs shrink-0">SA</div>
+                                    <div className="overflow-hidden">
+                                        <p className="font-bold text-xs text-slate-900 truncate">Super Admin</p>
+                                        <p className="text-[9px] text-slate-400 font-medium uppercase tracking-widest truncate">Root Access</p>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        if(confirm("Terminate administrative session?")) {
+                                            clearAuth();
+                                            window.location.href = '/login';
+                                        }
+                                    }}
+                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all font-bold text-xs uppercase tracking-wider border border-transparent hover:border-red-100"
+                                >
+                                    <LogOut className="w-4 h-4 shrink-0" />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        </motion.aside>
+                    </>
+                )}
+            </AnimatePresence>
+
             {/* Main Content */}
-            <main className="flex-1 flex flex-col relative overflow-hidden bg-white">
+            <main className="flex-1 flex flex-col relative overflow-hidden bg-white min-w-0">
                 {/* Background Decoration */}
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-50/30 rounded-full blur-[140px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
                 
                 {/* Header */}
-                <header className="h-28 px-12 flex items-center justify-between relative z-10">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">
-                            <LayoutDashboard className="w-3 h-3" /> System
-                            <ChevronRight className="w-3 h-3" /> {activeTab}
+                <header className="h-16 sm:h-20 lg:h-28 px-4 sm:px-6 lg:px-12 flex items-center justify-between relative z-10 border-b border-slate-100 lg:border-none">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        {/* Hamburger button on mobile */}
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-2.5 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-xl border border-slate-200 transition-colors"
+                            aria-label="Open Navigation"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                        <div className="space-y-0.5 sm:space-y-1">
+                            <div className="hidden sm:flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">
+                                <LayoutDashboard className="w-3 h-3" /> System
+                                <ChevronRight className="w-3 h-3" /> {activeTab}
+                            </div>
+                            <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight font-jakarta truncate max-w-[180px] xs:max-w-[260px] sm:max-w-none">
+                                {navigation.find(n => n.id === activeTab)?.label}
+                            </h2>
                         </div>
-                        <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight font-jakarta">
-                            {navigation.find(n => n.id === activeTab)?.label}
-                        </h2>
                     </div>
 
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-2 sm:gap-4 lg:gap-8">
                         <div className="hidden xl:flex items-center gap-3 px-6 py-3 bg-slate-50/80 rounded-2xl border border-slate-100 focus-within:bg-white focus-within:border-blue-200 focus-within:shadow-xl focus-within:shadow-blue-900/5 transition-all">
                             <Search className="w-4 h-4 text-slate-400" />
                             <input type="text" placeholder="Search system resources..." className="bg-transparent border-none outline-none text-sm font-semibold text-slate-900 placeholder:text-slate-400 w-72" />
                         </div>
-                        <div className="flex items-center gap-3">
-                            <button className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all relative">
-                                <Bell className="w-5 h-5 text-slate-500" />
-                                <span className="absolute top-4 right-4 w-2 h-2 bg-blue-600 rounded-full ring-4 ring-white" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <button className="p-2.5 sm:p-3.5 lg:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all relative">
+                                <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+                                <span className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 w-2 h-2 bg-blue-600 rounded-full ring-2 sm:ring-4 ring-white" />
                             </button>
-                            <button className="p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all">
-                                <Settings className="w-5 h-5 text-slate-500" />
+                            <button className="p-2.5 sm:p-3.5 lg:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all">
+                                <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
                             </button>
                         </div>
                     </div>
                 </header>
 
                 {/* Content Container */}
-                <div className="flex-1 overflow-y-auto px-12 pb-12 relative z-10 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:pb-12 relative z-10 custom-scrollbar">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}
@@ -370,25 +487,25 @@ export default function AdminDashboard() {
                             className="font-inter"
                         >
                             {activeTab === 'overview' && (
-                                <div className="space-y-12">
+                                <div className="space-y-8 sm:space-y-12">
                                     {/* Stats Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                                         <StatCard
-                                            icon={<Users className="w-7 h-7" />}
+                                            icon={<Users className="w-6 h-6 sm:w-7 sm:h-7" />}
                                             label="Total Network Users"
                                             value={stats?.counts?.users || 0}
                                             trend="+12.4%"
                                             color="blue"
                                         />
                                         <StatCard
-                                            icon={<Heart className="w-7 h-7" />}
+                                            icon={<Heart className="w-6 h-6 sm:w-7 sm:h-7" />}
                                             label="Verified Donors"
                                             value={stats?.counts?.donors || 0}
                                             trend="+3.2%"
                                             color="rose"
                                         />
                                         <StatCard
-                                            icon={<TrendingUp className="w-7 h-7" />}
+                                            icon={<TrendingUp className="w-6 h-6 sm:w-7 sm:h-7" />}
                                             label="System Activity"
                                             value={stats?.counts?.activity || 0}
                                             trend="+28.1%"
@@ -397,24 +514,24 @@ export default function AdminDashboard() {
                                     </div>
 
                                     {/* Detailed Insights */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
                                         {/* Activity Log */}
-                                        <div className="lg:col-span-8 bg-white border border-slate-100 p-10 rounded-[2.5rem] shadow-xl shadow-blue-900/5">
-                                            <div className="flex items-center justify-between mb-10">
-                                                <h3 className="text-xl font-bold text-slate-900 font-jakarta flex items-center gap-3">
+                                        <div className="lg:col-span-8 bg-white border border-slate-100 p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] shadow-xl shadow-blue-900/5">
+                                            <div className="flex items-center justify-between mb-6 sm:mb-10">
+                                                <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta flex items-center gap-2.5 sm:gap-3">
                                                     <Activity className="w-5 h-5 text-blue-600" /> Platform Insights
                                                 </h3>
-                                                <button className="text-xs font-bold text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-xl transition-all flex items-center gap-2">
-                                                    View Detailed Log <ArrowUpRight className="w-4 h-4" />
+                                                <button className="text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all flex items-center gap-2">
+                                                    <span>View Log</span> <ArrowUpRight className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                                            <div className="space-y-3 sm:space-y-4 max-h-[500px] sm:max-h-[600px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
                                                 {activities.length === 0 ? (
-                                                    <div className="py-20 text-center">
-                                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                                                            <Activity className="w-8 h-8 text-slate-200" />
+                                                    <div className="py-16 sm:py-20 text-center">
+                                                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                                                            <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-slate-200" />
                                                         </div>
-                                                        <p className="text-slate-400 font-medium">No recent activities detected.</p>
+                                                        <p className="text-slate-400 font-medium text-sm">No recent activities detected.</p>
                                                     </div>
                                                 ) : (
                                                     activities.map((log, i) => (
@@ -422,10 +539,10 @@ export default function AdminDashboard() {
                                                             key={log._id || i} 
                                                             initial={{ opacity: 0, x: -10 }}
                                                             animate={{ opacity: 1, x: 0 }}
-                                                            className="flex items-center justify-between p-6 bg-[#FDFDFF] hover:bg-blue-50/30 rounded-3xl border border-slate-50 transition-all group"
+                                                            className="flex items-center justify-between p-4 sm:p-6 bg-[#FDFDFF] hover:bg-blue-50/30 rounded-2xl sm:rounded-3xl border border-slate-50 transition-all group gap-3"
                                                         >
-                                                            <div className="flex items-center gap-6">
-                                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border transition-all ${
+                                                            <div className="flex items-center gap-3 sm:gap-6 min-w-0 flex-1">
+                                                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-sm border transition-all shrink-0 ${
                                                                     log.type === 'blood_request' ? 'bg-rose-50 text-rose-500 border-rose-100' :
                                                                     log.type === 'blood_donor' ? 'bg-emerald-50 text-emerald-500 border-emerald-100' :
                                                                     log.type === 'hospital' ? 'bg-blue-50 text-blue-500 border-blue-100' :
@@ -438,12 +555,12 @@ export default function AdminDashboard() {
                                                                      log.type === 'partner' ? <Handshake className="w-5 h-5" /> :
                                                                      <Package className="w-5 h-5" />}
                                                                 </div>
-                                                                <div>
-                                                                    <p className="font-bold text-slate-900 text-base mb-0.5">{log.title}</p>
-                                                                    <p className="text-sm text-slate-500 font-medium line-clamp-1">{log.description}</p>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <p className="font-bold text-slate-900 text-sm sm:text-base mb-0.5 truncate">{log.title}</p>
+                                                                    <p className="text-xs sm:text-sm text-slate-500 font-medium line-clamp-1">{log.description}</p>
                                                                 </div>
                                                             </div>
-                                                            <div className="text-right hidden sm:block">
+                                                            <div className="text-right shrink-0 hidden sm:block">
                                                                 <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${
                                                                     log.type === 'blood_request' ? 'text-rose-600' :
                                                                     log.type === 'blood_donor' ? 'text-emerald-600' :
@@ -460,34 +577,34 @@ export default function AdminDashboard() {
                                         </div>
 
                                         {/* Notifications / Alerts */}
-                                        <div className="lg:col-span-4 bg-slate-900 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+                                        <div className="lg:col-span-4 bg-slate-900 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
                                             <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-600/20 rounded-full blur-3xl" />
-                                            <h3 className="text-xl font-bold text-white font-jakarta mb-8 flex items-center gap-3 relative z-10">
+                                            <h3 className="text-lg sm:text-xl font-bold text-white font-jakarta mb-6 sm:mb-8 flex items-center gap-3 relative z-10">
                                                 <Bell className="w-5 h-5 text-amber-500" /> Active Alerts
                                             </h3>
-                                            <div className="space-y-6 relative z-10">
-                                                <div className="p-6 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group/alert">
-                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-3">
+                                            <div className="space-y-4 sm:space-y-6 relative z-10">
+                                                <div className="p-4 sm:p-6 bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group/alert">
+                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-2 sm:mb-3">
                                                         <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Urgent Requirement
                                                     </div>
-                                                    <p className="text-sm font-semibold text-slate-200 leading-relaxed">NGO &quot;LifeSource&quot; is requesting priority access for blood donor API.</p>
-                                                    <div className="flex items-center justify-between mt-4">
+                                                    <p className="text-xs sm:text-sm font-semibold text-slate-200 leading-relaxed">NGO &quot;LifeSource&quot; is requesting priority access for blood donor API.</p>
+                                                    <div className="flex items-center justify-between mt-3 sm:mt-4">
                                                         <span className="text-[10px] text-slate-500 font-bold uppercase">Today • 11:24 AM</span>
                                                         <ChevronRight className="w-4 h-4 text-slate-600 group-hover/alert:translate-x-1 transition-transform" />
                                                     </div>
                                                 </div>
-                                                <div className="p-6 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group/alert">
-                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-3">
+                                                <div className="p-4 sm:p-6 bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group/alert">
+                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2 sm:mb-3">
                                                         <div className="w-1.5 h-1.5 rounded-full bg-blue-400" /> System Update
                                                     </div>
-                                                    <p className="text-sm font-semibold text-slate-300 leading-relaxed">Automatic backup of PostgreSQL database completed successfully.</p>
-                                                    <div className="flex items-center justify-between mt-4">
+                                                    <p className="text-xs sm:text-sm font-semibold text-slate-300 leading-relaxed">Automatic backup of PostgreSQL database completed successfully.</p>
+                                                    <div className="flex items-center justify-between mt-3 sm:mt-4">
                                                         <span className="text-[10px] text-slate-500 font-bold uppercase">Today • 04:12 AM</span>
                                                         <ChevronRight className="w-4 h-4 text-slate-600 group-hover/alert:translate-x-1 transition-transform" />
                                                     </div>
                                                 </div>
                                             </div>
-                                            <button className="w-full mt-10 py-4 bg-white/10 text-white font-bold rounded-2xl text-[11px] uppercase tracking-[0.2em] hover:bg-white hover:text-slate-900 transition-all">
+                                            <button className="w-full mt-6 sm:mt-10 py-3.5 sm:py-4 bg-white/10 text-white font-bold rounded-xl sm:rounded-2xl text-[11px] uppercase tracking-[0.2em] hover:bg-white hover:text-slate-900 transition-all">
                                                 Clear Command Center
                                             </button>
                                         </div>
@@ -504,30 +621,30 @@ export default function AdminDashboard() {
                             )}
 
                             {activeTab === 'approvals' && (
-                                <div className="space-y-8">
-                                    <div className="bg-white border border-slate-100 p-12 rounded-[3rem] shadow-xl shadow-blue-900/5">
-                                        <div className="flex items-center justify-between mb-12">
+                                <div className="space-y-6 sm:space-y-8">
+                                    <div className="bg-white border border-slate-100 p-5 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-xl shadow-blue-900/5">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-12">
                                             <div>
-                                                <h3 className="text-2xl font-bold text-slate-900 font-jakarta flex items-center gap-3">
-                                                    <Lock className="w-6 h-6 text-amber-500" /> Identity Verification
+                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-jakarta flex items-center gap-3">
+                                                    <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" /> Identity Verification
                                                 </h3>
-                                                <p className="text-slate-500 font-medium mt-1.5">Review credentials of new platform participants</p>
+                                                <p className="text-slate-500 font-medium text-xs sm:text-sm mt-1">Review credentials of new platform participants</p>
                                             </div>
-                                            <div className="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                                            <div className="self-start sm:self-auto px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                                                 {pendingUsers.length} Applications Pending
                                             </div>
                                         </div>
 
                                         {pendingUsers.length === 0 ? (
-                                            <div className="text-center py-24 bg-[#FDFDFF] rounded-[2.5rem] border-2 border-dashed border-slate-100">
-                                                <div className="w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center mx-auto mb-6">
-                                                    <CheckCircle2 className="w-10 h-10 text-slate-200" />
+                                            <div className="text-center py-16 sm:py-24 bg-[#FDFDFF] rounded-2xl sm:rounded-[2.5rem] border-2 border-dashed border-slate-100">
+                                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full shadow-xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                                                    <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-slate-200" />
                                                 </div>
-                                                <h4 className="text-xl font-bold text-slate-400 uppercase tracking-widest">Verification Clear</h4>
-                                                <p className="text-slate-400 mt-2 font-medium">No pending user applications to process.</p>
+                                                <h4 className="text-lg sm:text-xl font-bold text-slate-400 uppercase tracking-widest">Verification Clear</h4>
+                                                <p className="text-slate-400 mt-2 font-medium text-xs sm:text-sm">No pending user applications to process.</p>
                                             </div>
                                         ) : (
-                                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                                                 <AnimatePresence>
                                                     {pendingUsers.map((user: any) => (
                                                         <motion.div 
@@ -535,30 +652,30 @@ export default function AdminDashboard() {
                                                             initial={{ opacity: 0, scale: 0.98 }}
                                                             animate={{ opacity: 1, scale: 1 }}
                                                             exit={{ opacity: 0, scale: 0.95 }}
-                                                            className="flex flex-col p-8 bg-[#FDFDFF] hover:bg-white rounded-[2rem] border border-slate-50 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500"
+                                                            className="flex flex-col p-5 sm:p-8 bg-[#FDFDFF] hover:bg-white rounded-2xl sm:rounded-[2rem] border border-slate-50 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500"
                                                         >
-                                                            <div className="flex items-center gap-6 mb-10">
-                                                                <div className="w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center text-white font-bold text-2xl shadow-xl">
+                                                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6 sm:mb-10">
+                                                                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-slate-900 flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-xl shrink-0">
                                                                     {user.name.charAt(0)}
                                                                 </div>
-                                                                <div>
-                                                                    <p className="font-bold text-slate-900 text-lg leading-none">{user.name}</p>
-                                                                    <div className="flex items-center gap-3 mt-2.5">
-                                                                        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-widest">{user.role}</span>
-                                                                        <span className="text-slate-400 text-xs font-semibold">{user.email}</span>
+                                                                <div className="min-w-0">
+                                                                    <p className="font-bold text-slate-900 text-base sm:text-lg leading-tight truncate">{user.name}</p>
+                                                                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
+                                                                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-widest">{user.role}</span>
+                                                                        <span className="text-slate-400 text-xs font-semibold truncate">{user.email}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div className="flex gap-3">
+                                                            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                                                                 <button
                                                                     onClick={() => handleStatusUpdate(user._id, 'approved')}
-                                                                    className="flex-1 py-4 bg-blue-600 text-white hover:bg-blue-700 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                                                                    className="flex-1 py-3.5 sm:py-4 bg-blue-600 text-white hover:bg-blue-700 rounded-xl sm:rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                                                                 >
                                                                     Approve
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleStatusUpdate(user._id, 'rejected')}
-                                                                    className="flex-1 py-4 bg-white text-rose-500 hover:bg-rose-50 border border-rose-100 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all active:scale-95"
+                                                                    className="flex-1 py-3.5 sm:py-4 bg-white text-rose-500 hover:bg-rose-50 border border-rose-100 rounded-xl sm:rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all active:scale-95"
                                                                 >
                                                                     Reject
                                                                 </button>
@@ -573,22 +690,22 @@ export default function AdminDashboard() {
                             )}
 
                             {activeTab === 'bloodbank' && (
-                                <div className="space-y-8">
-                                    <div className="bg-white border border-slate-100 p-12 rounded-[3rem] shadow-xl shadow-blue-900/5">
-                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
+                                <div className="space-y-6 sm:space-y-8">
+                                    <div className="bg-white border border-slate-100 p-4 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-xl shadow-blue-900/5">
+                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-8 mb-6 sm:mb-12">
                                             <div className="space-y-1">
-                                                <h3 className="text-2xl font-bold text-slate-900 font-jakarta flex items-center gap-3">
-                                                    <Droplets className="w-8 h-8 text-rose-500" /> Blood Network Live
+                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-jakarta flex items-center gap-3">
+                                                    <Droplets className="w-6 h-6 sm:w-8 sm:h-8 text-rose-500" /> Blood Network Live
                                                 </h3>
-                                                <p className="text-slate-500 font-medium italic">Emergency resource tracking and donor coordination console</p>
+                                                <p className="text-slate-500 font-medium text-xs sm:text-sm italic">Emergency resource tracking and donor coordination console</p>
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <div className="flex items-center gap-3 px-5 py-2.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
+                                                <div className="flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 bg-emerald-50 text-emerald-600 rounded-xl sm:rounded-2xl border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
                                                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" /> Network Synchronized
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="bg-[#FDFDFF] rounded-[2.5rem] border border-slate-100 p-8">
+                                        <div className="bg-[#FDFDFF] rounded-xl sm:rounded-2xl lg:rounded-[2.5rem] border border-slate-100 p-3 sm:p-6 lg:p-8">
                                             <BloodBankAdmin />
                                         </div>
                                     </div>
@@ -596,11 +713,11 @@ export default function AdminDashboard() {
                             )}
 
                             {activeTab === 'hospitals' && (
-                                <div className="space-y-12">
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+                                <div className="space-y-6 sm:space-y-12">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-8">
                                         <div className="space-y-1">
-                                            <h2 className="text-4xl font-extrabold text-slate-900 tracking-tight font-jakarta">Medical Directory</h2>
-                                            <p className="text-slate-500 font-medium text-lg italic">Manage healthcare infrastructure and system registration</p>
+                                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-jakarta">Medical Directory</h2>
+                                            <p className="text-slate-500 font-medium text-sm sm:text-base lg:text-lg italic">Manage healthcare infrastructure and system registration</p>
                                         </div>
                                         <button
                                              onClick={() => {
@@ -611,13 +728,13 @@ export default function AdminDashboard() {
                                                      setShowAddHospital(true);
                                                  }
                                              }}
-                                             className={`px-10 py-5 rounded-2xl text-[11px] font-bold uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-3 shadow-2xl ${
+                                             className={`w-full sm:w-auto justify-center px-6 sm:px-10 py-3.5 sm:py-5 rounded-xl sm:rounded-2xl text-[11px] font-bold uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-3 shadow-2xl ${
                                                  showAddHospital || editingHospital 
                                                  ? 'bg-slate-900 text-white hover:bg-slate-800' 
-                                                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/40 hover:-translate-y-2 active:scale-95'
+                                                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/40 hover:-translate-y-1 active:scale-95'
                                              }`}
                                          >
-                                             {showAddHospital || editingHospital ? <XCircle className="w-6 h-6" /> : <Plus className="w-6 h-6" />}
+                                             {showAddHospital || editingHospital ? <XCircle className="w-5 h-5 sm:w-6 sm:h-6" /> : <Plus className="w-5 h-5 sm:w-6 sm:h-6" />}
                                              {showAddHospital || editingHospital ? 'Exit Form' : 'Register Hospital'}
                                          </button>
                                     </div>
@@ -629,7 +746,7 @@ export default function AdminDashboard() {
                                                  initial={{ opacity: 0, scale: 0.99, y: 20 }}
                                                  animate={{ opacity: 1, scale: 1, y: 0 }}
                                                  exit={{ opacity: 0, scale: 0.99, y: -20 }}
-                                                 className="bg-white rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden"
+                                                 className="bg-white rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden"
                                              >
                                                  <AddHospitalForm 
                                                      hospitalToEdit={editingHospital}
@@ -645,7 +762,7 @@ export default function AdminDashboard() {
                                                  key="hospital-list"
                                                  initial={{ opacity: 0 }}
                                                  animate={{ opacity: 1 }}
-                                                 className="bg-white p-12 rounded-[3.5rem] shadow-xl shadow-blue-900/5 border border-slate-50"
+                                                 className="bg-white p-4 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3.5rem] shadow-xl shadow-blue-900/5 border border-slate-50"
                                              >
                                                  <HospitalListAdmin 
                                                      key={refreshTrigger} 
@@ -658,20 +775,20 @@ export default function AdminDashboard() {
                             )}
 
                             {activeTab === 'subscriptions' && (
-                                <div className="space-y-8">
+                                <div className="space-y-6 sm:space-y-8">
                                     <HospitalSubscriptionsAdmin />
                                 </div>
                             )}
 
                             {activeTab === 'partners' && (
-                                <div className="space-y-10">
-                                    <div className="bg-white border border-slate-100 p-12 rounded-[3rem] shadow-xl shadow-blue-900/5">
-                                        <div className="flex items-center justify-between mb-12">
+                                <div className="space-y-6 sm:space-y-10">
+                                    <div className="bg-white border border-slate-100 p-4 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-xl shadow-blue-900/5">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-12">
                                             <div className="space-y-1">
-                                                <h3 className="text-3xl font-extrabold text-slate-900 font-jakarta flex items-center gap-4 tracking-tight">
-                                                    <Handshake className="w-10 h-10 text-blue-600" /> Strategic Hub
+                                                <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-jakarta flex items-center gap-3 sm:gap-4 tracking-tight">
+                                                    <Handshake className="w-7 h-7 sm:w-10 sm:h-10 text-blue-600" /> Strategic Hub
                                                 </h3>
-                                                <p className="text-slate-500 font-medium text-lg italic">Collaboration proposals from Healthcare Entities & NGOs</p>
+                                                <p className="text-slate-500 font-medium text-sm sm:text-base lg:text-lg italic">Collaboration proposals from Healthcare Entities & NGOs</p>
                                             </div>
                                         </div>
                                         <PartnerInquiriesAdmin />
@@ -692,7 +809,7 @@ export default function AdminDashboard() {
                             )}
 
                             {activeTab === 'revenue' && (
-                                <RevenueAdmin />
+                                <FinancialManagementAdmin />
                             )}
                         </motion.div>
                     </AnimatePresence>
@@ -727,32 +844,32 @@ function StatCard({ icon, label, value, trend, color }: any) {
     return (
         <motion.div
             variants={itemVariants}
-            className="group p-10 rounded-[3rem] bg-white border border-slate-100 transition-all duration-700 hover:shadow-2xl hover:shadow-blue-900/10 hover:border-blue-100 relative overflow-hidden"
+            className="group p-5 sm:p-7 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] bg-white border border-slate-100 transition-all duration-700 hover:shadow-2xl hover:shadow-blue-900/10 hover:border-blue-100 relative overflow-hidden"
         >
             <div className={`absolute -right-12 -top-12 w-48 h-48 rounded-full ${colors[color].bg} blur-3xl opacity-30 group-hover:opacity-60 transition-opacity duration-700`} />
             
-            <div className="flex items-start justify-between mb-10 relative z-10">
-                <div className={`p-5 ${colors[color].bg} rounded-2xl group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border border-transparent group-hover:border-white shadow-sm`}>
+            <div className="flex items-start justify-between mb-6 sm:mb-10 relative z-10">
+                <div className={`p-3.5 sm:p-5 ${colors[color].bg} rounded-xl sm:rounded-2xl group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border border-transparent group-hover:border-white shadow-sm`}>
                     <div className={colors[color].icon}>{icon}</div>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-50 border border-slate-100 rounded-full">
+                <div className="flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-slate-50 border border-slate-100 rounded-full">
                     <div className={`w-1.5 h-1.5 rounded-full ${colors[color].indicator} animate-pulse`} />
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Realtime</span>
                 </div>
             </div>
             
             <div className="relative z-10">
-                <h3 className="text-6xl font-extrabold text-slate-900 mb-2 tracking-tighter font-jakarta">
+                <h3 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-slate-900 mb-1 sm:mb-2 tracking-tighter font-jakarta">
                     {value}
                 </h3>
                 <p className="text-slate-400 font-bold tracking-[0.2em] uppercase text-[9px] italic">{label}</p>
             </div>
 
-            <div className="mt-10 pt-8 border-t border-slate-50 flex items-center justify-between">
-                <div className={`flex items-center gap-1.5 ${colors[color].icon} text-sm font-bold`}>
-                    <TrendingUp className="w-4 h-4" /> {trend}
+            <div className="mt-6 sm:mt-10 pt-4 sm:pt-8 border-t border-slate-50 flex items-center justify-between">
+                <div className={`flex items-center gap-1.5 ${colors[color].icon} text-xs sm:text-sm font-bold`}>
+                    <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {trend}
                 </div>
-                <span className="text-slate-300 text-[10px] font-bold uppercase tracking-widest">Growth Index</span>
+                <span className="text-slate-300 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">Growth Index</span>
             </div>
         </motion.div>
     )

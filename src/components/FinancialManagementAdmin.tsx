@@ -1,0 +1,1412 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import api from "@/lib/api";
+import { getToken } from "@/lib/tokenStorage";
+import { 
+    IndianRupee, 
+    Calendar, 
+    Search, 
+    Download, 
+    RefreshCw, 
+    CheckCircle2, 
+    Clock, 
+    AlertCircle, 
+    Building2, 
+    Wallet, 
+    CreditCard, 
+    Banknote, 
+    ArrowUpRight, 
+    RotateCcw, 
+    Check, 
+    X, 
+    ChevronLeft, 
+    ChevronRight, 
+    FileText, 
+    Eye, 
+    HelpCircle, 
+    Layers, 
+    TrendingUp, 
+    ShieldCheck, 
+    AlertTriangle,
+    Info 
+} from "lucide-react";
+
+export default function FinancialManagementAdmin() {
+    // 5 Subsections: 'overall' | 'hospital_reports' | 'settlements' | 'transactions' | 'refunds'
+    const [activeSection, setActiveSection] = useState<"overall" | "hospital_reports" | "settlements" | "transactions" | "refunds">("overall");
+
+    // Global Date Filter
+    const [period, setPeriod] = useState<string>("this_month");
+    const [customStartDate, setCustomStartDate] = useState<string>("");
+    const [customEndDate, setCustomEndDate] = useState<string>("");
+
+    // Toast Notification
+    const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+    const showToast = (message: string, type: "success" | "error" = "success") => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    };
+
+    // Helper currency formatter
+    const fmt = (val: number | undefined | null) => {
+        const num = Number(val) || 0;
+        return `₹${num.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
+    // Helper date formatter
+    const fmtDate = (dStr: string | undefined | null) => {
+        if (!dStr) return "N/A";
+        try {
+            return new Date(dStr).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+        } catch {
+            return "N/A";
+        }
+    };
+
+    const fmtDateTime = (dStr: string | undefined | null) => {
+        if (!dStr) return "N/A";
+        try {
+            const d = new Date(dStr);
+            return `${d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" })} ${d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
+        } catch {
+            return "N/A";
+        }
+    };
+
+    // =========================================================================
+    // SUBSECTION 1: OVERALL DASHBOARD DATA
+    // =========================================================================
+    const [overallData, setOverallData] = useState<any>(null);
+    const [loadingOverall, setLoadingOverall] = useState(true);
+
+    const fetchOverall = useCallback(async () => {
+        setLoadingOverall(true);
+        try {
+            const params = new URLSearchParams();
+            params.append("period", period);
+            if (period === "custom") {
+                if (customStartDate) params.append("startDate", customStartDate);
+                if (customEndDate) params.append("endDate", customEndDate);
+            }
+            const res = await api.get(`/admin/financial/overview?${params.toString()}`);
+            if (res.data?.success) {
+                setOverallData(res.data.cards);
+            }
+        } catch (err) {
+            console.error("Failed to fetch overall dashboard:", err);
+            showToast("Failed to load overall financial metrics", "error");
+        } finally {
+            setLoadingOverall(false);
+        }
+    }, [period, customStartDate, customEndDate]);
+
+    // =========================================================================
+    // SUBSECTION 2: HOSPITAL-WISE FINANCIAL REPORTS
+    // =========================================================================
+    const [hospitalsList, setHospitalsList] = useState<any[]>([]);
+    const [selectedHospitalId, setSelectedHospitalId] = useState<string>("");
+    const [hospitalReport, setHospitalReport] = useState<any>(null);
+    const [loadingHospitalReport, setLoadingHospitalReport] = useState(false);
+
+    // Fetch list of hospitals for selector
+    useEffect(() => {
+        const fetchHospitals = async () => {
+            try {
+                const res = await api.get("/admin/hospitals");
+                const list = res.data?.hospitals || res.data || [];
+                setHospitalsList(list);
+                if (list.length > 0 && !selectedHospitalId) {
+                    setSelectedHospitalId(list[0]._id);
+                }
+            } catch (err) {
+                console.error("Failed to load hospitals list", err);
+            }
+        };
+        fetchHospitals();
+    }, [selectedHospitalId]);
+
+    const fetchHospitalReport = useCallback(async () => {
+        if (!selectedHospitalId) return;
+        setLoadingHospitalReport(true);
+        try {
+            const params = new URLSearchParams();
+            params.append("period", period);
+            if (period === "custom") {
+                if (customStartDate) params.append("startDate", customStartDate);
+                if (customEndDate) params.append("endDate", customEndDate);
+            }
+            const res = await api.get(`/admin/financial/hospital/${selectedHospitalId}?${params.toString()}`);
+            if (res.data?.success) {
+                setHospitalReport(res.data);
+            }
+        } catch (err) {
+            console.error("Failed to load hospital report:", err);
+            showToast("Failed to load hospital financial report", "error");
+        } finally {
+            setLoadingHospitalReport(false);
+        }
+    }, [selectedHospitalId, period, customStartDate, customEndDate]);
+
+    // =========================================================================
+    // SUBSECTION 3: SETTLEMENT MANAGEMENT
+    // =========================================================================
+    const [settlements, setSettlements] = useState<any[]>([]);
+    const [loadingSettlements, setLoadingSettlements] = useState(false);
+    const [payoutModalHosp, setPayoutModalHosp] = useState<any | null>(null);
+    const [payoutAmount, setPayoutAmount] = useState<number>(0);
+    const [payoutMethod, setPayoutMethod] = useState<string>("NEFT");
+    const [payoutUtr, setPayoutUtr] = useState<string>("");
+    const [payoutNotes, setPayoutNotes] = useState<string>("");
+    const [payoutSubmitting, setPayoutSubmitting] = useState(false);
+
+    const fetchSettlements = useCallback(async () => {
+        setLoadingSettlements(true);
+        try {
+            const res = await api.get("/admin/financial/settlements");
+            if (res.data?.success) {
+                setSettlements(res.data.settlements || []);
+            }
+        } catch (err) {
+            console.error("Failed to load settlements:", err);
+            showToast("Failed to load settlements", "error");
+        } finally {
+            setLoadingSettlements(false);
+        }
+    }, []);
+
+    const handleRecordPayoutSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!payoutModalHosp) return;
+        if (!payoutUtr.trim()) {
+            showToast("UTR / Reference number is mandatory", "error");
+            return;
+        }
+        if (payoutAmount <= 0) {
+            showToast("Payout amount must be greater than 0", "error");
+            return;
+        }
+
+        setPayoutSubmitting(true);
+        try {
+            const res = await api.post("/admin/financial/settlements/payout", {
+                hospitalId: payoutModalHosp.hospitalId,
+                amount: payoutAmount,
+                paymentMethod: payoutMethod,
+                utrReference: payoutUtr.trim(),
+                notes: payoutNotes.trim()
+            });
+
+            if (res.data?.success) {
+                showToast(`Payout of ₹${payoutAmount} recorded successfully!`, "success");
+                setPayoutModalHosp(null);
+                fetchSettlements();
+                fetchOverall();
+            } else {
+                showToast(res.data?.message || "Failed to record payout", "error");
+            }
+        } catch (err: any) {
+            console.error("Error submitting payout:", err);
+            showToast(err.response?.data?.message || "Failed to record payout", "error");
+        } finally {
+            setPayoutSubmitting(false);
+        }
+    };
+
+    // =========================================================================
+    // SUBSECTION 4: TRANSACTION MANAGEMENT (MASTER LEDGER)
+    // =========================================================================
+    const [transactions, setTransactions] = useState<any[]>([]);
+    const [loadingTxns, setLoadingTxns] = useState(false);
+    const [txnSearch, setTxnSearch] = useState("");
+    const [txnTypeFilter, setTxnTypeFilter] = useState("all");
+    const [txnSourceFilter, setTxnSourceFilter] = useState("all");
+    const [txnMethodFilter, setTxnMethodFilter] = useState("all");
+    const [txnStatusFilter, setTxnStatusFilter] = useState("all");
+    const [txnHospFilter, setTxnHospFilter] = useState("all");
+    const [txnPage, setTxnPage] = useState(1);
+    const [txnLimit, setTxnLimit] = useState(15);
+    const [txnPagination, setTxnPagination] = useState({ totalPages: 1, totalRecords: 0 });
+    const [exportingTxn, setExportingTxn] = useState(false);
+
+    const getTxnParams = useCallback((isExport: boolean = false) => {
+        const params = new URLSearchParams();
+        params.append("period", period);
+        if (period === "custom") {
+            if (customStartDate) params.append("startDate", customStartDate);
+            if (customEndDate) params.append("endDate", customEndDate);
+        }
+        if (txnSearch.trim()) params.append("search", txnSearch.trim());
+        if (txnTypeFilter !== "all") params.append("paymentType", txnTypeFilter);
+        if (txnSourceFilter !== "all") params.append("paymentSource", txnSourceFilter);
+        if (txnMethodFilter !== "all") params.append("paymentMethod", txnMethodFilter);
+        if (txnStatusFilter !== "all") params.append("status", txnStatusFilter);
+        if (txnHospFilter !== "all") params.append("hospitalId", txnHospFilter);
+
+        if (isExport) {
+            params.append("export", "csv");
+        } else {
+            params.append("page", txnPage.toString());
+            params.append("limit", txnLimit.toString());
+        }
+        return params.toString();
+    }, [period, customStartDate, customEndDate, txnSearch, txnTypeFilter, txnSourceFilter, txnMethodFilter, txnStatusFilter, txnHospFilter, txnPage, txnLimit]);
+
+    const fetchTransactions = useCallback(async () => {
+        setLoadingTxns(true);
+        try {
+            const query = getTxnParams(false);
+            const res = await api.get(`/admin/financial/transactions?${query}`);
+            if (res.data?.success) {
+                setTransactions(res.data.transactions || []);
+                if (res.data.pagination) {
+                    setTxnPagination({
+                        totalPages: res.data.pagination.totalPages || 1,
+                        totalRecords: res.data.pagination.totalRecords || 0
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Failed to fetch transactions:", err);
+            showToast("Failed to load master ledger transactions", "error");
+        } finally {
+            setLoadingTxns(false);
+        }
+    }, [getTxnParams]);
+
+    const handleExportTxnCSV = async () => {
+        setExportingTxn(true);
+        try {
+            const query = getTxnParams(true);
+            const res = await api.get(`/admin/financial/transactions?${query}`, {
+                responseType: "blob"
+            });
+            const blob = new Blob([res.data], { type: "text/csv;charset=utf-8;" });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `pillora-transactions-master-${new Date().toISOString().split("T")[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            showToast("Master ledger CSV downloaded!", "success");
+        } catch (err) {
+            console.error("CSV Export error:", err);
+            showToast("Failed to download CSV export", "error");
+        } finally {
+            setExportingTxn(false);
+        }
+    };
+
+    // =========================================================================
+    // SUBSECTION 5: REFUND MANAGEMENT
+    // =========================================================================
+    const [refunds, setRefunds] = useState<any[]>([]);
+    const [loadingRefunds, setLoadingRefunds] = useState(false);
+    const [refundModalAppt, setRefundModalAppt] = useState<any | null>(null);
+    const [refundAmountInput, setRefundAmountInput] = useState<number>(0);
+    const [refundReasonInput, setRefundReasonInput] = useState<string>("");
+    const [refundManualNotes, setRefundManualNotes] = useState<string>("");
+    const [refundSubmitting, setRefundSubmitting] = useState(false);
+
+    const fetchRefunds = useCallback(async () => {
+        setLoadingRefunds(true);
+        try {
+            const res = await api.get("/admin/financial/refunds");
+            if (res.data?.success) {
+                setRefunds(res.data.refunds || []);
+            }
+        } catch (err) {
+            console.error("Failed to load refunds:", err);
+            showToast("Failed to load refund records", "error");
+        } finally {
+            setLoadingRefunds(false);
+        }
+    }, []);
+
+    const handleProcessRefundSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!refundModalAppt) return;
+        if (refundAmountInput <= 0) {
+            showToast("Refund amount must be greater than 0", "error");
+            return;
+        }
+
+        setRefundSubmitting(true);
+        try {
+            const res = await api.post("/admin/financial/refunds/process", {
+                appointmentId: refundModalAppt.appointmentId,
+                refundAmount: refundAmountInput,
+                reason: refundReasonInput.trim() || refundModalAppt.cancellationReason || "Appointment cancellation",
+                manualNotes: refundManualNotes.trim()
+            });
+
+            if (res.data?.success) {
+                showToast(`Refund of ₹${refundAmountInput} processed successfully!`, "success");
+                setRefundModalAppt(null);
+                fetchRefunds();
+                fetchOverall();
+                fetchSettlements();
+            } else {
+                showToast(res.data?.message || "Failed to process refund", "error");
+            }
+        } catch (err: any) {
+            console.error("Refund error:", err);
+            showToast(err.response?.data?.message || "Failed to process refund", "error");
+        } finally {
+            setRefundSubmitting(false);
+        }
+    };
+
+    // Initial load based on section
+    useEffect(() => {
+        if (activeSection === "overall") fetchOverall();
+        if (activeSection === "hospital_reports") fetchHospitalReport();
+        if (activeSection === "settlements") fetchSettlements();
+        if (activeSection === "transactions") fetchTransactions();
+        if (activeSection === "refunds") fetchRefunds();
+    }, [activeSection, fetchOverall, fetchHospitalReport, fetchSettlements, fetchTransactions, fetchRefunds]);
+
+    // Status badge style helper
+    const getSettlementBadge = (status: string) => {
+        switch (status?.toLowerCase()) {
+            case "settled":
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Settled</span>;
+            case "processing":
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">Processing</span>;
+            case "pending":
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Pending</span>;
+            case "failed":
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800">Failed</span>;
+            case "reversed":
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800">Reversed</span>;
+            default:
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600">{status || "Pending"}</span>;
+        }
+    };
+
+    return (
+        <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            {/* Toast Feedback */}
+            {toast && (
+                <div className={`fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border text-sm font-semibold transition-all transform animate-bounce ${
+                    toast.type === "success" ? "bg-emerald-900 text-emerald-100 border-emerald-700" : "bg-rose-900 text-rose-100 border-rose-700"
+                }`}>
+                    {toast.type === "success" ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <AlertCircle className="w-5 h-5 text-rose-400" />}
+                    <span>{toast.message}</span>
+                </div>
+            )}
+
+            {/* Top Header & Subsection Navigation */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 space-y-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
+                            <ShieldCheck className="w-3.5 h-3.5" /> Pillora Financial Control
+                        </div>
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Financial Management</h1>
+                        <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+                            Central administration for hospital settlements, gateway deductions, appointment transactions ledger, and refunds.
+                        </p>
+                    </div>
+
+                    {/* Date Filter Bar */}
+                    <div className="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5" /> Period:
+                        </span>
+                        {[
+                            { label: "Today", value: "today" },
+                            { label: "Yesterday", value: "yesterday" },
+                            { label: "This Week", value: "this_week" },
+                            { label: "This Month", value: "this_month" },
+                            { label: "Last Month", value: "last_month" },
+                            { label: "Custom", value: "custom" }
+                        ].map((t) => (
+                            <button
+                                key={t.value}
+                                onClick={() => setPeriod(t.value)}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                                    period === t.value ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-slate-200"
+                                }`}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Custom Date Inputs if custom period */}
+                {period === "custom" && (
+                    <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
+                        <span className="text-xs text-slate-500 font-bold">Custom Range:</span>
+                        <input
+                            type="date"
+                            value={customStartDate}
+                            onChange={(e) => setCustomStartDate(e.target.value)}
+                            className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium"
+                        />
+                        <span className="text-xs text-slate-400">to</span>
+                        <input
+                            type="date"
+                            value={customEndDate}
+                            onChange={(e) => setCustomEndDate(e.target.value)}
+                            className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium"
+                        />
+                        <button
+                            onClick={() => {
+                                if (activeSection === "overall") fetchOverall();
+                                if (activeSection === "hospital_reports") fetchHospitalReport();
+                                if (activeSection === "transactions") fetchTransactions();
+                            }}
+                            className="px-4 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all"
+                        >
+                            Apply Filter
+                        </button>
+                    </div>
+                )}
+
+                {/* 5 Subsections Nav Bar */}
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-slate-100">
+                    {[
+                        { id: "overall", label: "1. Overall Dashboard", icon: Layers },
+                        { id: "hospital_reports", label: "2. Hospital Reports", icon: Building2 },
+                        { id: "settlements", label: "3. Settlement Management", icon: Wallet },
+                        { id: "transactions", label: "4. Master Ledger", icon: FileText },
+                        { id: "refunds", label: "5. Refund Management", icon: RotateCcw }
+                    ].map((sec) => {
+                        const Icon = sec.icon;
+                        const isCurrent = activeSection === sec.id;
+                        return (
+                            <button
+                                key={sec.id}
+                                onClick={() => setActiveSection(sec.id as any)}
+                                className={`py-3 px-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                                    isCurrent
+                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                                        : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/60"
+                                }`}
+                            >
+                                <Icon className="w-3.5 h-3.5" />
+                                <span className="truncate">{sec.label}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* ========================================================================= */}
+            {/* SUBSECTION 1: OVERALL FINANCIAL DASHBOARD */}
+            {/* ========================================================================= */}
+            {activeSection === "overall" && (
+                <div className="space-y-6">
+                    {/* The 8 Aggregate KPI Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        {/* 1. Total Consultation Fees */}
+                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Card 1 • All Facilities</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-slate-500">Total Consultation Fees</h4>
+                                <div className="text-2xl font-black text-slate-900 mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.totalConsultationFees)}
+                                </div>
+                                <span className="text-[10px] text-slate-400 mt-1 block">Gross booked appointment value</span>
+                            </div>
+                        </div>
+
+                        {/* 2. Total Online Advances via Pillora */}
+                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-blue-500">Card 2 • 20% Online</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-slate-500">Total Online Advances</h4>
+                                <div className="text-2xl font-black text-blue-600 mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.grossOnlineAdvances)}
+                                </div>
+                                <span className="text-[10px] text-blue-600/80 mt-1 block">Patient advance paid on Pillora.in</span>
+                            </div>
+                        </div>
+
+                        {/* 3. Total Net Payable to Hospitals */}
+                        <div className="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-6 rounded-3xl shadow-xl shadow-indigo-900/20 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300">Card 3 • Net Payable</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-indigo-200">Total Net Payable to Hospitals</h4>
+                                <div className="text-2xl font-black text-white mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.netPayableToHospitals)}
+                                </div>
+                                <span className="text-[10px] text-indigo-300 mt-1 block">Advances minus gateway deductions</span>
+                            </div>
+                        </div>
+
+                        {/* 4. Total Collected at Clinics – Cash */}
+                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Card 4 • Physical Cash</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-slate-500">Collected at Clinics – Cash</h4>
+                                <div className="text-2xl font-black text-emerald-600 mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.totalCashAtClinics)}
+                                </div>
+                                <span className="text-[10px] text-emerald-600/80 mt-1 block">Physical currency collected at clinic</span>
+                            </div>
+                        </div>
+
+                        {/* 5. Total Collected at Clinics – Online */}
+                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-teal-600">Card 5 • Clinic Online</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-slate-500">Collected at Clinics – Online</h4>
+                                <div className="text-2xl font-black text-teal-600 mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.totalOnlineAtClinics)}
+                                </div>
+                                <span className="text-[10px] text-teal-600/80 mt-1 block">Direct UPI / Card at clinic counter</span>
+                            </div>
+                        </div>
+
+                        {/* 6. Total Gateway Charges & Taxes */}
+                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Card 6 • Gateway Deductions</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-slate-500">Gateway Charges & Taxes</h4>
+                                <div className="text-2xl font-black text-slate-700 mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.totalGatewayCharges)}
+                                </div>
+                                <span className="text-[10px] text-slate-400 mt-1 block">2% fee + 18% GST (2.36%)</span>
+                            </div>
+                        </div>
+
+                        {/* 7. Total Pending Settlements */}
+                        <div className="bg-white p-6 rounded-3xl border border-amber-200 bg-amber-50/20 shadow-xl shadow-amber-900/5 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-600">Card 7 • Owed to Hospitals</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-amber-700">Total Pending Settlements</h4>
+                                <div className="text-2xl font-black text-amber-600 mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.totalPendingSettlements)}
+                                </div>
+                                <span className="text-[10px] text-amber-600/80 mt-1 block">Due for NEFT/RTGS payout</span>
+                            </div>
+                        </div>
+
+                        {/* 8. Total Completed Settlements */}
+                        <div className="bg-white p-6 rounded-3xl border border-emerald-200 bg-emerald-50/20 shadow-xl shadow-emerald-900/5 flex flex-col justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Card 8 • Payouts Dispatched</span>
+                            <div className="mt-3">
+                                <h4 className="text-xs font-bold text-emerald-700">Completed Settlements</h4>
+                                <div className="text-2xl font-black text-emerald-600 mt-1">
+                                    {loadingOverall ? "..." : fmt(overallData?.totalCompletedSettlements)}
+                                </div>
+                                <span className="text-[10px] text-emerald-600/80 mt-1 block">Successfully transferred to hospitals</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Pillora Business Model Reminder Banner */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-3xl p-6 flex items-start gap-4 text-xs">
+                        <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+                            <Info className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                            <h5 className="font-black text-blue-900 text-sm">Pillora Business Model Policy</h5>
+                            <p className="text-blue-800 leading-relaxed">
+                                Pillora operates on fixed hospital subscriptions and does <strong>NOT</strong> earn commission from doctor consultation fees.
+                                The 20% online advance collected from patients belongs entirely to the respective hospital (minus 2.36% third-party gateway processing fees & taxes).
+                                The remaining 80% consultation balance is collected directly by hospital staff at the facility.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ========================================================================= */}
+            {/* SUBSECTION 2: HOSPITAL-WISE FINANCIAL REPORTS */}
+            {/* ========================================================================= */}
+            {activeSection === "hospital_reports" && (
+                <div className="space-y-6">
+                    {/* Hospital Selector Bar */}
+                    <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="w-full sm:w-1/2">
+                            <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                                Select Hospital / Clinic
+                            </label>
+                            <select
+                                value={selectedHospitalId}
+                                onChange={(e) => setSelectedHospitalId(e.target.value)}
+                                className="w-full py-2.5 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                {hospitalsList.map((h) => (
+                                    <option key={h._id} value={h._id}>
+                                        {h.name} ({h.city || "Facility"})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex items-center gap-2 self-end sm:self-auto">
+                            <button
+                                onClick={fetchHospitalReport}
+                                disabled={loadingHospitalReport}
+                                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-2 hover:bg-slate-800 transition-all disabled:opacity-50"
+                            >
+                                <RefreshCw className={`w-3.5 h-3.5 ${loadingHospitalReport ? "animate-spin" : ""}`} />
+                                <span>Reload Report</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {hospitalReport && (
+                        <div className="space-y-6">
+                            {/* Hospital Info & Bank Details */}
+                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Hospital Details</span>
+                                    <h3 className="text-xl font-black text-slate-900 mt-1">{hospitalReport.hospital?.name}</h3>
+                                    <p className="text-xs text-slate-500 mt-0.5">{hospitalReport.hospital?.address}</p>
+                                    <p className="text-xs text-slate-500">Contact: {hospitalReport.hospital?.phone || "N/A"} • Email: {hospitalReport.hospital?.email || "N/A"}</p>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                                        <Wallet className="w-3.5 h-3.5" /> Verified Bank Account
+                                    </span>
+                                    {hospitalReport.hospital?.bankDetails?.accountNumber ? (
+                                        <div className="mt-2 space-y-1 text-xs">
+                                            <div className="flex justify-between">
+                                                <span className="text-slate-500">Beneficiary:</span>
+                                                <span className="font-bold text-slate-800">{hospitalReport.hospital.bankDetails.accountHolderName || "Hospital"}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-slate-500">Account No:</span>
+                                                <span className="font-mono font-bold text-slate-800">{hospitalReport.hospital.bankDetails.accountNumber}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-slate-500">IFSC & Bank:</span>
+                                                <span className="font-bold text-slate-800">{hospitalReport.hospital.bankDetails.ifscCode} ({hospitalReport.hospital.bankDetails.bankName || "Bank"})</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="mt-2 text-xs text-amber-700 font-semibold flex items-center gap-1.5">
+                                            <AlertTriangle className="w-4 h-4 text-amber-500" />
+                                            <span>Bank details not yet configured for this hospital.</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* 10 Hospital Financial Summary Cards */}
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Consultation Fees</span>
+                                    <p className="text-lg font-black text-slate-900 mt-1">{fmt(hospitalReport.financialSummary?.totalConsultationFees)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-blue-100 bg-blue-50/20 shadow-sm">
+                                    <span className="text-[10px] font-bold text-blue-500 uppercase">Pillora Advance (20%)</span>
+                                    <p className="text-lg font-black text-blue-700 mt-1">{fmt(hospitalReport.financialSummary?.grossOnlineAdvances)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Gateway Charges</span>
+                                    <p className="text-lg font-black text-slate-700 mt-1">{fmt(hospitalReport.financialSummary?.gatewayCharges)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-indigo-100 bg-indigo-50/20 shadow-sm">
+                                    <span className="text-[10px] font-bold text-indigo-500 uppercase">Net Payable</span>
+                                    <p className="text-lg font-black text-indigo-700 mt-1">{fmt(hospitalReport.financialSummary?.netPayable)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-emerald-100 bg-emerald-50/20 shadow-sm">
+                                    <span className="text-[10px] font-bold text-emerald-600 uppercase">Clinic Cash</span>
+                                    <p className="text-lg font-black text-emerald-700 mt-1">{fmt(hospitalReport.financialSummary?.cashAtClinic)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-teal-100 bg-teal-50/20 shadow-sm">
+                                    <span className="text-[10px] font-bold text-teal-600 uppercase">Clinic Online</span>
+                                    <p className="text-lg font-black text-teal-700 mt-1">{fmt(hospitalReport.financialSummary?.onlineAtClinic)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Total Collected</span>
+                                    <p className="text-lg font-black text-slate-900 mt-1">{fmt(hospitalReport.financialSummary?.totalPatientCollections)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-rose-100 bg-rose-50/20 shadow-sm">
+                                    <span className="text-[10px] font-bold text-rose-500 uppercase">Patient Dues</span>
+                                    <p className="text-lg font-black text-rose-700 mt-1">{fmt(hospitalReport.financialSummary?.pendingPatientCollection)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-emerald-100 bg-emerald-50/20 shadow-sm">
+                                    <span className="text-[10px] font-bold text-emerald-600 uppercase">Already Settled</span>
+                                    <p className="text-lg font-black text-emerald-700 mt-1">{fmt(hospitalReport.financialSummary?.alreadySettled)}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm">
+                                    <span className="text-[10px] font-bold text-amber-600 uppercase">Pending Settlement</span>
+                                    <p className="text-lg font-black text-amber-700 mt-1">{fmt(hospitalReport.financialSummary?.pendingSettlement)}</p>
+                                </div>
+                            </div>
+
+                            {/* Appointments Table for this Hospital */}
+                            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 overflow-hidden">
+                                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                                    <h4 className="font-black text-slate-900">Hospital Appointment Records ({hospitalReport.appointments?.length || 0})</h4>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-xs">
+                                        <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                                            <tr>
+                                                <th className="py-3 px-4">Token / ID</th>
+                                                <th className="py-3 px-4">Patient</th>
+                                                <th className="py-3 px-4">Doctor</th>
+                                                <th className="py-3 px-4 text-right">Fee</th>
+                                                <th className="py-3 px-4 text-right">Advance Paid</th>
+                                                <th className="py-3 px-4 text-right">Balance Due</th>
+                                                <th className="py-3 px-4 text-right">Balance Paid</th>
+                                                <th className="py-3 px-4">Payment Status</th>
+                                                <th className="py-3 px-4">Settlement</th>
+                                                <th className="py-3 px-4">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 font-medium">
+                                            {hospitalReport.appointments?.map((app: any) => (
+                                                <tr key={app.appointmentId} className="hover:bg-slate-50">
+                                                    <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                                                        {app.tokenNumber ? `#${app.tokenNumber}` : app.appointmentId.slice(-6).toUpperCase()}
+                                                    </td>
+                                                    <td className="py-3 px-4 font-bold text-slate-900">{app.patientName}</td>
+                                                    <td className="py-3 px-4 text-slate-700">{app.doctorName}</td>
+                                                    <td className="py-3 px-4 text-right font-bold">₹{app.consultationFee}</td>
+                                                    <td className="py-3 px-4 text-right font-bold text-blue-600">₹{app.advancePaid}</td>
+                                                    <td className="py-3 px-4 text-right font-bold text-rose-600">₹{app.balanceDue}</td>
+                                                    <td className="py-3 px-4 text-right font-bold text-emerald-600">₹{app.balancePaid}</td>
+                                                    <td className="py-3 px-4 capitalize font-semibold">{app.paymentStatus}</td>
+                                                    <td className="py-3 px-4">{getSettlementBadge(app.settlementStatus)}</td>
+                                                    <td className="py-3 px-4 text-slate-400">{fmtDate(app.appointmentDate)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ========================================================================= */}
+            {/* SUBSECTION 3: SETTLEMENT MANAGEMENT */}
+            {/* ========================================================================= */}
+            {activeSection === "settlements" && (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 overflow-hidden">
+                        <div className="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div>
+                                <h3 className="text-xl font-black text-slate-900">Hospital Settlement Ledger</h3>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Gross online advances, 2.36% gateway charges, net payable, and outstanding payout tracking.
+                                </p>
+                            </div>
+                            <button
+                                onClick={fetchSettlements}
+                                disabled={loadingSettlements}
+                                className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 flex items-center gap-2"
+                            >
+                                <RefreshCw className={`w-3.5 h-3.5 ${loadingSettlements ? "animate-spin" : ""}`} />
+                                <span>Refresh</span>
+                            </button>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs">
+                                <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                                    <tr>
+                                        <th className="py-3.5 px-4">Hospital Name</th>
+                                        <th className="py-3.5 px-4">Bank Account Details</th>
+                                        <th className="py-3.5 px-4 text-right">Gross Advances</th>
+                                        <th className="py-3.5 px-4 text-right">Gateway Deductions</th>
+                                        <th className="py-3.5 px-4 text-right">Net Payable</th>
+                                        <th className="py-3.5 px-4 text-right">Already Settled</th>
+                                        <th className="py-3.5 px-4 text-right">Pending Payout</th>
+                                        <th className="py-3.5 px-4">Status</th>
+                                        <th className="py-3.5 px-4 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 font-medium">
+                                    {loadingSettlements ? (
+                                        <tr>
+                                            <td colSpan={9} className="py-12 text-center text-slate-400">Loading settlements...</td>
+                                        </tr>
+                                    ) : settlements.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={9} className="py-12 text-center text-slate-400">No hospital settlement records found.</td>
+                                        </tr>
+                                    ) : (
+                                        settlements.map((s) => {
+                                            const hasPendingPayout = s.pendingSettlement > 0;
+                                            return (
+                                                <tr key={s.hospitalId} className="hover:bg-slate-50">
+                                                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                                                        {s.hospitalName}
+                                                        <div className="text-[10px] font-normal text-slate-400">{s.phone}</div>
+                                                    </td>
+                                                    <td className="py-3.5 px-4">
+                                                        {s.bankDetails?.accountNumber ? (
+                                                            <div className="font-mono text-[11px] text-slate-700">
+                                                                <div>{s.bankDetails.accountHolderName}</div>
+                                                                <div>{s.bankDetails.accountNumber} • {s.bankDetails.ifscCode}</div>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-[10px] text-amber-600 font-bold">No bank added</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-3.5 px-4 text-right font-bold text-blue-600">{fmt(s.grossOnlineAdvances)}</td>
+                                                    <td className="py-3.5 px-4 text-right text-slate-500">{fmt(s.gatewayCharges)}</td>
+                                                    <td className="py-3.5 px-4 text-right font-black text-indigo-700">{fmt(s.netPayable)}</td>
+                                                    <td className="py-3.5 px-4 text-right font-bold text-emerald-600">{fmt(s.alreadySettled)}</td>
+                                                    <td className="py-3.5 px-4 text-right">
+                                                        {hasPendingPayout ? (
+                                                            <span className="font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">
+                                                                {fmt(s.pendingSettlement)}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-emerald-600 font-bold">₹0.00</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-3.5 px-4 whitespace-nowrap">
+                                                        {getSettlementBadge(s.settlementStatus)}
+                                                    </td>
+                                                    <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                                        {hasPendingPayout && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setPayoutModalHosp(s);
+                                                                    setPayoutAmount(s.pendingSettlement);
+                                                                    setPayoutMethod("NEFT");
+                                                                    setPayoutUtr("");
+                                                                    setPayoutNotes("");
+                                                                }}
+                                                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs shadow-md shadow-blue-600/10 flex items-center gap-1.5 transition-all"
+                                                            >
+                                                                <Wallet className="w-3.5 h-3.5" />
+                                                                <span>Record Payout</span>
+                                                            </button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Record Payout Modal */}
+                    {payoutModalHosp && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                            <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6">
+                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <div>
+                                        <h3 className="text-xl font-black text-slate-900">Record Settlement Payout</h3>
+                                        <p className="text-xs text-slate-500 mt-0.5">Hospital: {payoutModalHosp.hospitalName}</p>
+                                    </div>
+                                    <button onClick={() => setPayoutModalHosp(null)} className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100">
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-500">Bank Account:</span>
+                                        <span className="font-mono font-bold text-slate-900">{payoutModalHosp.bankDetails?.accountNumber || "N/A"}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-500">IFSC & Bank:</span>
+                                        <span className="font-bold text-slate-900">{payoutModalHosp.bankDetails?.ifscCode || "N/A"} ({payoutModalHosp.bankDetails?.bankName || "Bank"})</span>
+                                    </div>
+                                    <div className="flex justify-between border-t border-slate-200 pt-2 text-amber-700 font-bold">
+                                        <span>Outstanding Net Settlement:</span>
+                                        <span className="text-sm font-black text-amber-600">{fmt(payoutModalHosp.pendingSettlement)}</span>
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handleRecordPayoutSubmit} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                                            Transfer Amount (₹)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            required
+                                            min={1}
+                                            step="0.01"
+                                            value={payoutAmount}
+                                            onChange={(e) => setPayoutAmount(Number(e.target.value))}
+                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                                                Transfer Method
+                                            </label>
+                                            <select
+                                                value={payoutMethod}
+                                                onChange={(e) => setPayoutMethod(e.target.value)}
+                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                <option value="NEFT">NEFT</option>
+                                                <option value="RTGS">RTGS</option>
+                                                <option value="IMPS">IMPS</option>
+                                                <option value="UPI">UPI</option>
+                                                <option value="Other">Other Bank Transfer</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                                                UTR / Ref Number <span className="text-rose-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                placeholder="e.g. UTR123456789"
+                                                value={payoutUtr}
+                                                onChange={(e) => setPayoutUtr(e.target.value)}
+                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                                            Notes / Remarks
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Optional remarks"
+                                            value={payoutNotes}
+                                            onChange={(e) => setPayoutNotes(e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-medium"
+                                        />
+                                    </div>
+
+                                    <div className="pt-3 flex justify-end gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setPayoutModalHosp(null)}
+                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={payoutSubmitting}
+                                            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-600/20 flex items-center gap-2"
+                                        >
+                                            {payoutSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                                            <span>Confirm Settlement Payout</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* ========================================================================= */}
+            {/* SUBSECTION 4: TRANSACTION MANAGEMENT (MASTER LEDGER) */}
+            {/* ========================================================================= */}
+            {activeSection === "transactions" && (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 space-y-4">
+                        {/* Table Header & Master Filters */}
+                        <div className="p-6 sm:p-8 border-b border-slate-100 space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-900">Master Financial Transaction Ledger</h3>
+                                    <p className="text-xs text-slate-500 mt-0.5">
+                                        Immutable record of all patient advances, clinic cash/online collections, refunds, and settlements.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={handleExportTxnCSV}
+                                    disabled={exportingTxn}
+                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-emerald-600/10"
+                                >
+                                    <Download className="w-3.5 h-3.5" />
+                                    <span>{exportingTxn ? "Exporting..." : "Export CSV"}</span>
+                                </button>
+                            </div>
+
+                            {/* Filters Bar */}
+                            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+                                <div className="relative">
+                                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search Txn ID, Rzp ID, Patient..."
+                                        value={txnSearch}
+                                        onChange={(e) => {
+                                            setTxnSearch(e.target.value);
+                                            setTxnPage(1);
+                                        }}
+                                        className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+
+                                <select
+                                    value={txnTypeFilter}
+                                    onChange={(e) => {
+                                        setTxnTypeFilter(e.target.value);
+                                        setTxnPage(1);
+                                    }}
+                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                >
+                                    <option value="all">All Types</option>
+                                    <option value="advance">Advance</option>
+                                    <option value="balance">Balance</option>
+                                    <option value="full">Full</option>
+                                    <option value="refund">Refund</option>
+                                </select>
+
+                                <select
+                                    value={txnSourceFilter}
+                                    onChange={(e) => {
+                                        setTxnSourceFilter(e.target.value);
+                                        setTxnPage(1);
+                                    }}
+                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                >
+                                    <option value="all">All Sources</option>
+                                    <option value="pillora_online">Pillora Online</option>
+                                    <option value="clinic_collection">Clinic Collection</option>
+                                </select>
+
+                                <select
+                                    value={txnMethodFilter}
+                                    onChange={(e) => {
+                                        setTxnMethodFilter(e.target.value);
+                                        setTxnPage(1);
+                                    }}
+                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                >
+                                    <option value="all">All Methods</option>
+                                    <option value="razorpay">Razorpay</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="upi">UPI</option>
+                                    <option value="card">Card</option>
+                                    <option value="other_online">Other Online</option>
+                                </select>
+
+                                <select
+                                    value={txnStatusFilter}
+                                    onChange={(e) => {
+                                        setTxnStatusFilter(e.target.value);
+                                        setTxnPage(1);
+                                    }}
+                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                >
+                                    <option value="all">All Statuses</option>
+                                    <option value="completed">Completed / Captured</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="refunded">Refunded</option>
+                                </select>
+
+                                <select
+                                    value={txnHospFilter}
+                                    onChange={(e) => {
+                                        setTxnHospFilter(e.target.value);
+                                        setTxnPage(1);
+                                    }}
+                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                >
+                                    <option value="all">All Hospitals</option>
+                                    {hospitalsList.map((h) => (
+                                        <option key={h._id} value={h._id}>{h.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Master Ledger Table */}
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs">
+                                <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                                    <tr>
+                                        <th className="py-3 px-4">Txn ID / Razorpay ID</th>
+                                        <th className="py-3 px-4">Hospital</th>
+                                        <th className="py-3 px-4">Patient Info</th>
+                                        <th className="py-3 px-4 text-right">Amount</th>
+                                        <th className="py-3 px-4">Type</th>
+                                        <th className="py-3 px-4">Source & Method</th>
+                                        <th className="py-3 px-4 text-right">Gateway Deductions</th>
+                                        <th className="py-3 px-4">Status</th>
+                                        <th className="py-3 px-4">Settlement</th>
+                                        <th className="py-3 px-4">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 font-medium">
+                                    {loadingTxns ? (
+                                        <tr>
+                                            <td colSpan={10} className="py-12 text-center text-slate-400">Loading master ledger...</td>
+                                        </tr>
+                                    ) : transactions.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={10} className="py-12 text-center text-slate-400">No transactions found matching filters.</td>
+                                        </tr>
+                                    ) : (
+                                        transactions.map((tx) => (
+                                            <tr key={tx._id} className="hover:bg-slate-50">
+                                                <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                                                    <div>{tx.transactionId}</div>
+                                                    {tx.razorpayPaymentId && (
+                                                        <div className="text-[10px] font-normal text-slate-400">{tx.razorpayPaymentId}</div>
+                                                    )}
+                                                </td>
+                                                <td className="py-3 px-4 font-bold text-slate-800">{tx.hospitalName}</td>
+                                                <td className="py-3 px-4">
+                                                    <div className="font-bold text-slate-900">{tx.patientName}</div>
+                                                    <div className="text-[10px] text-slate-400">{tx.patientPhone}</div>
+                                                </td>
+                                                <td className="py-3 px-4 text-right font-black text-slate-900">
+                                                    ₹{tx.amount}
+                                                </td>
+                                                <td className="py-3 px-4 capitalize font-bold text-slate-700">{tx.paymentType}</td>
+                                                <td className="py-3 px-4">
+                                                    <span className="capitalize font-semibold text-slate-700">{tx.paymentMethod}</span>
+                                                    <div className="text-[10px] text-slate-400 capitalize">{tx.paymentSource?.replace("_", " ")}</div>
+                                                </td>
+                                                <td className="py-3 px-4 text-right text-slate-500 font-semibold">
+                                                    {tx.gatewayCharges > 0 ? `₹${tx.gatewayCharges}` : "—"}
+                                                </td>
+                                                <td className="py-3 px-4">
+                                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                                                        {tx.status}
+                                                    </span>
+                                                </td>
+                                                <td className="py-3 px-4">{getSettlementBadge(tx.settlementStatus)}</td>
+                                                <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{fmtDateTime(tx.createdAt)}</td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Pagination */}
+                        <div className="p-4 sm:p-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 font-semibold">
+                            <span>Showing {transactions.length} of {txnPagination.totalRecords} records</span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setTxnPage((p) => Math.max(1, p - 1))}
+                                    disabled={txnPage <= 1}
+                                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
+                                <span>Page {txnPage} of {txnPagination.totalPages}</span>
+                                <button
+                                    onClick={() => setTxnPage((p) => Math.min(txnPagination.totalPages, p + 1))}
+                                    disabled={txnPage >= txnPagination.totalPages}
+                                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ========================================================================= */}
+            {/* SUBSECTION 5: REFUND MANAGEMENT */}
+            {/* ========================================================================= */}
+            {activeSection === "refunds" && (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 overflow-hidden">
+                        <div className="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div>
+                                <h3 className="text-xl font-black text-slate-900">Cancelled Appointments & Refund Requests</h3>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Cancelled appointments with paid online advances requiring refund processing.
+                                </p>
+                            </div>
+                            <button
+                                onClick={fetchRefunds}
+                                disabled={loadingRefunds}
+                                className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 flex items-center gap-2"
+                            >
+                                <RefreshCw className={`w-3.5 h-3.5 ${loadingRefunds ? "animate-spin" : ""}`} />
+                                <span>Refresh</span>
+                            </button>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs">
+                                <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                                    <tr>
+                                        <th className="py-3 px-4">Appt ID</th>
+                                        <th className="py-3 px-4">Patient</th>
+                                        <th className="py-3 px-4">Hospital</th>
+                                        <th className="py-3 px-4 text-right">Fee</th>
+                                        <th className="py-3 px-4 text-right">Advance Paid</th>
+                                        <th className="py-3 px-4 text-right">Refund Amount</th>
+                                        <th className="py-3 px-4">Reason</th>
+                                        <th className="py-3 px-4">Refund Status</th>
+                                        <th className="py-3 px-4">Cancellation Date</th>
+                                        <th className="py-3 px-4 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 font-medium">
+                                    {loadingRefunds ? (
+                                        <tr>
+                                            <td colSpan={10} className="py-12 text-center text-slate-400">Loading refund queue...</td>
+                                        </tr>
+                                    ) : refunds.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={10} className="py-12 text-center text-slate-400">No pending refund requests found.</td>
+                                        </tr>
+                                    ) : (
+                                        refunds.map((r) => {
+                                            const isRefundPending = r.refundStatus === "Pending Approval";
+                                            return (
+                                                <tr key={r.appointmentId} className="hover:bg-slate-50">
+                                                    <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                                                        {r.appointmentId.slice(-6).toUpperCase()}
+                                                    </td>
+                                                    <td className="py-3 px-4">
+                                                        <div className="font-bold text-slate-900">{r.patientName}</div>
+                                                        <div className="text-[10px] text-slate-400">{r.patientPhone}</div>
+                                                    </td>
+                                                    <td className="py-3 px-4 font-bold text-slate-800">{r.hospitalName}</td>
+                                                    <td className="py-3 px-4 text-right font-bold">₹{r.consultationFee}</td>
+                                                    <td className="py-3 px-4 text-right font-black text-blue-600">₹{r.advancePaid}</td>
+                                                    <td className="py-3 px-4 text-right font-black text-rose-600">₹{r.refundAmount}</td>
+                                                    <td className="py-3 px-4 text-slate-600 max-w-xs truncate">{r.cancellationReason || "Patient cancelled"}</td>
+                                                    <td className="py-3 px-4">
+                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                                            r.refundStatus === "Refunded"
+                                                                ? "bg-emerald-100 text-emerald-800"
+                                                                : r.refundStatus === "Pending Approval"
+                                                                ? "bg-amber-100 text-amber-800"
+                                                                : "bg-slate-100 text-slate-600"
+                                                        }`}>
+                                                            {r.refundStatus}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-3 px-4 text-slate-400">{fmtDate(r.cancellationDate)}</td>
+                                                    <td className="py-3 px-4 text-center">
+                                                        {isRefundPending && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setRefundModalAppt(r);
+                                                                    setRefundAmountInput(r.refundAmount || r.advancePaid);
+                                                                    setRefundReasonInput(r.cancellationReason || "Appointment cancelled");
+                                                                    setRefundManualNotes("");
+                                                                }}
+                                                                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs shadow-md shadow-rose-600/10 flex items-center gap-1.5 transition-all"
+                                                            >
+                                                                <RotateCcw className="w-3.5 h-3.5" />
+                                                                <span>Process Refund</span>
+                                                            </button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Process Refund Modal */}
+                    {refundModalAppt && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                            <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6">
+                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                                    <div>
+                                        <h3 className="text-xl font-black text-slate-900">Process Patient Refund</h3>
+                                        <p className="text-xs text-slate-500 mt-0.5">Appointment: {refundModalAppt.appointmentId}</p>
+                                    </div>
+                                    <button onClick={() => setRefundModalAppt(null)} className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100">
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+
+                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
+                                    <div className="flex justify-between font-bold">
+                                        <span className="text-slate-500">Patient:</span>
+                                        <span className="text-slate-900">{refundModalAppt.patientName} ({refundModalAppt.patientPhone})</span>
+                                    </div>
+                                    <div className="flex justify-between font-bold">
+                                        <span className="text-slate-500">Hospital:</span>
+                                        <span className="text-slate-900">{refundModalAppt.hospitalName}</span>
+                                    </div>
+                                    <div className="flex justify-between border-t border-slate-200 pt-2 font-bold text-blue-700">
+                                        <span>Advance Paid via Pillora:</span>
+                                        <span>₹{refundModalAppt.advancePaid}</span>
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handleProcessRefundSubmit} className="space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                                            Refund Amount (₹)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            required
+                                            min={1}
+                                            max={refundModalAppt.advancePaid}
+                                            step="0.01"
+                                            value={refundAmountInput}
+                                            onChange={(e) => setRefundAmountInput(Number(e.target.value))}
+                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                                            Refund Reason
+                                        </label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={refundReasonInput}
+                                            onChange={(e) => setRefundReasonInput(e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
+                                            Internal Admin Notes (Optional)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Transaction ref, bank acknowledgement..."
+                                            value={refundManualNotes}
+                                            onChange={(e) => setRefundManualNotes(e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800"
+                                        />
+                                    </div>
+
+                                    <div className="pt-3 flex justify-end gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setRefundModalAppt(null)}
+                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={refundSubmitting}
+                                            className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-lg shadow-rose-600/20 flex items-center gap-2"
+                                        >
+                                            {refundSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+                                            <span>Confirm & Process Refund</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}

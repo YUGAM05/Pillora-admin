@@ -330,39 +330,39 @@ export default function BloodBankAdmin() {
     }
 
     return (
-        <div className="bg-white rounded-3xl p-6 md:p-8 space-y-8">
+        <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
             {/* Stats Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-3.5 sm:p-4 bg-blue-50 border border-blue-100 rounded-2xl">
                     <p className="text-[10px] font-black text-blue-400 uppercase tracking-wider mb-1">Total Donors</p>
-                    <p className="text-2xl font-black text-blue-900">{stats.totalDonors}</p>
+                    <p className="text-xl sm:text-2xl font-black text-blue-900">{stats.totalDonors}</p>
                 </div>
-                <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                <div className="p-3.5 sm:p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
                     <p className="text-[10px] font-black text-emerald-400 uppercase tracking-wider mb-1">Available</p>
-                    <p className="text-2xl font-black text-emerald-900">{stats.availableDonors}</p>
+                    <p className="text-xl sm:text-2xl font-black text-emerald-900">{stats.availableDonors}</p>
                 </div>
-                <div className="p-4 bg-purple-50 border border-purple-100 rounded-2xl">
+                <div className="p-3.5 sm:p-4 bg-purple-50 border border-purple-100 rounded-2xl">
                     <p className="text-[10px] font-black text-purple-400 uppercase tracking-wider mb-1">Requests</p>
-                    <p className="text-2xl font-black text-purple-900">{stats.totalRequests}</p>
+                    <p className="text-xl sm:text-2xl font-black text-purple-900">{stats.totalRequests}</p>
                 </div>
-                <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl">
+                <div className="p-3.5 sm:p-4 bg-rose-50 border border-rose-100 rounded-2xl">
                     <p className="text-[10px] font-black text-rose-400 uppercase tracking-wider mb-1">Urgent</p>
-                    <p className="text-2xl font-black text-rose-900">{stats.urgentRequests}</p>
+                    <p className="text-xl sm:text-2xl font-black text-rose-900">{stats.urgentRequests}</p>
                 </div>
             </div>
 
             {/* Controls */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex bg-gray-100 p-1 rounded-xl w-fit">
+                <div className="flex bg-gray-100 p-1 rounded-xl w-full sm:w-fit overflow-x-auto">
                     <button
                         onClick={() => setActiveTab('donors')}
-                        className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'donors' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'donors' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Donors ({totalDonors})
                     </button>
                     <button
                         onClick={() => setActiveTab('requests')}
-                        className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'requests' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`flex-1 sm:flex-initial px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'requests' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Requests ({requests.length})
                     </button>
@@ -370,12 +370,12 @@ export default function BloodBankAdmin() {
 
 
                 {activeTab === 'requests' && (
-                    <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                    <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100 overflow-x-auto no-scrollbar">
                         {['all', 'Open', 'Fulfilled', 'Fake'].map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setRequestFilter(f as any)}
-                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
                                     requestFilter === f ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
                                 }`}
                             >
@@ -385,7 +385,7 @@ export default function BloodBankAdmin() {
                     </div>
                 )}
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     {activeTab === 'donors' && (
                         <>
                             <input
@@ -398,7 +398,7 @@ export default function BloodBankAdmin() {
                             <button
                                 onClick={() => document.getElementById('bulk-import-input')?.click()}
                                 disabled={importing}
-                                className="px-4 py-2.5 bg-purple-50 text-purple-600 border border-purple-100 rounded-xl hover:bg-purple-100 transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-wider disabled:opacity-50"
+                                className="px-3 sm:px-4 py-2 sm:py-2.5 bg-purple-50 text-purple-600 border border-purple-100 rounded-xl hover:bg-purple-100 transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-wider disabled:opacity-50"
                                 title="Import from Excel (.xlsx)"
                             >
                                 {importing ? (
@@ -415,25 +415,25 @@ export default function BloodBankAdmin() {
                             </button>
                             <button
                                 onClick={handleDownloadTemplate}
-                                className="px-4 py-2.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-wider"
+                                className="px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-2 text-xs font-black uppercase tracking-wider"
                                 title="Download Sample Excel Template"
                             >
                                 <Download className="w-4 h-4" />
                                 Sample Excel
                             </button>
-                            <div className="w-[1px] h-6 bg-slate-200 mx-1" />
+                            <div className="w-[1px] h-6 bg-slate-200 mx-1 hidden sm:block" />
                         </>
                     )}
                     <button
                         onClick={() => downloadExcel(activeTab)}
-                        className="p-2.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-colors"
+                        className="p-2 sm:p-2.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-colors"
                         title="Export Excel"
                     >
                         <FileSpreadsheet className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => downloadPDF(activeTab)}
-                        className="p-2.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors"
+                        className="p-2 sm:p-2.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl hover:bg-blue-100 transition-colors"
                         title="Export PDF"
                     >
                         <Download className="w-5 h-5" />
@@ -574,10 +574,10 @@ export default function BloodBankAdmin() {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="bg-white rounded-3xl p-6 md:p-8 max-w-2xl w-full shadow-2xl relative z-10 border border-slate-100 flex flex-col max-h-[90vh]"
+                            className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 max-w-2xl w-full shadow-2xl relative z-10 border border-slate-100 flex flex-col max-h-[90vh]"
                         >
                             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                                <h3 className="font-extrabold text-xl text-slate-900">Bulk Donor Import Results</h3>
+                                <h3 className="font-extrabold text-lg sm:text-xl text-slate-900">Bulk Donor Import Results</h3>
                                 <button 
                                     onClick={() => setShowImportModal(false)}
                                     className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
@@ -586,20 +586,20 @@ export default function BloodBankAdmin() {
                                 </button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto py-6 space-y-6">
+                            <div className="flex-1 overflow-y-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
                                 {/* Statistics Summary Cards */}
-                                <div className="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                                     <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-center">
                                         <p className="text-[10px] font-black text-emerald-500 uppercase tracking-wider mb-1">Imported</p>
-                                        <p className="text-3xl font-black text-emerald-950">{importResult.inserted}</p>
+                                        <p className="text-2xl sm:text-3xl font-black text-emerald-950">{importResult.inserted}</p>
                                     </div>
                                     <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl text-center">
                                         <p className="text-[10px] font-black text-amber-500 uppercase tracking-wider mb-1">Skipped (Exists)</p>
-                                        <p className="text-3xl font-black text-amber-950">{importResult.skipped}</p>
+                                        <p className="text-2xl sm:text-3xl font-black text-amber-950">{importResult.skipped}</p>
                                     </div>
                                     <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-center">
                                         <p className="text-[10px] font-black text-rose-500 uppercase tracking-wider mb-1">Errors</p>
-                                        <p className="text-3xl font-black text-rose-950">{importResult.errors.length}</p>
+                                        <p className="text-2xl sm:text-3xl font-black text-rose-950">{importResult.errors.length}</p>
                                     </div>
                                 </div>
 
@@ -676,7 +676,7 @@ function DonorsTable({
 
     return (
         <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-left min-w-[720px]">
                 <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                         <th className="px-6 py-4 w-12">
@@ -807,7 +807,7 @@ function RequestsTable({ requests, onUpdateStatus, onDelete }: {
 }) {
     return (
         <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-left min-w-[720px]">
                 <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                         <th className="px-6 py-4">Patient Info</th>

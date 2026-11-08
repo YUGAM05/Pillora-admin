@@ -162,14 +162,14 @@ export default function HealthHubAdmin() {
     return (
         <div className="space-y-8 font-inter">
             {/* Header section */}
-            <div className="flex justify-between items-center bg-white p-8 rounded-3xl shadow-xl shadow-blue-900/5 border border-slate-100">
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center">
-                        <Heart className="w-7 h-7 text-rose-500" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl shadow-blue-900/5 border border-slate-100">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-rose-50 rounded-2xl flex items-center justify-center shrink-0">
+                        <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-rose-500" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900 font-jakarta">Health Hub Management</h2>
-                        <p className="text-slate-500 text-sm font-medium">Create and manage daily wellness articles, videos, and external resource links</p>
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-jakarta">Health Hub Management</h2>
+                        <p className="text-slate-500 text-xs sm:text-sm font-medium">Create and manage daily wellness articles, videos, and external resource links</p>
                     </div>
                 </div>
                 {!isFormOpen && (
@@ -179,9 +179,9 @@ export default function HealthHubAdmin() {
                             setEditingId(null);
                             setIsFormOpen(true);
                         }}
-                        className="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest shadow-xl shadow-rose-600/30 transition-all active:scale-95"
+                        className="w-full sm:w-auto justify-center flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-rose-600/30 transition-all active:scale-95 whitespace-nowrap"
                     >
-                        <Plus className="w-5 h-5" />
+                        <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                         Create Tip
                     </button>
                 )}
@@ -195,10 +195,10 @@ export default function HealthHubAdmin() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-100"
+                        className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-2xl border border-slate-100"
                     >
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-xl font-bold text-slate-900">{editingId ? 'Edit Health Tip' : 'New Health Tip'}</h3>
+                        <div className="flex justify-between items-center mb-6 sm:mb-8">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-900">{editingId ? 'Edit Health Tip' : 'New Health Tip'}</h3>
                             <button
                                 onClick={() => setIsFormOpen(false)}
                                 className="p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
@@ -210,16 +210,16 @@ export default function HealthHubAdmin() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Title</label>
-                                    <input required name="title" value={formData.title} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-rose-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="Enter health tip title" />
+                                    <input required name="title" value={formData.title} onChange={handleInputChange} className="w-full px-4 sm:px-5 py-3.5 sm:py-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-rose-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="Enter health tip title" />
                                 </div>
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Content / Description</label>
-                                    <textarea required name="description" value={formData.description} onChange={handleInputChange} rows={6} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-rose-500/20 font-medium text-slate-900 outline-none transition-all resize-none" placeholder="Provide wellness advice, detailed guidelines, or context..." />
+                                    <textarea required name="description" value={formData.description} onChange={handleInputChange} rows={6} className="w-full px-4 sm:px-5 py-3.5 sm:py-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-rose-500/20 font-medium text-slate-900 outline-none transition-all resize-none" placeholder="Provide wellness advice, detailed guidelines, or context..." />
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
                                     <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Choose Media Format</label>
-                                    <div className="grid grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                                         {[
                                             { id: 'image', label: 'Image post', icon: ImageIcon, desc: 'Cover image upload', color: 'blue' },
                                             { id: 'video', label: 'Video Clip', icon: VideoIcon, desc: 'Short video upload', color: 'rose' },
@@ -229,13 +229,13 @@ export default function HealthHubAdmin() {
                                                 type="button"
                                                 key={format.id}
                                                 onClick={() => handleMediaTypeChange(format.id as any)}
-                                                className={`p-5 rounded-2xl border-2 text-left transition-all ${
+                                                className={`p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border-2 text-left transition-all ${
                                                     formData.mediaType === format.id 
                                                     ? `border-${format.color}-500 bg-${format.color}-50/30` 
                                                     : 'border-slate-100 hover:border-slate-200 bg-slate-50/50'
                                                 }`}
                                             >
-                                                <format.icon className={`w-6 h-6 mb-2 ${formData.mediaType === format.id ? `text-${format.color}-500` : 'text-slate-400'}`} />
+                                                <format.icon className={`w-5 h-5 sm:w-6 sm:h-6 mb-2 ${formData.mediaType === format.id ? `text-${format.color}-500` : 'text-slate-400'}`} />
                                                 <p className="font-bold text-slate-900 text-sm">{format.label}</p>
                                                 <p className="text-xs text-slate-400 mt-1 font-medium">{format.desc}</p>
                                             </button>
