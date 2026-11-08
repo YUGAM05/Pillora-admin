@@ -228,7 +228,7 @@ export default function AdminDashboard() {
         { id: 'blogs', label: 'Blog Posts', icon: FileText, color: 'text-purple-600' },
         { id: 'health-hub', label: 'Health Hub', icon: Heart, color: 'text-rose-500' },
         { id: 'tickets', label: 'Support Tickets', icon: MessageSquare, color: 'text-blue-600' },
-        { id: 'revenue', label: 'Financial Management', icon: DollarSign, color: 'text-emerald-600' },
+        { id: 'revenue', label: 'Revenue & Settlements', icon: DollarSign, color: 'text-emerald-600' },
     ];
 
     return (
