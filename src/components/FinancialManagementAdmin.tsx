@@ -1045,25 +1045,63 @@ export default function FinancialManagementAdmin() {
                                     </p>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-3xl border border-indigo-100 bg-indigo-50/20 shadow-sm relative overflow-hidden">
-                                    <div className="flex items-center justify-between text-indigo-600 mb-2">
+                                <div className={`bg-white p-5 rounded-3xl border shadow-sm relative overflow-hidden ${
+                                    (hospitalReport.financialSummary?.pendingSettlement || 0) > 0
+                                        ? "border-amber-200 bg-amber-50/20"
+                                        : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0
+                                            ? "border-blue-200 bg-blue-50/20"
+                                            : "border-emerald-200 bg-emerald-50/20"
+                                }`}>
+                                    <div className={`flex items-center justify-between mb-2 ${
+                                        (hospitalReport.financialSummary?.pendingSettlement || 0) > 0
+                                            ? "text-amber-600"
+                                            : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0
+                                                ? "text-blue-600"
+                                                : "text-emerald-600"
+                                    }`}>
                                         <span className="text-[10px] font-black uppercase tracking-wider">Net Amount Pillora Has to Pay</span>
                                         <IndianRupee className="w-4 h-4" />
                                     </div>
-                                    <p className="text-2xl font-black text-indigo-700">{fmt(hospitalReport.financialSummary?.netPayable)}</p>
-                                    <p className="text-[11px] text-indigo-600/80 font-semibold mt-1.5">
-                                        Gross Advances minus 2.36% Gateway Charges
+                                    <p className={`text-2xl font-black ${
+                                        (hospitalReport.financialSummary?.pendingSettlement || 0) > 0
+                                            ? "text-amber-700"
+                                            : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0
+                                                ? "text-blue-700"
+                                                : "text-emerald-700"
+                                    }`}>
+                                        {fmt(hospitalReport.financialSummary?.pendingSettlement || 0)}
                                     </p>
+                                    <div className="text-[11px] font-semibold mt-1.5">
+                                        {(hospitalReport.financialSummary?.pendingSettlement || 0) > 0 ? (
+                                            <span className="text-amber-700 flex items-center gap-1">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                <span>Unsettled patient advances pending payout</span>
+                                            </span>
+                                        ) : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0 ? (
+                                            <span className="text-blue-700 flex items-center gap-1">
+                                                <Clock className="w-3.5 h-3.5 animate-pulse" />
+                                                <span>{fmt(hospitalReport.financialSummary?.awaitingConfirmation)} sent • awaiting hospital confirmation</span>
+                                            </span>
+                                        ) : (
+                                            <span className="text-emerald-700 flex items-center gap-1 font-bold">
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                                <span>All dues settled • ₹0.00 pending to pay</span>
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-3xl border border-amber-200 bg-amber-50/30 shadow-sm relative overflow-hidden">
-                                    <div className="flex items-center justify-between text-amber-700 mb-2">
-                                        <span className="text-[10px] font-black uppercase tracking-wider">Pending Settlement Payout</span>
-                                        <Clock className="w-4 h-4" />
+                                <div className="bg-white p-5 rounded-3xl border border-emerald-200 bg-emerald-50/20 shadow-sm relative overflow-hidden">
+                                    <div className="flex items-center justify-between text-emerald-700 mb-2">
+                                        <span className="text-[10px] font-black uppercase tracking-wider">Total Successfully Settled</span>
+                                        <CheckCircle2 className="w-4 h-4" />
                                     </div>
-                                    <p className="text-2xl font-black text-amber-700">{fmt(hospitalReport.financialSummary?.pendingSettlement)}</p>
-                                    <p className="text-[11px] text-amber-600/80 font-medium mt-1.5">
-                                        Already Settled: <span className="font-bold text-emerald-700">{fmt(hospitalReport.financialSummary?.alreadySettled)}</span>
+                                    <p className="text-2xl font-black text-emerald-700">
+                                        {fmt(hospitalReport.financialSummary?.alreadySettled || 0)}
+                                    </p>
+                                    <p className="text-[11px] text-emerald-600/90 font-medium mt-1.5 flex items-center gap-1">
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                        <span>Transferred & confirmed by hospital</span>
                                     </p>
                                 </div>
                             </div>
@@ -1218,6 +1256,16 @@ export default function FinancialManagementAdmin() {
                                                 </span>
                                             </div>
                                         </div>
+
+                                        {rangeCalculation.calculation?.advanceCount === 0 && (
+                                            <div className="bg-emerald-500/20 border border-emerald-400/40 rounded-2xl p-4 flex items-center gap-3 text-xs text-emerald-200">
+                                                <CheckCircle2 className="w-5 h-5 text-emerald-300 shrink-0" />
+                                                <div>
+                                                    <span className="font-bold text-white block">No Pending Advances in Selected Range:</span>
+                                                    <span>All online advance bookings within this date range have already been settled and confirmed by the hospital, or no online advances occurred.</span>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -1316,6 +1364,16 @@ export default function FinancialManagementAdmin() {
                                             </span>
                                         </div>
                                     </div>
+
+                                    {reqAmount <= 0 && (
+                                        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3 text-xs text-emerald-800">
+                                            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                                            <div>
+                                                <span className="font-bold block">No Pending Settlement to Send:</span>
+                                                <span>All eligible patient advances for this hospital have already been settled or none are due for the selected date range.</span>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="flex justify-end">
                                         <button
