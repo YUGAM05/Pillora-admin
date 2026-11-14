@@ -1106,6 +1106,21 @@ export default function FinancialManagementAdmin() {
                                 </div>
                             </div>
 
+                            {/* Over-Collection Reconciliation Note */}
+                            {Boolean(hospitalReport.financialSummary?.patientOverCollection && hospitalReport.financialSummary?.patientOverCollection > 0) && (
+                                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between text-xs text-amber-900">
+                                    <div className="flex items-center gap-2.5">
+                                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                                        <span>
+                                            <strong>Reconciliation Adjustment:</strong> Patient over-collection of <strong>{fmt(hospitalReport.financialSummary?.patientOverCollection)}</strong> recorded at facility (Total collections: {fmt(hospitalReport.financialSummary?.totalPatientCollections)} vs Total fees: {fmt(hospitalReport.financialSummary?.totalConsultationFees)}).
+                                        </span>
+                                    </div>
+                                    <span className="font-mono font-black text-amber-800 shrink-0">
+                                        +{fmt(hospitalReport.financialSummary?.patientOverCollection)}
+                                    </span>
+                                </div>
+                            )}
+
                             {/* 4. Date Range Settlement Calculator ("From Date to To Date -> Total Net ₹X") */}
                             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 space-y-6">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
