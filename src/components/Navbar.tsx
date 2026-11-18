@@ -67,16 +67,18 @@ export default function Navbar() {
                     {/* 1. Logo */}
                     <Link href="/" className="flex-shrink-0 flex items-center group">
                         <Image
-                            src="/logo.png"
+                            src="/logo-sm.png"
                             alt="Pillora"
+                            priority
                             width={72}
                             height={72}
                             className="w-14 h-14 xl:w-16 xl:h-16 object-contain object-right"
                             unoptimized
                         />
                         <Image
-                            src="/pillora-text.png"
+                            src="/pillora-text-sm.png"
                             alt="Pillora"
+                            priority
                             width={240}
                             height={80}
                             className="block h-14 sm:h-16 xl:h-[4.5rem] w-auto object-contain object-left -ml-1 sm:-ml-2 xl:-ml-3"
