@@ -48,7 +48,7 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
 
     const fetchHospitals = useCallback(async () => {
         try {
-            const res = await api.get("/hospitals");
+            const res = await api.get("/admin/hospitals");
             setHospitals(res.data);
         } catch (err: any) {
             setError("Failed to fetch hospitals");

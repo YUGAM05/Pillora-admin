@@ -22,6 +22,7 @@ export default function LoginPage() {
     const [mfaSetup, setMfaSetup] = useState(false);
     const [mfaCode, setMfaCode] = useState("");
     const [mfaUserId, setMfaUserId] = useState("");
+    const [mfaToken, setMfaToken] = useState("");
     const [qrCode, setQrCode] = useState("");
 
     useEffect(() => {
@@ -44,14 +45,14 @@ export default function LoginPage() {
 
             // ✅ Handle MFA required (admin flow) — DO NOT save token here
             if (data.mfaRequired) {
-                setMfaUserId(data.userId);
+                setMfaUserId(data.userId); setMfaToken(data.mfaToken || "");
                 setMfaStep(true);
                 return;
             }
 
             // ✅ Handle MFA setup required (first-time admin)
             if (data.mfaSetupRequired) {
-                setMfaUserId(data.userId);
+                setMfaUserId(data.userId); setMfaToken(data.mfaToken || "");
                 setQrCode(data.qrCode);
                 setMfaSetup(true);
                 setMfaStep(true);
@@ -105,7 +106,7 @@ export default function LoginPage() {
         setError("");
         try {
             const res = await api.post('/auth/verify-mfa', {
-                userId: mfaUserId,
+                mfaToken,
                 token: mfaCode,
             });
             const data = res.data;
