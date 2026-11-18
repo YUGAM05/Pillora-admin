@@ -182,6 +182,21 @@ export default function BloodBankAdmin() {
         }
     };
 
+    // ID review: approving is the only way donor details are shared with a requester
+    // (backend: PATCH /blood-bank/admin/requests/:id/kyc; up to 5 consenting donors, once).
+    const handleKycDecision = async (id: string, status: 'Verified' | 'Rejected') => {
+        const msg = status === 'Verified'
+            ? 'Approve this ID? Pillora will send the requester the name and phone number of up to 5 matching donors who agreed to be contacted. This cannot be undone.'
+            : 'Reject this ID? The requester will be emailed that the ID check failed, and no donor details will be shared.';
+        if (!window.confirm(msg)) return;
+        try {
+            const res = await api.patch(`blood-bank/admin/requests/${id}/kyc`, { status });
+            setRequests(requests.map(r => r._id === id ? { ...r, ...res.data } : r));
+        } catch (error: any) {
+            alert(`ID review failed: ${error.response?.data?.message || error.message}`);
+        }
+    };
+
     const filteredRequests = requests.filter(r => 
         requestFilter === 'all' ? true : r.status === requestFilter
     );
@@ -503,6 +518,7 @@ export default function BloodBankAdmin() {
                                 requests={filteredRequests} 
                                 onUpdateStatus={handleUpdateStatus}
                                 onDelete={handleDeleteRequest}
+                                onKycDecision={handleKycDecision}
                             />
                         )}
                     </motion.div>
@@ -800,13 +816,28 @@ function DonorsTable({
     );
 }
 
-function RequestsTable({ requests, onUpdateStatus, onDelete }: { 
-    requests: any[], 
+function RequestsTable({ requests, onUpdateStatus, onDelete, onKycDecision }: {
+    requests: any[],
     onUpdateStatus: (id: string, status: string) => void,
-    onDelete: (id: string) => void 
+    onDelete: (id: string) => void,
+    onKycDecision: (id: string, status: 'Verified' | 'Rejected') => void
 }) {
+    const [viewingId, setViewingId] = useState<any>(null);
     return (
         <div className="overflow-x-auto">
+            {viewingId && (
+                <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setViewingId(null)} role="dialog" aria-label="ID document">
+                    <div className="bg-white rounded-2xl p-4 max-w-2xl w-full max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="font-bold text-gray-900">{viewingId.kycDocumentType}: {viewingId.patientName}</p>
+                            <button onClick={() => setViewingId(null)} className="text-sm font-bold text-gray-500 hover:text-gray-900">Close</button>
+                        </div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={viewingId.kycDocumentImage} alt="Uploaded ID document" className="w-full h-auto rounded-lg border" />
+                        <p className="text-xs text-gray-500 mt-3">Check that the document is genuine and that the name matches the requester before approving.</p>
+                    </div>
+                </div>
+            )}
             <table className="w-full text-left min-w-[720px]">
                 <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
@@ -864,6 +895,21 @@ function RequestsTable({ requests, onUpdateStatus, onDelete }: {
                                     </span>
                                 </div>
                                 <p className="text-[9px] text-gray-400 font-mono mt-1">{request.kycDocumentId || 'NO_ID'}</p>
+                                {request.donorsSharedAt ? (
+                                    <p className="text-[10px] text-gray-500 mt-1">Donors shared: {request.donorsSharedCount ?? 0}</p>
+                                ) : (
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                        {request.kycDocumentImage && (
+                                            <button onClick={() => setViewingId(request)} className="px-2 py-1 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded text-[10px] font-black uppercase">View ID</button>
+                                        )}
+                                        {request.aiVerificationStatus !== 'Rejected' && (
+                                            <button onClick={() => onKycDecision(request._id, 'Verified')} className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded text-[10px] font-black uppercase">Approve ID</button>
+                                        )}
+                                        {request.aiVerificationStatus !== 'Rejected' && (
+                                            <button onClick={() => onKycDecision(request._id, 'Rejected')} className="px-2 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded text-[10px] font-black uppercase">Reject ID</button>
+                                        )}
+                                    </div>
+                                )}
                             </td>
                             <td className="px-6 py-4">
                                 <div className="flex items-center justify-end gap-2">
