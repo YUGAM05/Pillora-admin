@@ -34,6 +34,9 @@ import Image from "next/image";
 import { useCallback } from "react";
 import SlotGenTool from "./SlotGenTool";
 
+// Plan codes stored on hospitals -> the names hospitals see.
+const PLAN_LABEL: Record<string, string> = { Standard: 'Clinic', Premium: 'Hospital', Enterprise: 'Enterprise' };
+
 export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) => void }) {
     const [hospitals, setHospitals] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -162,7 +165,7 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                         hospital.plan === 'Premium' ? 'bg-purple-50 text-purple-600 border-purple-100' :
                                                         'bg-blue-50 text-blue-600 border-blue-100'
                                                     }`}>
-                                                        {hospital.plan}
+                                                        {PLAN_LABEL[hospital.plan] ?? hospital.plan}
                                                     </div>
                                                 )}
                                                 {hospital.rating && (

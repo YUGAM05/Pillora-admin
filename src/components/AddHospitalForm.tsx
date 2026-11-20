@@ -376,9 +376,9 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                             <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Subscription Plan</label>
                             <div className="grid grid-cols-1 gap-3">
                                 {[
-                                    { id: 'Standard', price: '2,000', label: 'Standard Listing', desc: 'Small Clinics, Individual Doctors', color: 'blue' },
-                                    { id: 'Premium', price: '5,000', label: 'Premium Feature', desc: 'Mid-Size & Multi-specialist', color: 'purple' },
-                                    { id: 'Enterprise', price: '10,000', label: 'Enterprise Feature', desc: 'Large Hospital Chains', color: 'amber' }
+                                    { id: 'Standard', price: '2,999', label: 'Clinic', desc: 'Up to 5 doctors · 3,000 WhatsApp messages a month', color: 'blue' },
+                                    { id: 'Premium', price: '7,999', label: 'Hospital', desc: 'Up to 25 doctors · 10,000 WhatsApp messages · 500 AI call minutes a month', color: 'purple' },
+                                    { id: 'Enterprise', price: '14,999', label: 'Enterprise', desc: 'Unlimited doctors · 25,000 WhatsApp messages · 1,500 AI call minutes a month', color: 'amber' }
                                 ].map((p) => (
                                     <div 
                                         key={p.id}
@@ -391,7 +391,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                     >
                                         <div className="flex items-center justify-between mb-1">
                                             <span className={`text-sm font-black uppercase tracking-wider ${formData.plan === p.id ? `text-${p.color}-600` : 'text-gray-900'}`}>{p.label}</span>
-                                            <span className={`text-xs font-black ${formData.plan === p.id ? `text-${p.color}-700` : 'text-gray-400'}`}>₹{p.price}/mo</span>
+                                            <span className={`text-xs font-black ${formData.plan === p.id ? `text-${p.color}-700` : 'text-gray-400'}`}>₹{p.price}/mo + GST</span>
                                         </div>
                                         <p className="text-[10px] text-gray-500 font-medium">{p.desc}</p>
                                         {formData.plan === p.id && (
