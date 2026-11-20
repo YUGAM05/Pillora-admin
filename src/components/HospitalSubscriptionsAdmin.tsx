@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import api from "@/lib/api";
+import AdminUsageModal from "@/components/AdminUsageModal";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
+    Gauge,
     CreditCard, 
     Calendar, 
     Clock, 
@@ -76,6 +78,8 @@ interface IPaymentRecord {
 }
 
 export default function HospitalSubscriptionsAdmin() {
+    // Usage, add-on packs and AI number for one hospital (AdminUsageModal)
+    const [usageHospital, setUsageHospital] = useState<{ _id: string; name?: string } | null>(null);
     const [hospitals, setHospitals] = useState<IHospitalSub[]>([]);
     const [summary, setSummary] = useState<ISubscriptionSummary | null>(null);
     const [loading, setLoading] = useState(true);
@@ -730,6 +734,14 @@ export default function HospitalSubscriptionsAdmin() {
                                                 </button>
 
                                                 <button
+                                                    onClick={() => setUsageHospital({ _id: h._id, name: h.name })}
+                                                    className="p-2 bg-violet-50 hover:bg-violet-100 text-violet-700 rounded-xl transition-all"
+                                                    title="Usage, add-on packs and AI receptionist number"
+                                                >
+                                                    <Gauge className="w-4 h-4" />
+                                                </button>
+
+                                                <button
                                                     onClick={() => handleOpenEditModal(h)}
                                                     className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all"
                                                     title="Edit subscription dates and notes"
@@ -1088,6 +1100,8 @@ export default function HospitalSubscriptionsAdmin() {
                     </div>
                 )}
             </AnimatePresence>
+
+            {usageHospital && <AdminUsageModal hospital={usageHospital} onClose={() => setUsageHospital(null)} />}
         </div>
     );
 }
