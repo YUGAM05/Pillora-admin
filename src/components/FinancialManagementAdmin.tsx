@@ -526,137 +526,143 @@ export default function FinancialManagementAdmin() {
         const s = (status || "").toLowerCase();
         if (s === "settlement completed" || s === "settled") {
             return (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Settlement Completed
+                <span className="ui-badge border-emerald-200 bg-emerald-50 text-emerald-700">
+                    <CheckCircle2 className="h-3 w-3" /> Settlement Completed
                 </span>
             );
         }
         if (s === "awaiting hospital confirmation") {
             return (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
-                    <Clock className="w-3 h-3 text-amber-600" /> Awaiting Hospital Confirmation
+                <span className="ui-badge border-amber-200 bg-amber-50 text-amber-700">
+                    <Clock className="h-3 w-3" /> Awaiting Hospital Confirmation
                 </span>
             );
         }
         if (s === "under review") {
             return (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                    <AlertTriangle className="w-3 h-3 text-rose-600" /> Under Review
+                <span className="ui-badge border-rose-200 bg-rose-50 text-rose-700">
+                    <AlertTriangle className="h-3 w-3" /> Under Review
                 </span>
             );
         }
         if (s === "processing" || s === "payment initiated") {
             return (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                    <RefreshCw className="w-3 h-3 text-blue-600" /> Processing
+                <span className="ui-badge border-blue-200 bg-blue-50 text-blue-700">
+                    <RefreshCw className="h-3 w-3" /> Processing
                 </span>
             );
         }
         if (s === "pending" || s === "ready for settlement" || s === "waiting for razorpay settlement") {
             return (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                    <Clock className="w-3 h-3 text-amber-500" /> Pending
+                <span className="ui-badge border-amber-200 bg-amber-50 text-amber-700">
+                    <Clock className="h-3 w-3" /> Pending
                 </span>
             );
         }
         if (s === "failed") {
-            return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">Failed</span>;
+            return <span className="ui-badge border-rose-200 bg-rose-50 text-rose-700">Failed</span>;
         }
         if (s === "reversed") {
-            return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">Reversed</span>;
+            return <span className="ui-badge border-violet-200 bg-violet-50 text-violet-700">Reversed</span>;
         }
-        return <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">{status || "Pending"}</span>;
+        return <span className="ui-badge border-slate-200 bg-slate-100 text-slate-600">{status || "Pending"}</span>;
     };
 
     return (
-        <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="space-y-6">
             {/* Toast Feedback */}
             {toast && (
-                <div className={`fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border text-sm font-semibold transition-all transform animate-bounce ${
-                    toast.type === "success" ? "bg-emerald-900 text-emerald-100 border-emerald-700" : "bg-rose-900 text-rose-100 border-rose-700"
+                <div role="status" className={`fixed bottom-4 left-4 right-4 z-[9999] flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium shadow-lg sm:bottom-6 sm:left-auto sm:right-6 ${
+                    toast.type === "success" ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"
                 }`}>
-                    {toast.type === "success" ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <AlertCircle className="w-5 h-5 text-rose-400" />}
+                    {toast.type === "success" ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
                     <span>{toast.message}</span>
                 </div>
             )}
 
             {/* Top Header & Subsection Navigation */}
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
-                            <ShieldCheck className="w-3.5 h-3.5" /> Pillora Financial Control
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Financial Management</h1>
-                        <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+            <section className="ui-card p-4 sm:p-5" aria-labelledby="fin-heading">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                    <div className="min-w-0">
+                        <h2 id="fin-heading" className="ui-title">Financial management</h2>
+                        <p className="ui-subtitle">
                             Central administration for hospital settlements, gateway deductions, appointment transactions ledger, and refunds.
                         </p>
                     </div>
 
                     {/* Date Filter Bar */}
-                    <div className="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200">
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" /> Period:
+                    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                        <span className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-slate-500">
+                            <Calendar className="h-4 w-4" /> Period:
                         </span>
+                        <div className="no-scrollbar -mx-4 min-w-0 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                            <div className="ui-segmented">
                         {[
                             { label: "Today", value: "today" },
                             { label: "Yesterday", value: "yesterday" },
-                            { label: "This Week", value: "this_week" },
-                            { label: "This Month", value: "this_month" },
-                            { label: "Last Month", value: "last_month" },
+                            { label: "This week", value: "this_week" },
+                            { label: "This month", value: "this_month" },
+                            { label: "Last month", value: "last_month" },
                             { label: "Custom", value: "custom" }
                         ].map((t) => (
                             <button
                                 key={t.value}
                                 onClick={() => setPeriod(t.value)}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                                    period === t.value ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-slate-200"
+                                aria-pressed={period === t.value}
+                                className={`ui-segment shrink-0 whitespace-nowrap ${
+                                    period === t.value ? "ui-segment-active" : ""
                                 }`}
                             >
                                 {t.label}
                             </button>
                         ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Custom Date Inputs if custom period */}
                 {period === "custom" && (
-                    <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
-                        <span className="text-xs text-slate-500 font-bold">Custom Range:</span>
+                    <div className="-mx-4 mt-4 flex flex-col gap-3 border-t border-slate-100 px-4 pt-4 sm:-mx-5 sm:flex-row sm:flex-wrap sm:items-center sm:px-5">
+                        <span className="shrink-0 text-sm font-medium text-slate-500">Custom range:</span>
+                        <div className="flex min-w-0 items-center gap-2">
                         <input
                             type="date"
                             value={customStartDate}
                             onChange={(e) => setCustomStartDate(e.target.value)}
-                            className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium"
+                            aria-label="Custom range start date"
+                            className="ui-input min-w-0 flex-1 sm:w-44 sm:flex-none"
                         />
-                        <span className="text-xs text-slate-400">to</span>
+                        <span className="text-sm text-slate-500">to</span>
                         <input
                             type="date"
                             value={customEndDate}
                             onChange={(e) => setCustomEndDate(e.target.value)}
-                            className="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium"
+                            aria-label="Custom range end date"
+                            className="ui-input min-w-0 flex-1 sm:w-44 sm:flex-none"
                         />
+                        </div>
                         <button
                             onClick={() => {
                                 if (activeSection === "overall") fetchOverall();
                                 if (activeSection === "hospital_reports") fetchHospitalReport();
                                 if (activeSection === "transactions") fetchTransactions();
                             }}
-                            className="px-4 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all"
+                            className="ui-btn-primary w-full sm:w-auto"
                         >
-                            Apply Filter
+                            Apply filter
                         </button>
                     </div>
                 )}
 
                 {/* 5 Subsections Nav Bar */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-slate-100">
+                <div role="tablist" aria-label="Financial management sections" className="no-scrollbar -mx-4 mt-4 flex gap-1.5 overflow-x-auto border-t border-slate-100 px-4 pt-4 sm:-mx-5 sm:px-5">
                     {[
-                        { id: "overall", label: "1. Overall Dashboard", icon: Layers },
-                        { id: "hospital_reports", label: "2. Hospitals & Settlements", icon: Building2 },
-                        { id: "settlements", label: "3. Settlement Ledger", icon: Wallet },
-                        { id: "transactions", label: "4. Master Ledger", icon: FileText },
-                        { id: "refunds", label: "5. Refund Management", icon: RotateCcw }
+                        { id: "overall", label: "1. Overall dashboard", icon: Layers },
+                        { id: "hospital_reports", label: "2. Hospitals & settlements", icon: Building2 },
+                        { id: "settlements", label: "3. Settlement ledger", icon: Wallet },
+                        { id: "transactions", label: "4. Master ledger", icon: FileText },
+                        { id: "refunds", label: "5. Refund management", icon: RotateCcw }
                     ].map((sec) => {
                         const Icon = sec.icon;
                         const isCurrent = activeSection === sec.id;
@@ -664,19 +670,21 @@ export default function FinancialManagementAdmin() {
                             <button
                                 key={sec.id}
                                 onClick={() => setActiveSection(sec.id as any)}
-                                className={`py-3 px-3 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                                role="tab"
+                                aria-selected={isCurrent}
+                                className={`flex min-h-[40px] shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3.5 text-sm font-medium transition ${
                                     isCurrent
-                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                                        : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/60"
+                                        ? "border-slate-900 bg-slate-900 text-white shadow-sm"
+                                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
                                 }`}
                             >
-                                <Icon className="w-3.5 h-3.5" />
-                                <span className="truncate">{sec.label}</span>
+                                <Icon className={`h-4 w-4 shrink-0 ${isCurrent ? "text-white" : "text-slate-400"}`} />
+                                <span>{sec.label}</span>
                             </button>
                         );
                     })}
                 </div>
-            </div>
+            </section>
 
             {/* ========================================================================= */}
             {/* SUBSECTION 1: OVERALL FINANCIAL DASHBOARD */}
@@ -684,113 +692,153 @@ export default function FinancialManagementAdmin() {
             {activeSection === "overall" && (
                 <div className="space-y-6">
                     {/* The 8 Aggregate KPI Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
                         {/* 1. Total Consultation Fees */}
-                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Card 1 • All Facilities</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-slate-500">Total Consultation Fees</h4>
-                                <div className="text-2xl font-black text-slate-900 mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-slate-200 bg-slate-50 text-slate-600">Card 1 • All facilities</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                                    <Layers className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Total consultation fees</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.totalConsultationFees)}
                                 </div>
-                                <span className="text-[10px] text-slate-400 mt-1 block">Gross booked appointment value</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">Gross booked appointment value</span>
                             </div>
                         </div>
 
                         {/* 2. Total Online Advances via Pillora */}
-                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-blue-500">Card 2 • 20% Online</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-slate-500">Total Online Advances</h4>
-                                <div className="text-2xl font-black text-blue-600 mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-blue-200 bg-blue-50 text-blue-700">Card 2 • 20% online</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                    <CreditCard className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Total online advances</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.grossOnlineAdvances)}
                                 </div>
-                                <span className="text-[10px] text-blue-600/80 mt-1 block">Patient advance paid on Pillora.in</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">Patient advance paid on Pillora.in</span>
                             </div>
                         </div>
 
                         {/* 3. Total Net Payable to Hospitals */}
-                        <div className="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-6 rounded-3xl shadow-xl shadow-indigo-900/20 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300">Card 3 • Net Payable</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-indigo-200">Total Net Payable to Hospitals</h4>
-                                <div className="text-2xl font-black text-white mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-indigo-200 bg-indigo-50 text-indigo-700">Card 3 • Net payable</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                                    <Wallet className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Total net payable to hospitals</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.netPayableToHospitals)}
                                 </div>
-                                <span className="text-[10px] text-indigo-300 mt-1 block">Advances minus gateway deductions</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">Advances minus gateway deductions</span>
                             </div>
                         </div>
 
                         {/* 4. Total Collected at Clinics – Cash */}
-                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Card 4 • Physical Cash</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-slate-500">Collected at Clinics – Cash</h4>
-                                <div className="text-2xl font-black text-emerald-600 mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-emerald-200 bg-emerald-50 text-emerald-700">Card 4 • Physical cash</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                                    <Banknote className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Collected at clinics – cash</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.totalCashAtClinics)}
                                 </div>
-                                <span className="text-[10px] text-emerald-600/80 mt-1 block">Physical currency collected at clinic</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">Physical currency collected at clinic</span>
                             </div>
                         </div>
 
                         {/* 5. Total Collected at Clinics – Online */}
-                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-teal-600">Card 5 • Clinic Online</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-slate-500">Collected at Clinics – Online</h4>
-                                <div className="text-2xl font-black text-teal-600 mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-teal-200 bg-teal-50 text-teal-700">Card 5 • Clinic online</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                                    <ArrowUpRight className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Collected at clinics – online</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.totalOnlineAtClinics)}
                                 </div>
-                                <span className="text-[10px] text-teal-600/80 mt-1 block">Direct UPI / Card at clinic counter</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">Direct UPI / Card at clinic counter</span>
                             </div>
                         </div>
 
                         {/* 6. Total Gateway Charges & Taxes */}
-                        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Card 6 • Gateway Deductions</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-slate-500">Gateway Charges & Taxes</h4>
-                                <div className="text-2xl font-black text-slate-700 mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-slate-200 bg-slate-50 text-slate-600">Card 6 • Gateway deductions</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                                    <IndianRupee className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Gateway charges & taxes</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.totalGatewayCharges)}
                                 </div>
-                                <span className="text-[10px] text-slate-400 mt-1 block">2% fee + 18% GST (2.36%)</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">2% fee + 18% GST (2.36%)</span>
                             </div>
                         </div>
 
                         {/* 7. Total Pending Settlements */}
-                        <div className="bg-white p-6 rounded-3xl border border-amber-200 bg-amber-50/20 shadow-xl shadow-amber-900/5 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-600">Card 7 • Owed to Hospitals</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-amber-700">Total Pending Settlements</h4>
-                                <div className="text-2xl font-black text-amber-600 mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-amber-200 bg-amber-50 text-amber-700">Card 7 • Owed to hospitals</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                                    <Clock className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Total pending settlements</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.totalPendingSettlements)}
                                 </div>
-                                <span className="text-[10px] text-amber-600/80 mt-1 block">Due for NEFT/RTGS payout</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">Due for NEFT/RTGS payout</span>
                             </div>
                         </div>
 
                         {/* 8. Total Completed Settlements */}
-                        <div className="bg-white p-6 rounded-3xl border border-emerald-200 bg-emerald-50/20 shadow-xl shadow-emerald-900/5 flex flex-col justify-between">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Card 8 • Payouts Dispatched</span>
-                            <div className="mt-3">
-                                <h4 className="text-xs font-bold text-emerald-700">Completed Settlements</h4>
-                                <div className="text-2xl font-black text-emerald-600 mt-1">
+                        <div className="ui-card flex flex-col p-4 sm:p-5">
+                            <div className="flex items-start justify-between gap-3">
+                                <span className="ui-badge border-emerald-200 bg-emerald-50 text-emerald-700">Card 8 • Payouts dispatched</span>
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                                    <CheckCircle2 className="h-5 w-5" />
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <h4 className="text-[13px] font-medium leading-snug text-slate-500">Completed settlements</h4>
+                                <div className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900">
                                     {loadingOverall ? "..." : fmt(overallData?.totalCompletedSettlements)}
                                 </div>
-                                <span className="text-[10px] text-emerald-600/80 mt-1 block">Successfully transferred to hospitals</span>
+                                <span className="mt-1 block text-xs leading-snug text-slate-500">Successfully transferred to hospitals</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Pillora Business Model Reminder Banner */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-3xl p-6 flex items-start gap-4 text-xs">
-                        <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
-                            <Info className="w-5 h-5" />
+                    <div className="flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50/60 p-4 sm:gap-4 sm:p-5">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
+                            <Info className="h-5 w-5" />
                         </div>
-                        <div className="space-y-1">
-                            <h5 className="font-black text-blue-900 text-sm">Pillora Business Model Policy</h5>
-                            <p className="text-blue-800 leading-relaxed">
-                                Pillora operates on fixed hospital subscriptions and does <strong>NOT</strong> earn commission from doctor consultation fees.
+                        <div className="min-w-0">
+                            <h5 className="font-semibold text-slate-900">Pillora business model policy</h5>
+                            <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                                Pillora operates on fixed hospital subscriptions and does <strong className="font-semibold text-slate-900">NOT</strong> earn commission from doctor consultation fees.
                                 The 20% online advance collected from patients belongs entirely to the respective hospital (minus 2.36% third-party gateway processing fees & taxes).
                                 The remaining 80% consultation balance is collected directly by hospital staff at the facility.
                             </p>
@@ -803,25 +851,26 @@ export default function FinancialManagementAdmin() {
             {/* SUBSECTION 2: HOSPITALS & SETTLEMENTS */}
             {/* ========================================================================= */}
             {activeSection === "hospital_reports" && (
-                <div className="space-y-8">
+                <div className="space-y-6">
                     {/* 1. Hospitals Selection & Quick Search Bar */}
-                    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 space-y-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
-                                <h3 className="text-xl font-black text-slate-900">Select Hospital / Clinic</h3>
-                                <p className="text-xs text-slate-500 mt-0.5">
+                    <div className="ui-card space-y-4 p-4 sm:p-5">
+                        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                            <div className="min-w-0">
+                                <h3 className="ui-title">Select hospital / clinic</h3>
+                                <p className="ui-subtitle">
                                     Click on any hospital to manage bank details, view online advances, calculate date-range settlements, and disburse payouts.
                                 </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <div className="relative">
-                                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <div className="flex w-full items-center gap-2 sm:w-auto sm:shrink-0">
+                                <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
+                                    <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                     <input
                                         type="text"
                                         placeholder="Search hospital..."
                                         value={hospSearchTerm}
                                         onChange={(e) => setHospSearchTerm(e.target.value)}
-                                        className="pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 sm:w-64"
+                                        aria-label="Search hospitals"
+                                        className="ui-input pl-10"
                                     />
                                 </div>
                                 <button
@@ -830,16 +879,17 @@ export default function FinancialManagementAdmin() {
                                         calculateSettlementForRange();
                                     }}
                                     disabled={loadingHospitalReport}
-                                    className="p-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl border border-slate-200 transition-all disabled:opacity-50"
-                                    title="Refresh Report"
+                                    className="ui-btn-secondary h-11 w-11 shrink-0 px-0"
+                                    title="Refresh report"
+                                    aria-label="Refresh report"
                                 >
-                                    <RefreshCw className={`w-3.5 h-3.5 ${loadingHospitalReport ? "animate-spin" : ""}`} />
+                                    <RefreshCw className={`h-4 w-4 ${loadingHospitalReport ? "animate-spin" : ""}`} />
                                 </button>
                             </div>
                         </div>
 
                         {/* Hospital Cards Selector */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+                        <div className="custom-scrollbar grid max-h-64 grid-cols-1 gap-2.5 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {hospitalsList
                                 .filter((h) => !hospSearchTerm.trim() || h.name?.toLowerCase().includes(hospSearchTerm.toLowerCase()) || h.city?.toLowerCase().includes(hospSearchTerm.toLowerCase()))
                                 .map((h) => {
@@ -849,26 +899,25 @@ export default function FinancialManagementAdmin() {
                                         <button
                                             key={h._id}
                                             onClick={() => setSelectedHospitalId(h._id)}
-                                            className={`p-3.5 rounded-2xl text-left border transition-all relative flex flex-col justify-between ${
+                                            aria-pressed={isSelected}
+                                            className={`relative flex min-h-[72px] flex-col justify-between rounded-xl border p-3.5 text-left transition ${
                                                 isSelected
-                                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25 ring-2 ring-blue-600/40"
-                                                    : "bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200/80"
+                                                    ? "border-blue-500 bg-blue-50/60 ring-1 ring-blue-500"
+                                                    : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
                                             }`}
                                         >
                                             <div className="flex items-start justify-between gap-2">
-                                                <div className="font-extrabold text-xs truncate max-w-[180px]">{h.name}</div>
-                                                {isSelected && <Check className="w-4 h-4 text-white shrink-0" />}
+                                                <div className="min-w-0 truncate text-sm font-semibold text-slate-900">{h.name}</div>
+                                                {isSelected && <Check className="h-4 w-4 shrink-0 text-blue-600" />}
                                             </div>
-                                            <div className="flex items-center justify-between text-[10px] mt-2 font-medium">
-                                                <span className={isSelected ? "text-blue-100" : "text-slate-500"}>
+                                            <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+                                                <span className="truncate text-slate-500">
                                                     {h.city || "Facility"}
                                                 </span>
-                                                <span className={`px-2 py-0.5 rounded-full font-bold ${
-                                                    isSelected 
-                                                        ? (hasBank ? "bg-blue-500 text-white" : "bg-blue-700 text-blue-200") 
-                                                        : (hasBank ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200")
+                                                <span className={`ui-badge ${
+                                                    hasBank ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700"
                                                 }`}>
-                                                    {hasBank ? "Bank Added" : "No Bank"}
+                                                    {hasBank ? "Bank added" : "No bank"}
                                                 </span>
                                             </div>
                                         </button>
@@ -878,20 +927,20 @@ export default function FinancialManagementAdmin() {
                     </div>
 
                     {hospitalReport && (
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             {/* 2. Hospital Bank Account Details Card (Admin Editable) */}
-                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 space-y-6">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/25">
-                                            <Building2 className="w-6 h-6" />
+                            <div className="ui-card space-y-5 p-4 sm:p-6">
+                                <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-start">
+                                    <div className="flex min-w-0 items-start gap-3">
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                            <Building2 className="h-5 w-5" />
                                         </div>
-                                        <div>
-                                            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-wider mb-1">
-                                                Hospital Bank Account Management
+                                        <div className="min-w-0">
+                                            <div className="text-[13px] font-medium text-blue-600">
+                                                Hospital bank account management
                                             </div>
-                                            <h3 className="text-xl font-black text-slate-900">{hospitalReport.hospital?.name}</h3>
-                                            <p className="text-xs text-slate-500 font-medium">
+                                            <h3 className="ui-title mt-0.5">{hospitalReport.hospital?.name}</h3>
+                                            <p className="ui-subtitle">
                                                 {hospitalReport.hospital?.address} • Phone: {hospitalReport.hospital?.phone || "N/A"}
                                             </p>
                                         </div>
@@ -899,14 +948,10 @@ export default function FinancialManagementAdmin() {
                                     <button
                                         type="button"
                                         onClick={() => setIsEditingBank(!isEditingBank)}
-                                        className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all self-start sm:self-auto ${
-                                            isEditingBank
-                                                ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                                : "bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"
-                                        }`}
+                                        className={`${isEditingBank ? "ui-btn-soft" : "ui-btn-secondary"} ui-btn-sm shrink-0 self-start`}
                                     >
-                                        <Edit3 className="w-3.5 h-3.5" />
-                                        <span>{isEditingBank ? "Close Form" : "Edit Bank Account"}</span>
+                                        <Edit3 className="h-3.5 w-3.5" />
+                                        <span>{isEditingBank ? "Close form" : "Edit bank account"}</span>
                                     </button>
                                 </div>
 
@@ -914,8 +959,8 @@ export default function FinancialManagementAdmin() {
                                 <form onSubmit={handleSaveBankDetails} className="space-y-4">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Account Beneficiary / Holder Name <span className="text-rose-500">*</span>
+                                            <label className="ui-label">
+                                                Account beneficiary / holder name <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -923,13 +968,13 @@ export default function FinancialManagementAdmin() {
                                                 placeholder="e.g. Ami Clinic Healthcare Pvt Ltd"
                                                 value={bankForm.accountHolderName}
                                                 onChange={(e) => setBankForm({ ...bankForm, accountHolderName: e.target.value })}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Bank Name <span className="text-rose-500">*</span>
+                                            <label className="ui-label">
+                                                Bank name <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -937,13 +982,13 @@ export default function FinancialManagementAdmin() {
                                                 placeholder="e.g. HDFC Bank, SBI, ICICI"
                                                 value={bankForm.bankName}
                                                 onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Account Number <span className="text-rose-500">*</span>
+                                            <label className="ui-label">
+                                                Account number <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -951,13 +996,13 @@ export default function FinancialManagementAdmin() {
                                                 placeholder="e.g. 50200012345678"
                                                 value={bankForm.accountNumber}
                                                 onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input font-mono"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                IFSC Code <span className="text-rose-500">*</span>
+                                            <label className="ui-label">
+                                                IFSC code <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -965,104 +1010,104 @@ export default function FinancialManagementAdmin() {
                                                 placeholder="e.g. HDFC0001234"
                                                 value={bankForm.ifscCode}
                                                 onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value.toUpperCase() })}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                                                className="ui-input font-mono uppercase"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Branch Name
+                                            <label className="ui-label">
+                                                Branch name
                                             </label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. Navrangpura Branch"
                                                 value={bankForm.branchName}
                                                 onChange={(e) => setBankForm({ ...bankForm, branchName: e.target.value })}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Hospital UPI ID (Optional)
+                                            <label className="ui-label">
+                                                Hospital UPI ID (optional)
                                             </label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. hospital@okaxis"
                                                 value={bankForm.upiId}
                                                 onChange={(e) => setBankForm({ ...bankForm, upiId: e.target.value })}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input"
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-slate-500">
+                                    <div className="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                                        <div className="text-sm text-slate-500">
                                             {bankForm.accountNumber ? (
-                                                <span className="text-emerald-600 font-semibold flex items-center gap-1.5">
-                                                    <CheckCircle2 className="w-4 h-4" /> Bank account configured for settlements
+                                                <span className="flex items-center gap-1.5 font-medium text-emerald-700">
+                                                    <CheckCircle2 className="h-4 w-4 shrink-0" /> Bank account configured for settlements
                                                 </span>
                                             ) : (
-                                                <span className="text-amber-600 font-semibold flex items-center gap-1.5">
-                                                    <AlertTriangle className="w-4 h-4" /> Please enter bank details to enable payouts
+                                                <span className="flex items-center gap-1.5 font-medium text-amber-700">
+                                                    <AlertTriangle className="h-4 w-4 shrink-0" /> Please enter bank details to enable payouts
                                                 </span>
                                             )}
                                         </div>
                                         <button
                                             type="submit"
                                             disabled={savingBankDetails}
-                                            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black shadow-md flex items-center gap-2 transition-all disabled:opacity-50"
+                                            className="ui-btn-dark w-full sm:w-auto"
                                         >
-                                            {savingBankDetails ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                                            <span>Save Bank Account Details</span>
+                                            {savingBankDetails ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                            <span>Save bank account details</span>
                                         </button>
                                     </div>
                                 </form>
                             </div>
 
                             {/* 3. Hospital Financial Overview Cards (Focusing on Online Advance & 2.36% Deductions) */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div className="bg-white p-5 rounded-3xl border border-blue-100 bg-blue-50/20 shadow-sm relative overflow-hidden">
-                                    <div className="flex items-center justify-between text-blue-600 mb-2">
-                                        <span className="text-[10px] font-black uppercase tracking-wider">Online Advance via Pillora</span>
-                                        <Wallet className="w-4 h-4" />
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+                                <div className="ui-card p-4 sm:p-5">
+                                    <div className="mb-1 flex items-start justify-between gap-3 text-blue-600">
+                                        <span className="text-[13px] font-medium leading-snug text-slate-500">Online advance via Pillora</span>
+                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50"><Wallet className="h-5 w-5" /></span>
                                     </div>
-                                    <p className="text-2xl font-black text-blue-700">{fmt(hospitalReport.financialSummary?.grossOnlineAdvances)}</p>
-                                    <p className="text-[11px] text-blue-600/80 font-bold mt-1.5 flex items-center gap-1">
-                                        <CheckCircle2 className="w-3 h-3 text-blue-500" />
+                                    <p className="break-words text-2xl font-bold tracking-tight text-slate-900">{fmt(hospitalReport.financialSummary?.grossOnlineAdvances)}</p>
+                                    <p className="mt-1 flex items-center gap-1.5 text-xs leading-snug text-slate-500">
+                                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-blue-500" />
                                         <span>{hospitalReport.financialSummary?.onlineAdvanceCount || 0} patient advances collected (20% fee)</span>
                                     </p>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-3xl border border-rose-100 bg-rose-50/20 shadow-sm relative overflow-hidden">
-                                    <div className="flex items-center justify-between text-rose-600 mb-2">
-                                        <span className="text-[10px] font-black uppercase tracking-wider">Gateway Charges (2.36%)</span>
-                                        <CreditCard className="w-4 h-4" />
+                                <div className="ui-card p-4 sm:p-5">
+                                    <div className="mb-1 flex items-start justify-between gap-3 text-rose-600">
+                                        <span className="text-[13px] font-medium leading-snug text-slate-500">Gateway charges (2.36%)</span>
+                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50"><CreditCard className="h-5 w-5" /></span>
                                     </div>
-                                    <p className="text-2xl font-black text-rose-700">{fmt(hospitalReport.financialSummary?.gatewayCharges)}</p>
-                                    <p className="text-[11px] text-rose-600/80 font-medium mt-1.5">
+                                    <p className="break-words text-2xl font-bold tracking-tight text-slate-900">{fmt(hospitalReport.financialSummary?.gatewayCharges)}</p>
+                                    <p className="mt-1 text-xs leading-snug text-slate-500">
                                         2% Razorpay + 18% GST deducted per advance
                                     </p>
                                 </div>
 
-                                <div className={`bg-white p-5 rounded-3xl border shadow-sm relative overflow-hidden ${
+                                <div className={`ui-card p-4 sm:p-5 ${
                                     (hospitalReport.financialSummary?.pendingSettlement || 0) > 0
-                                        ? "border-amber-200 bg-amber-50/20"
+                                        ? "border-amber-200"
                                         : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0
-                                            ? "border-blue-200 bg-blue-50/20"
-                                            : "border-emerald-200 bg-emerald-50/20"
+                                            ? "border-blue-200"
+                                            : "border-emerald-200"
                                 }`}>
-                                    <div className={`flex items-center justify-between mb-2 ${
+                                    <div className={`mb-1 flex items-start justify-between gap-3 ${
                                         (hospitalReport.financialSummary?.pendingSettlement || 0) > 0
                                             ? "text-amber-600"
                                             : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0
                                                 ? "text-blue-600"
                                                 : "text-emerald-600"
                                     }`}>
-                                        <span className="text-[10px] font-black uppercase tracking-wider">Net Amount Pillora Has to Pay</span>
-                                        <IndianRupee className="w-4 h-4" />
+                                        <span className="text-[13px] font-medium leading-snug text-slate-500">Net amount Pillora has to pay</span>
+                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-50"><IndianRupee className="h-5 w-5" /></span>
                                     </div>
-                                    <p className={`text-2xl font-black ${
+                                    <p className={`break-words text-2xl font-bold tracking-tight ${
                                         (hospitalReport.financialSummary?.pendingSettlement || 0) > 0
                                             ? "text-amber-700"
                                             : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0
@@ -1071,36 +1116,36 @@ export default function FinancialManagementAdmin() {
                                     }`}>
                                         {fmt(hospitalReport.financialSummary?.pendingSettlement || 0)}
                                     </p>
-                                    <div className="text-[11px] font-semibold mt-1.5">
+                                    <div className="mt-1 text-xs font-medium leading-snug">
                                         {(hospitalReport.financialSummary?.pendingSettlement || 0) > 0 ? (
-                                            <span className="text-amber-700 flex items-center gap-1">
-                                                <Clock className="w-3.5 h-3.5" />
+                                            <span className="flex items-center gap-1.5 text-amber-700">
+                                                <Clock className="h-3.5 w-3.5 shrink-0" />
                                                 <span>Unsettled patient advances pending payout</span>
                                             </span>
                                         ) : (hospitalReport.financialSummary?.awaitingConfirmation || 0) > 0 ? (
-                                            <span className="text-blue-700 flex items-center gap-1">
-                                                <Clock className="w-3.5 h-3.5 animate-pulse" />
+                                            <span className="flex items-center gap-1.5 text-blue-700">
+                                                <Clock className="h-3.5 w-3.5 shrink-0" />
                                                 <span>{fmt(hospitalReport.financialSummary?.awaitingConfirmation)} sent • awaiting hospital confirmation</span>
                                             </span>
                                         ) : (
-                                            <span className="text-emerald-700 flex items-center gap-1 font-bold">
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                            <span className="flex items-center gap-1.5 text-emerald-700">
+                                                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                                                 <span>All dues settled • ₹0.00 pending to pay</span>
                                             </span>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="bg-white p-5 rounded-3xl border border-emerald-200 bg-emerald-50/20 shadow-sm relative overflow-hidden">
-                                    <div className="flex items-center justify-between text-emerald-700 mb-2">
-                                        <span className="text-[10px] font-black uppercase tracking-wider">Total Successfully Settled</span>
-                                        <CheckCircle2 className="w-4 h-4" />
+                                <div className="ui-card p-4 sm:p-5">
+                                    <div className="mb-1 flex items-start justify-between gap-3 text-emerald-600">
+                                        <span className="text-[13px] font-medium leading-snug text-slate-500">Total successfully settled</span>
+                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50"><CheckCircle2 className="h-5 w-5" /></span>
                                     </div>
-                                    <p className="text-2xl font-black text-emerald-700">
+                                    <p className="break-words text-2xl font-bold tracking-tight text-slate-900">
                                         {fmt(hospitalReport.financialSummary?.alreadySettled || 0)}
                                     </p>
-                                    <p className="text-[11px] text-emerald-600/90 font-medium mt-1.5 flex items-center gap-1">
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    <p className="mt-1 flex items-center gap-1.5 text-xs leading-snug text-slate-500">
+                                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
                                         <span>Transferred & confirmed by hospital</span>
                                     </p>
                                 </div>
@@ -1108,34 +1153,34 @@ export default function FinancialManagementAdmin() {
 
                             {/* Over-Collection Reconciliation Note */}
                             {Boolean(hospitalReport.financialSummary?.patientOverCollection && hospitalReport.financialSummary?.patientOverCollection > 0) && (
-                                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between text-xs text-amber-900">
-                                    <div className="flex items-center gap-2.5">
-                                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                                <div className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="flex items-start gap-2.5">
+                                        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
                                         <span>
-                                            <strong>Reconciliation Adjustment:</strong> Patient over-collection of <strong>{fmt(hospitalReport.financialSummary?.patientOverCollection)}</strong> recorded at facility (Total collections: {fmt(hospitalReport.financialSummary?.totalPatientCollections)} vs Total fees: {fmt(hospitalReport.financialSummary?.totalConsultationFees)}).
+                                            <strong className="font-semibold">Reconciliation adjustment:</strong> Patient over-collection of <strong className="font-semibold">{fmt(hospitalReport.financialSummary?.patientOverCollection)}</strong> recorded at facility (Total collections: {fmt(hospitalReport.financialSummary?.totalPatientCollections)} vs Total fees: {fmt(hospitalReport.financialSummary?.totalConsultationFees)}).
                                         </span>
                                     </div>
-                                    <span className="font-mono font-black text-amber-800 shrink-0">
+                                    <span className="shrink-0 font-mono font-bold text-amber-800">
                                         +{fmt(hospitalReport.financialSummary?.patientOverCollection)}
                                     </span>
                                 </div>
                             )}
 
                             {/* 4. Date Range Settlement Calculator ("From Date to To Date -> Total Net ₹X") */}
-                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 space-y-6">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-                                    <div>
-                                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase tracking-wider mb-1">
-                                            Settlement Range Calculation
+                            <div className="ui-card space-y-5 p-4 sm:p-6">
+                                <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-5 lg:flex-row lg:items-end">
+                                    <div className="min-w-0">
+                                        <div className="ui-badge mb-2 border-indigo-200 bg-indigo-50 text-indigo-700">
+                                            Settlement range calculation
                                         </div>
-                                        <h3 className="text-xl font-black text-slate-900">Calculate Payout for Custom Date Range</h3>
-                                        <p className="text-xs text-slate-500 font-medium mt-0.5">
-                                            Select &quot;From Date&quot; to &quot;To Date&quot; to determine the total net amount (₹X) Pillora has to pay to this hospital.
+                                        <h3 className="ui-title">Calculate payout for custom date range</h3>
+                                        <p className="ui-subtitle">
+                                            Select &quot;From date&quot; to &quot;To date&quot; to determine the total net amount (₹X) Pillora has to pay to this hospital.
                                         </p>
                                     </div>
 
                                     {/* Quick Date Presets */}
-                                    <div className="flex flex-wrap items-center gap-1.5 bg-slate-50 p-1.5 rounded-2xl border border-slate-200">
+                                    <div className="flex shrink-0 flex-wrap items-center gap-2">
                                         {[
                                             {
                                                 label: "Today",
@@ -1145,7 +1190,7 @@ export default function FinancialManagementAdmin() {
                                                 }
                                             },
                                             {
-                                                label: "This Week",
+                                                label: "This week",
                                                 getDates: () => {
                                                     const now = new Date();
                                                     const day = now.getDay();
@@ -1156,7 +1201,7 @@ export default function FinancialManagementAdmin() {
                                                 }
                                             },
                                             {
-                                                label: "This Month",
+                                                label: "This month",
                                                 getDates: () => {
                                                     const now = new Date();
                                                     const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
@@ -1165,7 +1210,7 @@ export default function FinancialManagementAdmin() {
                                                 }
                                             },
                                             {
-                                                label: "All Time",
+                                                label: "All time",
                                                 getDates: () => {
                                                     return { start: "2024-01-01", end: new Date().toISOString().split("T")[0] };
                                                 }
@@ -1180,7 +1225,7 @@ export default function FinancialManagementAdmin() {
                                                     setCalcEndDate(end);
                                                     calculateSettlementForRange(start, end);
                                                 }}
-                                                className="px-3 py-1 bg-white hover:bg-slate-200 text-slate-700 rounded-xl text-[11px] font-bold border border-slate-200/80 transition-all"
+                                                className="ui-btn-secondary ui-btn-sm"
                                             >
                                                 {preset.label}
                                             </button>
@@ -1189,28 +1234,30 @@ export default function FinancialManagementAdmin() {
                                 </div>
 
                                 {/* Date Inputs Bar */}
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80">
+                                <div className="grid grid-cols-1 items-end gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
                                     <div>
-                                        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                                            From Date (Start)
+                                        <label htmlFor="fin-calc-start" className="ui-label">
+                                            From date (start)
                                         </label>
                                         <input
                                             type="date"
+                                            id="fin-calc-start"
                                             value={calcStartDate}
                                             onChange={(e) => setCalcStartDate(e.target.value)}
-                                            className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="ui-input"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                                            To Date (End)
+                                        <label htmlFor="fin-calc-end" className="ui-label">
+                                            To date (end)
                                         </label>
                                         <input
                                             type="date"
+                                            id="fin-calc-end"
                                             value={calcEndDate}
                                             onChange={(e) => setCalcEndDate(e.target.value)}
-                                            className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="ui-input"
                                         />
                                     </div>
 
@@ -1219,64 +1266,64 @@ export default function FinancialManagementAdmin() {
                                             type="button"
                                             onClick={() => calculateSettlementForRange(calcStartDate, calcEndDate)}
                                             disabled={loadingCalculation}
-                                            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                                            className="ui-btn-primary min-h-[44px] w-full"
                                         >
-                                            <RefreshCw className={`w-3.5 h-3.5 ${loadingCalculation ? "animate-spin" : ""}`} />
-                                            <span>Calculate Settlement (₹X)</span>
+                                            <RefreshCw className={`h-4 w-4 ${loadingCalculation ? "animate-spin" : ""}`} />
+                                            <span>Calculate settlement (₹X)</span>
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Calculation Results Display */}
                                 {rangeCalculation && (
-                                    <div className="bg-gradient-to-br from-indigo-900 to-blue-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl space-y-6">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-indigo-700/60 pb-5">
-                                            <div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300">
+                                    <div className="space-y-4 rounded-xl border border-slate-200 p-4 sm:p-5">
+                                        <div className="flex flex-col justify-between gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-end">
+                                            <div className="min-w-0">
+                                                <span className="text-xs font-medium text-slate-500">
                                                     Period: {fmtDate(rangeCalculation.dateRange?.startDate)} to {fmtDate(rangeCalculation.dateRange?.endDate)}
                                                 </span>
-                                                <h4 className="text-xl font-black mt-1">Calculated Hospital Settlement Amount</h4>
+                                                <h4 className="mt-0.5 text-base font-semibold text-slate-900">Calculated hospital settlement amount</h4>
                                             </div>
-                                            <div className="text-right">
-                                                <span className="text-xs text-indigo-300 font-semibold block">Total Amount to Pay (₹X):</span>
-                                                <span className="text-3xl font-black text-emerald-400">
+                                            <div className="sm:text-right">
+                                                <span className="block text-xs font-medium text-slate-500">Total amount to pay (₹X):</span>
+                                                <span className="break-words text-2xl font-bold tracking-tight text-emerald-600 sm:text-3xl">
                                                     {fmt(rangeCalculation.calculation?.netPayable)}
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                                            <div className="bg-white/10 backdrop-blur p-4 rounded-2xl border border-white/10">
-                                                <span className="text-indigo-200 block text-[10px] font-bold uppercase">Online Advances</span>
-                                                <span className="text-lg font-black text-white mt-1 block">
+                                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                            <div className="rounded-xl bg-slate-50 p-3.5 sm:p-4">
+                                                <span className="block text-xs font-medium text-slate-500">Online advances</span>
+                                                <span className="mt-1 block text-lg font-semibold text-slate-900">
                                                     {rangeCalculation.calculation?.advanceCount || 0} bookings
                                                 </span>
                                             </div>
-                                            <div className="bg-white/10 backdrop-blur p-4 rounded-2xl border border-white/10">
-                                                <span className="text-indigo-200 block text-[10px] font-bold uppercase">Gross Advances</span>
-                                                <span className="text-lg font-black text-white mt-1 block">
+                                            <div className="rounded-xl bg-slate-50 p-3.5 sm:p-4">
+                                                <span className="block text-xs font-medium text-slate-500">Gross advances</span>
+                                                <span className="mt-1 block break-words text-lg font-semibold text-slate-900">
                                                     {fmt(rangeCalculation.calculation?.grossOnlineAdvances)}
                                                 </span>
                                             </div>
-                                            <div className="bg-white/10 backdrop-blur p-4 rounded-2xl border border-white/10">
-                                                <span className="text-rose-300 block text-[10px] font-bold uppercase">Gateway (2.36%)</span>
-                                                <span className="text-lg font-black text-rose-300 mt-1 block">
+                                            <div className="rounded-xl bg-slate-50 p-3.5 sm:p-4">
+                                                <span className="block text-xs font-medium text-slate-500">Gateway (2.36%)</span>
+                                                <span className="mt-1 block break-words text-lg font-semibold text-rose-600">
                                                     - {fmt(rangeCalculation.calculation?.gatewayCharges)}
                                                 </span>
                                             </div>
-                                            <div className="bg-emerald-500/20 backdrop-blur p-4 rounded-2xl border border-emerald-400/30">
-                                                <span className="text-emerald-300 block text-[10px] font-bold uppercase">Net Payable (₹X)</span>
-                                                <span className="text-lg font-black text-emerald-300 mt-1 block">
+                                            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 sm:p-4">
+                                                <span className="block text-xs font-medium text-emerald-700">Net payable (₹X)</span>
+                                                <span className="mt-1 block break-words text-lg font-semibold text-emerald-700">
                                                     {fmt(rangeCalculation.calculation?.netPayable)}
                                                 </span>
                                             </div>
                                         </div>
 
                                         {rangeCalculation.calculation?.advanceCount === 0 && (
-                                            <div className="bg-emerald-500/20 border border-emerald-400/40 rounded-2xl p-4 flex items-center gap-3 text-xs text-emerald-200">
-                                                <CheckCircle2 className="w-5 h-5 text-emerald-300 shrink-0" />
+                                            <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                                                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
                                                 <div>
-                                                    <span className="font-bold text-white block">No Pending Advances in Selected Range:</span>
+                                                    <span className="block font-semibold text-emerald-900">No pending advances in selected range:</span>
                                                     <span>All online advance bookings within this date range have already been settled and confirmed by the hospital, or no online advances occurred.</span>
                                                 </div>
                                             </div>
@@ -1286,47 +1333,49 @@ export default function FinancialManagementAdmin() {
                             </div>
 
                             {/* 5. Transfer Money & Send Settlement Request Section */}
-                            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xl shadow-blue-900/5 space-y-6">
+                            <div className="ui-card space-y-5 p-4 sm:p-6">
                                 <div className="border-b border-slate-100 pb-5">
-                                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-wider mb-1">
-                                        <Send className="w-3 h-3" /> Step: Disburse Payout & Request Confirmation
+                                    <div className="ui-badge mb-2 border-emerald-200 bg-emerald-50 text-emerald-700">
+                                        <Send className="h-3 w-3" /> Step: Disburse payout & request confirmation
                                     </div>
-                                    <h3 className="text-xl font-black text-slate-900">Transfer & Send Settlement Request to Hospital</h3>
-                                    <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                                    <h3 className="ui-title">Transfer & send settlement request to hospital</h3>
+                                    <p className="ui-subtitle">
                                         After transferring the amount to the hospital&apos;s bank account via NEFT/RTGS/IMPS/UPI, enter the transfer details below and send the request.
-                                        The hospital will receive this request in their dashboard (<strong>pillorahospital.in</strong>) and confirm receipt (&quot;Yes, I have received the money from Pillora&quot;).
-                                        <strong> The settlement will only be considered completed after approval from the hospital.</strong>
+                                        The hospital will receive this request in their dashboard (<strong className="font-semibold text-slate-700">pillorahospital.in</strong>) and confirm receipt (&quot;Yes, I have received the money from Pillora&quot;).
+                                        <strong className="font-semibold text-slate-700"> The settlement will only be considered completed after approval from the hospital.</strong>
                                     </p>
                                 </div>
 
                                 <form onSubmit={handleSendSettlementRequest} className="space-y-5">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Settlement Amount (₹) <span className="text-rose-500">*</span>
+                                            <label htmlFor="fin-req-amount" className="ui-label">
+                                                Settlement amount (₹) <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="number"
                                                 required
                                                 min={1}
                                                 step="0.01"
+                                                id="fin-req-amount"
                                                 value={reqAmount}
                                                 onChange={(e) => setReqAmount(Number(e.target.value))}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-black text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input font-semibold"
                                             />
-                                            <span className="text-[10px] text-slate-400 mt-1 block">
+                                            <span className="ui-hint block">
                                                 Pre-filled from range calculation (₹X)
                                             </span>
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Transfer Method <span className="text-rose-500">*</span>
+                                            <label htmlFor="fin-req-method" className="ui-label">
+                                                Transfer method <span className="text-rose-500">*</span>
                                             </label>
                                             <select
+                                                id="fin-req-method"
                                                 value={reqMethod}
                                                 onChange={(e) => setReqMethod(e.target.value)}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input"
                                             >
                                                 <option value="NEFT">NEFT (National Electronic Fund Transfer)</option>
                                                 <option value="RTGS">RTGS (Real Time Gross Settlement)</option>
@@ -1336,143 +1385,145 @@ export default function FinancialManagementAdmin() {
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                UTR / Bank Ref Number <span className="text-rose-500">*</span>
+                                            <label htmlFor="fin-req-utr" className="ui-label">
+                                                UTR / bank ref number <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 required
                                                 placeholder="e.g. UTR123456789"
+                                                id="fin-req-utr"
                                                 value={reqUtr}
                                                 onChange={(e) => setReqUtr(e.target.value)}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input font-mono"
                                             />
-                                            <span className="text-[10px] text-slate-400 mt-1 block">
+                                            <span className="ui-hint block">
                                                 Bank transfer confirmation number
                                             </span>
                                         </div>
 
                                         <div>
-                                            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                                Notes / Remarks
+                                            <label htmlFor="fin-req-notes" className="ui-label">
+                                                Notes / remarks
                                             </label>
                                             <input
                                                 type="text"
+                                                id="fin-req-notes"
                                                 placeholder="e.g. Payout for 01-08 Nov"
                                                 value={reqNotes}
                                                 onChange={(e) => setReqNotes(e.target.value)}
-                                                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input"
                                             />
-                                            <span className="text-[10px] text-slate-400 mt-1 block">
+                                            <span className="ui-hint block">
                                                 Optional remarks for hospital
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-800">
-                                        <Clock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                    <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                                        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
                                         <div>
-                                            <span className="font-bold block">Hospital Approval Required:</span>
+                                            <span className="block font-semibold text-amber-900">Hospital approval required:</span>
                                             <span>
-                                                Clicking below creates a settlement with status <strong>&quot;Awaiting Hospital Confirmation&quot;</strong>.
+                                                Clicking below creates a settlement with status <strong className="font-semibold">&quot;Awaiting Hospital Confirmation&quot;</strong>.
                                                 The hospital must verify their bank account and click &quot;Confirm Received&quot; in their dashboard. Once confirmed, the settlement status automatically transitions to &quot;Settlement Completed&quot;.
                                             </span>
                                         </div>
                                     </div>
 
                                     {reqAmount <= 0 && (
-                                        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3 text-xs text-emerald-800">
-                                            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                                        <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                                            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
                                             <div>
-                                                <span className="font-bold block">No Pending Settlement to Send:</span>
+                                                <span className="block font-semibold text-emerald-900">No pending settlement to send:</span>
                                                 <span>All eligible patient advances for this hospital have already been settled or none are due for the selected date range.</span>
                                             </div>
                                         </div>
                                     )}
 
-                                    <div className="flex justify-end">
+                                    <div className="flex justify-end border-t border-slate-100 pt-4">
                                         <button
                                             type="submit"
                                             disabled={sendingRequest || reqAmount <= 0 || !reqUtr.trim()}
-                                            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-600/25 flex items-center gap-2 transition-all disabled:opacity-50"
+                                            className="ui-btn-success w-full whitespace-normal py-2.5 sm:w-auto"
                                         >
-                                            {sendingRequest ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                            <span>Send Settlement Request to Hospital (₹{reqAmount})</span>
+                                            {sendingRequest ? <RefreshCw className="h-4 w-4 shrink-0 animate-spin" /> : <Send className="h-4 w-4 shrink-0" />}
+                                            <span>Send settlement request to hospital (₹{reqAmount})</span>
                                         </button>
                                     </div>
                                 </form>
                             </div>
 
                             {/* 6. Hospital Settlement Requests & History Table */}
-                            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 overflow-hidden">
-                                <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="ui-card overflow-hidden">
+                                <div className="flex flex-col justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
                                     <div>
-                                        <h4 className="font-black text-slate-900 text-lg">Hospital Settlement Requests & Status</h4>
-                                        <p className="text-xs text-slate-500 mt-0.5">
+                                        <h4 className="ui-title">Hospital settlement requests & status</h4>
+                                        <p className="ui-subtitle">
                                             Permanent record of all settlement requests sent to this hospital and their verification status.
                                         </p>
                                     </div>
                                     <button
                                         onClick={fetchHospitalReport}
-                                        className="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 flex items-center gap-1.5 self-start sm:self-auto"
+                                        className="ui-btn-secondary ui-btn-sm shrink-0 self-start sm:self-auto"
                                     >
-                                        <RefreshCw className="w-3 h-3" />
-                                        <span>Refresh Status</span>
+                                        <RefreshCw className="h-3.5 w-3.5" />
+                                        <span>Refresh status</span>
                                     </button>
                                 </div>
 
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-xs">
-                                        <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                                    <table className="w-full text-left">
+                                        <thead className="border-b border-slate-100 bg-slate-50/80">
                                             <tr>
-                                                <th className="py-3.5 px-4">Settlement ID</th>
-                                                <th className="py-3.5 px-4">Period Range</th>
-                                                <th className="py-3.5 px-4 text-center">Advances</th>
-                                                <th className="py-3.5 px-4 text-right">Gross (₹)</th>
-                                                <th className="py-3.5 px-4 text-right">Deductions (2.36%)</th>
-                                                <th className="py-3.5 px-4 text-right">Net Transferred (₹)</th>
-                                                <th className="py-3.5 px-4">Transfer & UTR</th>
-                                                <th className="py-3.5 px-4">Request Date</th>
-                                                <th className="py-3.5 px-4 text-center">Settlement Status</th>
+                                                <th className="ui-th">Settlement ID</th>
+                                                <th className="ui-th">Period range</th>
+                                                <th className="ui-th text-center">Advances</th>
+                                                <th className="ui-th text-right">Gross (₹)</th>
+                                                <th className="ui-th text-right">Deductions (2.36%)</th>
+                                                <th className="ui-th text-right">Net transferred (₹)</th>
+                                                <th className="ui-th">Transfer & UTR</th>
+                                                <th className="ui-th">Request date</th>
+                                                <th className="ui-th text-center">Settlement status</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-100 font-medium">
+                                        <tbody className="divide-y divide-slate-100">
                                             {hospitalReport.settlementHistory && hospitalReport.settlementHistory.length > 0 ? (
                                                 hospitalReport.settlementHistory.map((s: any) => (
-                                                    <tr key={s._id} className="hover:bg-slate-50 transition-colors">
-                                                        <td className="py-3.5 px-4 font-mono font-bold text-blue-600">
+                                                    <tr key={s._id} className="transition-colors hover:bg-slate-50/60">
+                                                        <td className="ui-td whitespace-nowrap font-mono text-xs font-semibold text-blue-600">
                                                             {s.settlementId}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-slate-700 font-semibold">
+                                                        <td className="ui-td whitespace-nowrap text-slate-700">
                                                             {s.startDate && s.endDate ? (
                                                                 <span>{fmtDate(s.startDate)} - {fmtDate(s.endDate)}</span>
                                                             ) : (
-                                                                <span className="text-slate-400">N/A</span>
+                                                                <span className="text-slate-500">N/A</span>
                                                             )}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-center font-bold text-slate-800">
+                                                        <td className="ui-td text-center font-medium text-slate-900">
                                                             {s.advanceCount || s.paymentIds?.length || 0}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-right font-bold text-slate-700">
+                                                        <td className="ui-td text-right font-medium text-slate-700 whitespace-nowrap">
                                                             {fmt(s.grossCollection)}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-right text-rose-500 font-bold">
+                                                        <td className="ui-td text-right text-rose-600 font-medium whitespace-nowrap">
                                                             - {fmt((s.razorpayCharges || 0) + (s.gstCharges || 0))}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-right font-black text-emerald-600 text-sm">
+                                                        <td className="ui-td text-right font-semibold text-emerald-600 whitespace-nowrap">
                                                             {fmt(s.netAmount)}
                                                         </td>
-                                                        <td className="py-3.5 px-4">
-                                                            <div className="font-bold text-slate-800">{s.transferMethod || "NEFT"}</div>
-                                                            <div className="font-mono text-[11px] text-slate-500">{s.utrNumber || "N/A"}</div>
+                                                        <td className="ui-td">
+                                                            <div className="font-medium text-slate-900">{s.transferMethod || "NEFT"}</div>
+                                                            <div className="font-mono text-xs text-slate-500">{s.utrNumber || "N/A"}</div>
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-slate-500">
+                                                        <td className="ui-td whitespace-nowrap text-slate-500">
                                                             {fmtDate(s.transferDate || s.createdAt)}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                                        <td className="ui-td text-center whitespace-nowrap">
                                                             {getSettlementBadge(s.status)}
                                                             {s.confirmationDate && (
-                                                                <div className="text-[10px] text-emerald-700 mt-0.5">
+                                                                <div className="mt-1 text-xs text-emerald-700">
                                                                     Confirmed: {fmtDate(s.confirmationDate)}
                                                                 </div>
                                                             )}
@@ -1481,7 +1532,7 @@ export default function FinancialManagementAdmin() {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan={9} className="py-10 text-center text-slate-400 font-semibold italic">
+                                                    <td colSpan={9} className="ui-td py-12 text-slate-500 sm:text-center">
                                                         No settlement requests sent to this hospital yet.
                                                     </td>
                                                 </tr>
@@ -1492,44 +1543,44 @@ export default function FinancialManagementAdmin() {
                             </div>
 
                             {/* 7. Appointments Breakdown Table */}
-                            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 overflow-hidden">
-                                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                                    <div>
-                                        <h4 className="font-black text-slate-900">Hospital Appointment Bookings ({hospitalReport.appointments?.length || 0})</h4>
-                                        <p className="text-xs text-slate-500 mt-0.5">Patient advances, consultation fees, and balances for this hospital.</p>
+                            <div className="ui-card overflow-hidden">
+                                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
+                                    <div className="min-w-0">
+                                        <h4 className="ui-title">Hospital appointment bookings ({hospitalReport.appointments?.length || 0})</h4>
+                                        <p className="ui-subtitle">Patient advances, consultation fees, and balances for this hospital.</p>
                                     </div>
                                 </div>
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-xs">
-                                        <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                                    <table className="w-full text-left">
+                                        <thead className="border-b border-slate-100 bg-slate-50/80">
                                             <tr>
-                                                <th className="py-3 px-4">Token / ID</th>
-                                                <th className="py-3 px-4">Patient</th>
-                                                <th className="py-3 px-4">Doctor</th>
-                                                <th className="py-3 px-4 text-right">Consultation Fee</th>
-                                                <th className="py-3 px-4 text-right">Advance Paid (20%)</th>
-                                                <th className="py-3 px-4 text-right">Balance Due (80%)</th>
-                                                <th className="py-3 px-4 text-right">Balance Collected</th>
-                                                <th className="py-3 px-4">Payment Status</th>
-                                                <th className="py-3 px-4">Settlement</th>
-                                                <th className="py-3 px-4">Date</th>
+                                                <th className="ui-th">Token / ID</th>
+                                                <th className="ui-th">Patient</th>
+                                                <th className="ui-th">Doctor</th>
+                                                <th className="ui-th text-right">Consultation fee</th>
+                                                <th className="ui-th text-right">Advance paid (20%)</th>
+                                                <th className="ui-th text-right">Balance due (80%)</th>
+                                                <th className="ui-th text-right">Balance collected</th>
+                                                <th className="ui-th">Payment status</th>
+                                                <th className="ui-th">Settlement</th>
+                                                <th className="ui-th">Date</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-100 font-medium">
+                                        <tbody className="divide-y divide-slate-100">
                                             {hospitalReport.appointments?.map((app: any) => (
-                                                <tr key={app.appointmentId} className="hover:bg-slate-50">
-                                                    <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                                                <tr key={app.appointmentId} className="transition-colors hover:bg-slate-50/60">
+                                                    <td className="ui-td whitespace-nowrap font-mono text-xs font-semibold text-slate-900">
                                                         {app.tokenNumber ? `#${app.tokenNumber}` : app.appointmentId.slice(-6).toUpperCase()}
                                                     </td>
-                                                    <td className="py-3 px-4 font-bold text-slate-900">{app.patientName}</td>
-                                                    <td className="py-3 px-4 text-slate-700">{app.doctorName}</td>
-                                                    <td className="py-3 px-4 text-right font-bold">₹{app.consultationFee}</td>
-                                                    <td className="py-3 px-4 text-right font-bold text-blue-600">₹{app.advancePaid}</td>
-                                                    <td className="py-3 px-4 text-right font-bold text-rose-600">₹{app.balanceDue}</td>
-                                                    <td className="py-3 px-4 text-right font-bold text-emerald-600">₹{app.balancePaid}</td>
-                                                    <td className="py-3 px-4 capitalize font-semibold">{app.paymentStatus}</td>
-                                                    <td className="py-3 px-4">{getSettlementBadge(app.settlementStatus)}</td>
-                                                    <td className="py-3 px-4 text-slate-400">{fmtDate(app.appointmentDate)}</td>
+                                                    <td className="ui-td font-medium text-slate-900">{app.patientName}</td>
+                                                    <td className="ui-td text-slate-700">{app.doctorName}</td>
+                                                    <td className="ui-td text-right font-medium text-slate-900 whitespace-nowrap">₹{app.consultationFee}</td>
+                                                    <td className="ui-td text-right font-medium text-blue-600 whitespace-nowrap">₹{app.advancePaid}</td>
+                                                    <td className="ui-td text-right font-medium text-rose-600 whitespace-nowrap">₹{app.balanceDue}</td>
+                                                    <td className="ui-td text-right font-medium text-emerald-600 whitespace-nowrap">₹{app.balancePaid}</td>
+                                                    <td className="ui-td capitalize font-medium text-slate-700">{app.paymentStatus}</td>
+                                                    <td className="ui-td">{getSettlementBadge(app.settlementStatus)}</td>
+                                                    <td className="ui-td whitespace-nowrap text-slate-500">{fmtDate(app.appointmentDate)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -1546,71 +1597,71 @@ export default function FinancialManagementAdmin() {
             {/* ========================================================================= */}
             {activeSection === "settlements" && (
                 <div className="space-y-6">
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 overflow-hidden">
-                        <div className="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div>
-                                <h3 className="text-xl font-black text-slate-900">Hospital Settlement Ledger</h3>
-                                <p className="text-xs text-slate-500 mt-0.5">
+                    <div className="ui-card overflow-hidden">
+                        <div className="flex flex-col justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
+                            <div className="min-w-0">
+                                <h3 className="ui-title">Hospital settlement ledger</h3>
+                                <p className="ui-subtitle">
                                     Gross online advances, 2.36% gateway charges, net payable, and outstanding payout tracking.
                                 </p>
                             </div>
                             <button
                                 onClick={fetchSettlements}
                                 disabled={loadingSettlements}
-                                className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 flex items-center gap-2"
+                                className="ui-btn-secondary ui-btn-sm shrink-0 self-start sm:self-auto"
                             >
-                                <RefreshCw className={`w-3.5 h-3.5 ${loadingSettlements ? "animate-spin" : ""}`} />
+                                <RefreshCw className={`h-3.5 w-3.5 ${loadingSettlements ? "animate-spin" : ""}`} />
                                 <span>Refresh</span>
                             </button>
                         </div>
 
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs">
-                                <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                            <table className="w-full text-left">
+                                <thead className="border-b border-slate-100 bg-slate-50/80">
                                     <tr>
-                                        <th className="py-3.5 px-4">Hospital Name</th>
-                                        <th className="py-3.5 px-4">Bank Account Details</th>
-                                        <th className="py-3.5 px-4 text-right">Gross Advances</th>
-                                        <th className="py-3.5 px-4 text-right">Gateway Deductions</th>
-                                        <th className="py-3.5 px-4 text-right">Net Payable</th>
-                                        <th className="py-3.5 px-4 text-right">Already Settled</th>
-                                        <th className="py-3.5 px-4 text-right">Pending Payout</th>
-                                        <th className="py-3.5 px-4">Status</th>
-                                        <th className="py-3.5 px-4 text-center">Action</th>
+                                        <th className="ui-th">Hospital name</th>
+                                        <th className="ui-th">Bank account details</th>
+                                        <th className="ui-th text-right">Gross advances</th>
+                                        <th className="ui-th text-right">Gateway deductions</th>
+                                        <th className="ui-th text-right">Net payable</th>
+                                        <th className="ui-th text-right">Already settled</th>
+                                        <th className="ui-th text-right">Pending payout</th>
+                                        <th className="ui-th">Status</th>
+                                        <th className="ui-th text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 font-medium">
+                                <tbody className="divide-y divide-slate-100">
                                     {loadingSettlements ? (
                                         <tr>
-                                            <td colSpan={9} className="py-12 text-center text-slate-400">Loading settlements...</td>
+                                            <td colSpan={9} className="ui-td py-12 text-slate-500 sm:text-center">Loading settlements...</td>
                                         </tr>
                                     ) : settlements.length === 0 ? (
                                         <tr>
-                                            <td colSpan={9} className="py-12 text-center text-slate-400">No hospital settlement records found.</td>
+                                            <td colSpan={9} className="ui-td py-12 text-slate-500 sm:text-center">No hospital settlement records found.</td>
                                         </tr>
                                     ) : (
                                         settlements.map((s) => {
                                             const hasPendingPayout = s.pendingSettlement > 0;
                                             return (
-                                                <tr key={s.hospitalId} className="hover:bg-slate-50 transition-colors">
-                                                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                                                <tr key={s.hospitalId} className="transition-colors hover:bg-slate-50/60">
+                                                    <td className="ui-td font-medium text-slate-900">
                                                         <button
                                                             onClick={() => {
                                                                 setSelectedHospitalId(s.hospitalId);
                                                                 setActiveSection("hospital_reports");
                                                             }}
-                                                            className="text-left group hover:text-blue-600 transition-colors"
+                                                            className="group text-left"
                                                         >
-                                                            <div className="font-extrabold group-hover:underline flex items-center gap-1.5">
+                                                            <div className="flex items-center gap-1.5 font-semibold text-slate-900 transition-colors group-hover:text-blue-600">
                                                                 <span>{s.hospitalName}</span>
-                                                                <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600" />
+                                                                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-blue-600 opacity-0 transition-opacity group-hover:opacity-100" />
                                                             </div>
-                                                            <div className="text-[10px] font-normal text-slate-400">{s.phone}</div>
+                                                            <div className="text-xs text-slate-500">{s.phone}</div>
                                                         </button>
                                                     </td>
-                                                    <td className="py-3.5 px-4">
+                                                    <td className="ui-td">
                                                         {s.bankDetails?.accountNumber ? (
-                                                            <div className="font-mono text-[11px] text-slate-700">
+                                                            <div className="whitespace-nowrap font-mono text-xs text-slate-700">
                                                                 <div>{s.bankDetails.accountHolderName}</div>
                                                                 <div>{s.bankDetails.accountNumber} • {s.bankDetails.ifscCode}</div>
                                                             </div>
@@ -1621,38 +1672,38 @@ export default function FinancialManagementAdmin() {
                                                                     setActiveSection("hospital_reports");
                                                                     setIsEditingBank(true);
                                                                 }}
-                                                                className="text-[10px] text-amber-600 font-bold hover:underline"
+                                                                className="inline-flex min-h-[32px] items-center whitespace-nowrap text-xs font-semibold text-amber-700 hover:text-amber-800 hover:underline"
                                                             >
-                                                                + Add Bank Account
+                                                                + Add bank account
                                                             </button>
                                                         )}
                                                     </td>
-                                                    <td className="py-3.5 px-4 text-right font-bold text-blue-600">{fmt(s.totalGrossAdvances || s.grossOnlineAdvances)}</td>
-                                                    <td className="py-3.5 px-4 text-right text-rose-500 font-medium">- {fmt(s.gatewayCharges)}</td>
-                                                    <td className="py-3.5 px-4 text-right font-black text-indigo-700">{fmt(s.netPayable)}</td>
-                                                    <td className="py-3.5 px-4 text-right font-bold text-emerald-600">{fmt(s.alreadySettled)}</td>
-                                                    <td className="py-3.5 px-4 text-right">
+                                                    <td className="ui-td text-right font-medium text-slate-900 whitespace-nowrap">{fmt(s.totalGrossAdvances || s.grossOnlineAdvances)}</td>
+                                                    <td className="ui-td text-right text-rose-600 font-medium whitespace-nowrap">- {fmt(s.gatewayCharges)}</td>
+                                                    <td className="ui-td text-right font-semibold text-slate-900 whitespace-nowrap">{fmt(s.netPayable)}</td>
+                                                    <td className="ui-td text-right font-medium text-emerald-600 whitespace-nowrap">{fmt(s.alreadySettled)}</td>
+                                                    <td className="ui-td text-right whitespace-nowrap">
                                                         {hasPendingPayout ? (
-                                                            <span className="font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">
+                                                            <span className="rounded-lg bg-amber-50 px-2 py-1 font-semibold text-amber-700">
                                                                 {fmt(s.pendingSettlement)}
                                                             </span>
                                                         ) : (
-                                                            <span className="text-emerald-600 font-bold">₹0.00</span>
+                                                            <span className="font-medium text-emerald-600">₹0.00</span>
                                                         )}
                                                     </td>
-                                                    <td className="py-3.5 px-4 whitespace-nowrap">
+                                                    <td className="ui-td whitespace-nowrap">
                                                         {getSettlementBadge(s.settlementStatus)}
                                                     </td>
-                                                    <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                                                    <td className="ui-td text-center whitespace-nowrap">
                                                         <button
                                                             onClick={() => {
                                                                 setSelectedHospitalId(s.hospitalId);
                                                                 setActiveSection("hospital_reports");
                                                             }}
-                                                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs shadow-md shadow-blue-600/10 flex items-center gap-1.5 transition-all mx-auto"
+                                                            className="ui-btn-primary ui-btn-sm"
                                                         >
-                                                            <Wallet className="w-3.5 h-3.5" />
-                                                            <span>Manage & Settle</span>
+                                                            <Wallet className="h-3.5 w-3.5" />
+                                                            <span>Manage & settle</span>
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -1666,113 +1717,119 @@ export default function FinancialManagementAdmin() {
 
                     {/* Record Payout Modal */}
                     {payoutModalHosp && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-                            <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div>
-                                        <h3 className="text-xl font-black text-slate-900">Record Settlement Payout</h3>
-                                        <p className="text-xs text-slate-500 mt-0.5">Hospital: {payoutModalHosp.hospitalName}</p>
+                        <div className="ui-overlay">
+                            <div role="dialog" aria-modal="true" aria-labelledby="fin-payout-title" className="ui-dialog sm:max-w-lg">
+                                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                                    <div className="min-w-0">
+                                        <h3 id="fin-payout-title" className="text-lg font-semibold leading-tight text-slate-900">Record settlement payout</h3>
+                                        <p className="mt-0.5 truncate text-sm text-slate-500">Hospital: {payoutModalHosp.hospitalName}</p>
                                     </div>
-                                    <button onClick={() => setPayoutModalHosp(null)} className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100">
-                                        <X className="w-5 h-5" />
+                                    <button onClick={() => setPayoutModalHosp(null)} aria-label="Close" className="-mr-2 shrink-0 rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700">
+                                        <X className="h-5 w-5" />
                                     </button>
                                 </div>
 
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">Bank Account:</span>
-                                        <span className="font-mono font-bold text-slate-900">{payoutModalHosp.bankDetails?.accountNumber || "N/A"}</span>
+                                <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5 sm:px-6">
+                                <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
+                                    <div className="flex justify-between gap-3">
+                                        <span className="text-slate-500">Bank account:</span>
+                                        <span className="text-right font-mono font-medium text-slate-900">{payoutModalHosp.bankDetails?.accountNumber || "N/A"}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500">IFSC & Bank:</span>
-                                        <span className="font-bold text-slate-900">{payoutModalHosp.bankDetails?.ifscCode || "N/A"} ({payoutModalHosp.bankDetails?.bankName || "Bank"})</span>
+                                    <div className="flex justify-between gap-3">
+                                        <span className="text-slate-500">IFSC & bank:</span>
+                                        <span className="text-right font-medium text-slate-900">{payoutModalHosp.bankDetails?.ifscCode || "N/A"} ({payoutModalHosp.bankDetails?.bankName || "Bank"})</span>
                                     </div>
-                                    <div className="flex justify-between border-t border-slate-200 pt-2 text-amber-700 font-bold">
-                                        <span>Outstanding Net Settlement:</span>
-                                        <span className="text-sm font-black text-amber-600">{fmt(payoutModalHosp.pendingSettlement)}</span>
+                                    <div className="flex justify-between gap-3 border-t border-slate-200 pt-2 font-medium text-amber-700">
+                                        <span>Outstanding net settlement:</span>
+                                        <span className="font-semibold text-amber-700">{fmt(payoutModalHosp.pendingSettlement)}</span>
                                     </div>
                                 </div>
 
                                 <form onSubmit={handleRecordPayoutSubmit} className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                                            Transfer Amount (₹)
+                                        <label htmlFor="fin-payout-amount" className="ui-label">
+                                            Transfer amount (₹)
                                         </label>
                                         <input
                                             type="number"
                                             required
                                             min={1}
                                             step="0.01"
+                                            id="fin-payout-amount"
                                             value={payoutAmount}
                                             onChange={(e) => setPayoutAmount(Number(e.target.value))}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="ui-input font-semibold"
                                         />
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                                                Transfer Method
+                                            <label htmlFor="fin-payout-method" className="ui-label">
+                                                Transfer method
                                             </label>
                                             <select
+                                                id="fin-payout-method"
                                                 value={payoutMethod}
                                                 onChange={(e) => setPayoutMethod(e.target.value)}
-                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input"
                                             >
                                                 <option value="NEFT">NEFT</option>
                                                 <option value="RTGS">RTGS</option>
                                                 <option value="IMPS">IMPS</option>
                                                 <option value="UPI">UPI</option>
-                                                <option value="Other">Other Bank Transfer</option>
+                                                <option value="Other">Other bank transfer</option>
                                             </select>
                                         </div>
 
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                                                UTR / Ref Number <span className="text-rose-500">*</span>
+                                            <label htmlFor="fin-payout-utr" className="ui-label">
+                                                UTR / ref number <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 required
                                                 placeholder="e.g. UTR123456789"
+                                                id="fin-payout-utr"
                                                 value={payoutUtr}
                                                 onChange={(e) => setPayoutUtr(e.target.value)}
-                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="ui-input font-mono"
                                             />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                                            Notes / Remarks
+                                        <label htmlFor="fin-payout-notes" className="ui-label">
+                                            Notes / remarks
                                         </label>
                                         <input
                                             type="text"
+                                            id="fin-payout-notes"
                                             placeholder="Optional remarks"
                                             value={payoutNotes}
                                             onChange={(e) => setPayoutNotes(e.target.value)}
-                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 font-medium"
+                                            className="ui-input"
                                         />
                                     </div>
 
-                                    <div className="pt-3 flex justify-end gap-3">
+                                    <div className="sticky -bottom-5 -mx-5 -mb-5 mt-2 flex flex-col-reverse gap-2 border-t border-slate-100 bg-white/95 px-5 py-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
                                         <button
                                             type="button"
                                             onClick={() => setPayoutModalHosp(null)}
-                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700"
+                                            className="ui-btn-secondary w-full sm:w-auto"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={payoutSubmitting}
-                                            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-600/20 flex items-center gap-2"
+                                            className="ui-btn-primary w-full sm:w-auto"
                                         >
-                                            {payoutSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                                            <span>Confirm Settlement Payout</span>
+                                            {payoutSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                                            <span>Confirm settlement payout</span>
                                         </button>
                                     </div>
                                 </form>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -1784,39 +1841,40 @@ export default function FinancialManagementAdmin() {
             {/* ========================================================================= */}
             {activeSection === "transactions" && (
                 <div className="space-y-6">
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 space-y-4">
+                    <div className="ui-card overflow-hidden">
                         {/* Table Header & Master Filters */}
-                        <div className="p-6 sm:p-8 border-b border-slate-100 space-y-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div>
-                                    <h3 className="text-xl font-black text-slate-900">Master Financial Transaction Ledger</h3>
-                                    <p className="text-xs text-slate-500 mt-0.5">
+                        <div className="space-y-4 border-b border-slate-100 p-5 sm:p-6">
+                            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                                <div className="min-w-0">
+                                    <h3 className="ui-title">Master financial transaction ledger</h3>
+                                    <p className="ui-subtitle">
                                         Immutable record of all patient advances, clinic cash/online collections, refunds, and settlements.
                                     </p>
                                 </div>
                                 <button
                                     onClick={handleExportTxnCSV}
                                     disabled={exportingTxn}
-                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-emerald-600/10"
+                                    className="ui-btn-success w-full shrink-0 sm:w-auto"
                                 >
-                                    <Download className="w-3.5 h-3.5" />
+                                    <Download className="h-4 w-4" />
                                     <span>{exportingTxn ? "Exporting..." : "Export CSV"}</span>
                                 </button>
                             </div>
 
                             {/* Filters Bar */}
-                            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
                                 <div className="relative">
-                                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                    <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                     <input
                                         type="text"
-                                        placeholder="Search Txn ID, Rzp ID, Patient..."
+                                        placeholder="Search txn ID, Rzp ID, patient..."
                                         value={txnSearch}
                                         onChange={(e) => {
                                             setTxnSearch(e.target.value);
                                             setTxnPage(1);
                                         }}
-                                        className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        aria-label="Search transactions"
+                                        className="ui-input pl-10"
                                     />
                                 </div>
 
@@ -1826,9 +1884,10 @@ export default function FinancialManagementAdmin() {
                                         setTxnTypeFilter(e.target.value);
                                         setTxnPage(1);
                                     }}
-                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                    aria-label="Filter by type"
+                                    className="ui-input"
                                 >
-                                    <option value="all">All Types</option>
+                                    <option value="all">All types</option>
                                     <option value="advance">Advance</option>
                                     <option value="balance">Balance</option>
                                     <option value="full">Full</option>
@@ -1841,11 +1900,12 @@ export default function FinancialManagementAdmin() {
                                         setTxnSourceFilter(e.target.value);
                                         setTxnPage(1);
                                     }}
-                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                    aria-label="Filter by source"
+                                    className="ui-input"
                                 >
-                                    <option value="all">All Sources</option>
-                                    <option value="pillora_online">Pillora Online</option>
-                                    <option value="clinic_collection">Clinic Collection</option>
+                                    <option value="all">All sources</option>
+                                    <option value="pillora_online">Pillora online</option>
+                                    <option value="clinic_collection">Clinic collection</option>
                                 </select>
 
                                 <select
@@ -1854,14 +1914,15 @@ export default function FinancialManagementAdmin() {
                                         setTxnMethodFilter(e.target.value);
                                         setTxnPage(1);
                                     }}
-                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                    aria-label="Filter by method"
+                                    className="ui-input"
                                 >
-                                    <option value="all">All Methods</option>
+                                    <option value="all">All methods</option>
                                     <option value="razorpay">Razorpay</option>
                                     <option value="cash">Cash</option>
                                     <option value="upi">UPI</option>
                                     <option value="card">Card</option>
-                                    <option value="other_online">Other Online</option>
+                                    <option value="other_online">Other online</option>
                                 </select>
 
                                 <select
@@ -1870,10 +1931,11 @@ export default function FinancialManagementAdmin() {
                                         setTxnStatusFilter(e.target.value);
                                         setTxnPage(1);
                                     }}
-                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                    aria-label="Filter by status"
+                                    className="ui-input"
                                 >
-                                    <option value="all">All Statuses</option>
-                                    <option value="completed">Completed / Captured</option>
+                                    <option value="all">All statuses</option>
+                                    <option value="completed">Completed / captured</option>
                                     <option value="pending">Pending</option>
                                     <option value="failed">Failed</option>
                                     <option value="refunded">Refunded</option>
@@ -1885,9 +1947,10 @@ export default function FinancialManagementAdmin() {
                                         setTxnHospFilter(e.target.value);
                                         setTxnPage(1);
                                     }}
-                                    className="py-2 px-3 text-xs bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700"
+                                    aria-label="Filter by hospital"
+                                    className="ui-input"
                                 >
-                                    <option value="all">All Hospitals</option>
+                                    <option value="all">All hospitals</option>
                                     {hospitalsList.map((h) => (
                                         <option key={h._id} value={h._id}>{h.name}</option>
                                     ))}
@@ -1897,62 +1960,62 @@ export default function FinancialManagementAdmin() {
 
                         {/* Master Ledger Table */}
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs">
-                                <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                            <table className="w-full text-left">
+                                <thead className="border-b border-slate-100 bg-slate-50/80">
                                     <tr>
-                                        <th className="py-3 px-4">Txn ID / Razorpay ID</th>
-                                        <th className="py-3 px-4">Hospital</th>
-                                        <th className="py-3 px-4">Patient Info</th>
-                                        <th className="py-3 px-4 text-right">Amount</th>
-                                        <th className="py-3 px-4">Type</th>
-                                        <th className="py-3 px-4">Source & Method</th>
-                                        <th className="py-3 px-4 text-right">Gateway Deductions</th>
-                                        <th className="py-3 px-4">Status</th>
-                                        <th className="py-3 px-4">Settlement</th>
-                                        <th className="py-3 px-4">Date</th>
+                                        <th className="ui-th">Txn ID / Razorpay ID</th>
+                                        <th className="ui-th">Hospital</th>
+                                        <th className="ui-th">Patient info</th>
+                                        <th className="ui-th text-right">Amount</th>
+                                        <th className="ui-th">Type</th>
+                                        <th className="ui-th">Source & method</th>
+                                        <th className="ui-th text-right">Gateway deductions</th>
+                                        <th className="ui-th">Status</th>
+                                        <th className="ui-th">Settlement</th>
+                                        <th className="ui-th">Date</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 font-medium">
+                                <tbody className="divide-y divide-slate-100">
                                     {loadingTxns ? (
                                         <tr>
-                                            <td colSpan={10} className="py-12 text-center text-slate-400">Loading master ledger...</td>
+                                            <td colSpan={10} className="ui-td py-12 text-slate-500 sm:text-center">Loading master ledger...</td>
                                         </tr>
                                     ) : transactions.length === 0 ? (
                                         <tr>
-                                            <td colSpan={10} className="py-12 text-center text-slate-400">No transactions found matching filters.</td>
+                                            <td colSpan={10} className="ui-td py-12 text-slate-500 sm:text-center">No transactions found matching filters.</td>
                                         </tr>
                                     ) : (
                                         transactions.map((tx) => (
-                                            <tr key={tx._id} className="hover:bg-slate-50">
-                                                <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                                            <tr key={tx._id} className="transition-colors hover:bg-slate-50/60">
+                                                <td className="ui-td whitespace-nowrap font-mono text-xs font-semibold text-slate-900">
                                                     <div>{tx.transactionId}</div>
                                                     {tx.razorpayPaymentId && (
-                                                        <div className="text-[10px] font-normal text-slate-400">{tx.razorpayPaymentId}</div>
+                                                        <div className="font-normal text-slate-500">{tx.razorpayPaymentId}</div>
                                                     )}
                                                 </td>
-                                                <td className="py-3 px-4 font-bold text-slate-800">{tx.hospitalName}</td>
-                                                <td className="py-3 px-4">
-                                                    <div className="font-bold text-slate-900">{tx.patientName}</div>
-                                                    <div className="text-[10px] text-slate-400">{tx.patientPhone}</div>
+                                                <td className="ui-td font-medium text-slate-900">{tx.hospitalName}</td>
+                                                <td className="ui-td">
+                                                    <div className="font-medium text-slate-900">{tx.patientName}</div>
+                                                    <div className="text-xs text-slate-500">{tx.patientPhone}</div>
                                                 </td>
-                                                <td className="py-3 px-4 text-right font-black text-slate-900">
+                                                <td className="ui-td text-right font-semibold text-slate-900 whitespace-nowrap">
                                                     ₹{tx.amount}
                                                 </td>
-                                                <td className="py-3 px-4 capitalize font-bold text-slate-700">{tx.paymentType}</td>
-                                                <td className="py-3 px-4">
-                                                    <span className="capitalize font-semibold text-slate-700">{tx.paymentMethod}</span>
-                                                    <div className="text-[10px] text-slate-400 capitalize">{tx.paymentSource?.replace("_", " ")}</div>
+                                                <td className="ui-td capitalize font-medium text-slate-700">{tx.paymentType}</td>
+                                                <td className="ui-td">
+                                                    <span className="font-medium capitalize text-slate-700">{tx.paymentMethod}</span>
+                                                    <div className="text-xs text-slate-500 capitalize">{tx.paymentSource?.replace("_", " ")}</div>
                                                 </td>
-                                                <td className="py-3 px-4 text-right text-slate-500 font-semibold">
+                                                <td className="ui-td text-right text-slate-500 whitespace-nowrap">
                                                     {tx.gatewayCharges > 0 ? `₹${tx.gatewayCharges}` : "—"}
                                                 </td>
-                                                <td className="py-3 px-4">
-                                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                                                <td className="ui-td">
+                                                    <span className="ui-badge border-emerald-200 bg-emerald-50 capitalize text-emerald-700">
                                                         {tx.status}
                                                     </span>
                                                 </td>
-                                                <td className="py-3 px-4">{getSettlementBadge(tx.settlementStatus)}</td>
-                                                <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{fmtDateTime(tx.createdAt)}</td>
+                                                <td className="ui-td">{getSettlementBadge(tx.settlementStatus)}</td>
+                                                <td className="ui-td text-slate-500 whitespace-nowrap">{fmtDateTime(tx.createdAt)}</td>
                                             </tr>
                                         ))
                                     )}
@@ -1961,23 +2024,25 @@ export default function FinancialManagementAdmin() {
                         </div>
 
                         {/* Pagination */}
-                        <div className="p-4 sm:p-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 font-semibold">
+                        <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                             <span>Showing {transactions.length} of {txnPagination.totalRecords} records</span>
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setTxnPage((p) => Math.max(1, p - 1))}
                                     disabled={txnPage <= 1}
-                                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                    aria-label="Previous page"
+                                    className="ui-btn-secondary h-10 w-10 px-0"
                                 >
-                                    <ChevronLeft className="w-4 h-4" />
+                                    <ChevronLeft className="h-4 w-4" />
                                 </button>
-                                <span>Page {txnPage} of {txnPagination.totalPages}</span>
+                                <span className="font-medium text-slate-700">Page {txnPage} of {txnPagination.totalPages}</span>
                                 <button
                                     onClick={() => setTxnPage((p) => Math.min(txnPagination.totalPages, p + 1))}
                                     disabled={txnPage >= txnPagination.totalPages}
-                                    className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                    aria-label="Next page"
+                                    className="ui-btn-secondary h-10 w-10 px-0"
                                 >
-                                    <ChevronRight className="w-4 h-4" />
+                                    <ChevronRight className="h-4 w-4" />
                                 </button>
                             </div>
                         </div>
@@ -1990,79 +2055,79 @@ export default function FinancialManagementAdmin() {
             {/* ========================================================================= */}
             {activeSection === "refunds" && (
                 <div className="space-y-6">
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-blue-900/5 overflow-hidden">
-                        <div className="p-6 sm:p-8 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div>
-                                <h3 className="text-xl font-black text-slate-900">Cancelled Appointments & Refund Requests</h3>
-                                <p className="text-xs text-slate-500 mt-0.5">
+                    <div className="ui-card overflow-hidden">
+                        <div className="flex flex-col justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
+                            <div className="min-w-0">
+                                <h3 className="ui-title">Cancelled appointments & refund requests</h3>
+                                <p className="ui-subtitle">
                                     Cancelled appointments with paid online advances requiring refund processing.
                                 </p>
                             </div>
                             <button
                                 onClick={fetchRefunds}
                                 disabled={loadingRefunds}
-                                className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 flex items-center gap-2"
+                                className="ui-btn-secondary ui-btn-sm shrink-0 self-start sm:self-auto"
                             >
-                                <RefreshCw className={`w-3.5 h-3.5 ${loadingRefunds ? "animate-spin" : ""}`} />
+                                <RefreshCw className={`h-3.5 w-3.5 ${loadingRefunds ? "animate-spin" : ""}`} />
                                 <span>Refresh</span>
                             </button>
                         </div>
 
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-xs">
-                                <thead className="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b border-slate-100">
+                            <table className="w-full text-left">
+                                <thead className="border-b border-slate-100 bg-slate-50/80">
                                     <tr>
-                                        <th className="py-3 px-4">Appt ID</th>
-                                        <th className="py-3 px-4">Patient</th>
-                                        <th className="py-3 px-4">Hospital</th>
-                                        <th className="py-3 px-4 text-right">Fee</th>
-                                        <th className="py-3 px-4 text-right">Advance Paid</th>
-                                        <th className="py-3 px-4 text-right">Refund Amount</th>
-                                        <th className="py-3 px-4">Reason</th>
-                                        <th className="py-3 px-4">Refund Status</th>
-                                        <th className="py-3 px-4">Cancellation Date</th>
-                                        <th className="py-3 px-4 text-center">Action</th>
+                                        <th className="ui-th">Appt ID</th>
+                                        <th className="ui-th">Patient</th>
+                                        <th className="ui-th">Hospital</th>
+                                        <th className="ui-th text-right">Fee</th>
+                                        <th className="ui-th text-right">Advance paid</th>
+                                        <th className="ui-th text-right">Refund amount</th>
+                                        <th className="ui-th">Reason</th>
+                                        <th className="ui-th">Refund status</th>
+                                        <th className="ui-th">Cancellation date</th>
+                                        <th className="ui-th text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 font-medium">
+                                <tbody className="divide-y divide-slate-100">
                                     {loadingRefunds ? (
                                         <tr>
-                                            <td colSpan={10} className="py-12 text-center text-slate-400">Loading refund queue...</td>
+                                            <td colSpan={10} className="ui-td py-12 text-slate-500 sm:text-center">Loading refund queue...</td>
                                         </tr>
                                     ) : refunds.length === 0 ? (
                                         <tr>
-                                            <td colSpan={10} className="py-12 text-center text-slate-400">No pending refund requests found.</td>
+                                            <td colSpan={10} className="ui-td py-12 text-slate-500 sm:text-center">No pending refund requests found.</td>
                                         </tr>
                                     ) : (
                                         refunds.map((r) => {
                                             const isRefundPending = r.refundStatus === "Pending Approval";
                                             return (
-                                                <tr key={r.appointmentId} className="hover:bg-slate-50">
-                                                    <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                                                <tr key={r.appointmentId} className="transition-colors hover:bg-slate-50/60">
+                                                    <td className="ui-td whitespace-nowrap font-mono text-xs font-semibold text-slate-900">
                                                         {r.appointmentId.slice(-6).toUpperCase()}
                                                     </td>
-                                                    <td className="py-3 px-4">
-                                                        <div className="font-bold text-slate-900">{r.patientName}</div>
-                                                        <div className="text-[10px] text-slate-400">{r.patientPhone}</div>
+                                                    <td className="ui-td">
+                                                        <div className="font-medium text-slate-900">{r.patientName}</div>
+                                                        <div className="text-xs text-slate-500">{r.patientPhone}</div>
                                                     </td>
-                                                    <td className="py-3 px-4 font-bold text-slate-800">{r.hospitalName}</td>
-                                                    <td className="py-3 px-4 text-right font-bold">₹{r.consultationFee}</td>
-                                                    <td className="py-3 px-4 text-right font-black text-blue-600">₹{r.advancePaid}</td>
-                                                    <td className="py-3 px-4 text-right font-black text-rose-600">₹{r.refundAmount}</td>
-                                                    <td className="py-3 px-4 text-slate-600 max-w-xs truncate">{r.cancellationReason || "Patient cancelled"}</td>
-                                                    <td className="py-3 px-4">
-                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                                    <td className="ui-td font-medium text-slate-900">{r.hospitalName}</td>
+                                                    <td className="ui-td text-right font-medium text-slate-900 whitespace-nowrap">₹{r.consultationFee}</td>
+                                                    <td className="ui-td text-right font-semibold text-blue-600 whitespace-nowrap">₹{r.advancePaid}</td>
+                                                    <td className="ui-td text-right font-semibold text-rose-600 whitespace-nowrap">₹{r.refundAmount}</td>
+                                                    <td className="ui-td text-slate-600 max-w-xs truncate">{r.cancellationReason || "Patient cancelled"}</td>
+                                                    <td className="ui-td">
+                                                        <span className={`ui-badge ${
                                                             r.refundStatus === "Refunded"
-                                                                ? "bg-emerald-100 text-emerald-800"
+                                                                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                                                                 : r.refundStatus === "Pending Approval"
-                                                                ? "bg-amber-100 text-amber-800"
-                                                                : "bg-slate-100 text-slate-600"
+                                                                ? "border-amber-200 bg-amber-50 text-amber-700"
+                                                                : "border-slate-200 bg-slate-100 text-slate-600"
                                                         }`}>
                                                             {r.refundStatus}
                                                         </span>
                                                     </td>
-                                                    <td className="py-3 px-4 text-slate-400">{fmtDate(r.cancellationDate)}</td>
-                                                    <td className="py-3 px-4 text-center">
+                                                    <td className="ui-td whitespace-nowrap text-slate-500">{fmtDate(r.cancellationDate)}</td>
+                                                    <td className="ui-td text-center">
                                                         {isRefundPending && (
                                                             <button
                                                                 onClick={() => {
@@ -2071,10 +2136,10 @@ export default function FinancialManagementAdmin() {
                                                                     setRefundReasonInput(r.cancellationReason || "Appointment cancelled");
                                                                     setRefundManualNotes("");
                                                                 }}
-                                                                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs shadow-md shadow-rose-600/10 flex items-center gap-1.5 transition-all"
+                                                                className="ui-btn-danger ui-btn-sm"
                                                             >
-                                                                <RotateCcw className="w-3.5 h-3.5" />
-                                                                <span>Process Refund</span>
+                                                                <RotateCcw className="h-3.5 w-3.5" />
+                                                                <span>Process refund</span>
                                                             </button>
                                                         )}
                                                     </td>
@@ -2089,28 +2154,29 @@ export default function FinancialManagementAdmin() {
 
                     {/* Process Refund Modal */}
                     {refundModalAppt && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-                            <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                    <div>
-                                        <h3 className="text-xl font-black text-slate-900">Process Patient Refund</h3>
-                                        <p className="text-xs text-slate-500 mt-0.5">Appointment: {refundModalAppt.appointmentId}</p>
+                        <div className="ui-overlay">
+                            <div role="dialog" aria-modal="true" aria-labelledby="fin-refund-title" className="ui-dialog sm:max-w-lg">
+                                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                                    <div className="min-w-0">
+                                        <h3 id="fin-refund-title" className="text-lg font-semibold leading-tight text-slate-900">Process patient refund</h3>
+                                        <p className="mt-0.5 truncate text-sm text-slate-500">Appointment: {refundModalAppt.appointmentId}</p>
                                     </div>
-                                    <button onClick={() => setRefundModalAppt(null)} className="p-2 text-slate-400 hover:text-slate-600 rounded-xl hover:bg-slate-100">
-                                        <X className="w-5 h-5" />
+                                    <button onClick={() => setRefundModalAppt(null)} aria-label="Close" className="-mr-2 shrink-0 rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700">
+                                        <X className="h-5 w-5" />
                                     </button>
                                 </div>
 
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
-                                    <div className="flex justify-between font-bold">
+                                <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5 sm:px-6">
+                                <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
+                                    <div className="flex justify-between gap-3">
                                         <span className="text-slate-500">Patient:</span>
-                                        <span className="text-slate-900">{refundModalAppt.patientName} ({refundModalAppt.patientPhone})</span>
+                                        <span className="text-right font-medium text-slate-900">{refundModalAppt.patientName} ({refundModalAppt.patientPhone})</span>
                                     </div>
-                                    <div className="flex justify-between font-bold">
+                                    <div className="flex justify-between gap-3">
                                         <span className="text-slate-500">Hospital:</span>
-                                        <span className="text-slate-900">{refundModalAppt.hospitalName}</span>
+                                        <span className="text-right font-medium text-slate-900">{refundModalAppt.hospitalName}</span>
                                     </div>
-                                    <div className="flex justify-between border-t border-slate-200 pt-2 font-bold text-blue-700">
+                                    <div className="flex justify-between gap-3 border-t border-slate-200 pt-2 font-semibold text-blue-700">
                                         <span>Advance Paid via Pillora:</span>
                                         <span>₹{refundModalAppt.advancePaid}</span>
                                     </div>
@@ -2118,8 +2184,8 @@ export default function FinancialManagementAdmin() {
 
                                 <form onSubmit={handleProcessRefundSubmit} className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                                            Refund Amount (₹)
+                                        <label htmlFor="fin-refund-amount" className="ui-label">
+                                            Refund amount (₹)
                                         </label>
                                         <input
                                             type="number"
@@ -2127,56 +2193,60 @@ export default function FinancialManagementAdmin() {
                                             min={1}
                                             max={refundModalAppt.advancePaid}
                                             step="0.01"
+                                            id="fin-refund-amount"
                                             value={refundAmountInput}
                                             onChange={(e) => setRefundAmountInput(Number(e.target.value))}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="ui-input font-semibold"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                                            Refund Reason
+                                        <label htmlFor="fin-refund-reason" className="ui-label">
+                                            Refund reason
                                         </label>
                                         <input
                                             type="text"
                                             required
+                                            id="fin-refund-reason"
                                             value={refundReasonInput}
                                             onChange={(e) => setRefundReasonInput(e.target.value)}
-                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900"
+                                            className="ui-input"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 mb-1 uppercase tracking-wider">
-                                            Internal Admin Notes (Optional)
+                                        <label htmlFor="fin-refund-notes" className="ui-label">
+                                            Internal admin notes (optional)
                                         </label>
                                         <input
                                             type="text"
+                                            id="fin-refund-notes"
                                             placeholder="Transaction ref, bank acknowledgement..."
                                             value={refundManualNotes}
                                             onChange={(e) => setRefundManualNotes(e.target.value)}
-                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800"
+                                            className="ui-input"
                                         />
                                     </div>
 
-                                    <div className="pt-3 flex justify-end gap-3">
+                                    <div className="sticky -bottom-5 -mx-5 -mb-5 mt-2 flex flex-col-reverse gap-2 border-t border-slate-100 bg-white/95 px-5 py-4 backdrop-blur sm:-mx-6 sm:flex-row sm:justify-end sm:px-6">
                                         <button
                                             type="button"
                                             onClick={() => setRefundModalAppt(null)}
-                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold text-slate-700"
+                                            className="ui-btn-secondary w-full sm:w-auto"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={refundSubmitting}
-                                            className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-lg shadow-rose-600/20 flex items-center gap-2"
+                                            className="ui-btn-danger w-full sm:w-auto"
                                         >
-                                            {refundSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
-                                            <span>Confirm & Process Refund</span>
+                                            {refundSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
+                                            <span>Confirm & process refund</span>
                                         </button>
                                     </div>
                                 </form>
+                                </div>
                             </div>
                         </div>
                     )}

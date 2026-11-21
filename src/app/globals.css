@@ -81,7 +81,92 @@
   }
 }
 
+/*
+ * Shared UI building blocks for the admin panel. Same classes and values as the
+ * hospital dashboard on pillorahospital.in, so both products look like one.
+ */
+@layer components {
+  .ui-card {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-sm;
+  }
+  .ui-title {
+    @apply text-base font-semibold tracking-tight text-slate-900 sm:text-lg;
+  }
+  .ui-subtitle {
+    @apply mt-0.5 text-sm leading-relaxed text-slate-500;
+  }
+  .ui-label {
+    @apply mb-1.5 block text-[13px] font-medium text-slate-700;
+  }
+  .ui-hint {
+    @apply mt-1 text-xs leading-relaxed text-slate-500;
+  }
+  .ui-input {
+    @apply block min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400;
+  }
+  .ui-btn {
+    @apply inline-flex min-h-[40px] items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  }
+  .ui-btn-primary {
+    @apply ui-btn bg-blue-600 text-white shadow-sm hover:bg-blue-700;
+  }
+  .ui-btn-dark {
+    @apply ui-btn bg-slate-900 text-white shadow-sm hover:bg-slate-800;
+  }
+  .ui-btn-success {
+    @apply ui-btn bg-emerald-600 text-white shadow-sm hover:bg-emerald-700;
+  }
+  .ui-btn-danger {
+    @apply ui-btn bg-rose-600 text-white shadow-sm hover:bg-rose-700;
+  }
+  .ui-btn-secondary {
+    @apply ui-btn border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50;
+  }
+  .ui-btn-soft {
+    @apply ui-btn bg-slate-100 text-slate-700 hover:bg-slate-200;
+  }
+  /* Size modifier: keep after the colour variants so it wins. */
+  .ui-btn-sm {
+    @apply min-h-[32px] gap-1.5 rounded-lg px-2.5 py-1.5 text-xs;
+  }
+  .ui-badge {
+    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-4;
+  }
+  .ui-th {
+    @apply whitespace-nowrap px-4 py-3 text-left text-xs font-medium text-slate-500;
+  }
+  .ui-td {
+    @apply px-4 py-3.5 align-top text-sm text-slate-700;
+  }
+  .ui-empty {
+    @apply rounded-xl border border-dashed border-slate-200 bg-slate-50/60 px-4 py-10 text-center text-sm text-slate-500;
+  }
+  .ui-overlay {
+    @apply fixed inset-0 z-50 flex items-end justify-center bg-slate-900/50 backdrop-blur-[2px] sm:items-center sm:p-4;
+  }
+  .ui-dialog {
+    @apply flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:max-h-[90vh] sm:rounded-2xl;
+  }
+  .ui-segmented {
+    @apply inline-flex rounded-xl bg-slate-100 p-1;
+  }
+  .ui-segment {
+    @apply min-h-[36px] rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500 transition hover:text-slate-800;
+  }
+  .ui-segment-active {
+    @apply bg-white text-slate-900 shadow-sm hover:text-slate-900;
+  }
+}
+
 @layer utilities {
+  /* Scrolling areas that don't show a scrollbar (menus, tab rows). */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   ::-webkit-scrollbar {
     width: 8px;
   }

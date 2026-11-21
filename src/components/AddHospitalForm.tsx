@@ -198,86 +198,81 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
 
     if (success) {
         return (
-            <div className="flex flex-col items-center justify-center p-8 md:p-12 text-center bg-emerald-50 rounded-2xl border border-emerald-100">
-                <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-4" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{hospitalToEdit ? "Hospital Updated!" : "Hospital Registered!"}</h3>
-                <p className="text-gray-600 mb-8">
-                    {hospitalToEdit 
-                        ? "The medical facility details have been successfully saved and synchronized." 
+            <div className="flex flex-col items-center justify-center px-5 py-10 text-center sm:p-12">
+                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                    <CheckCircle2 className="h-7 w-7" />
+                </span>
+                <h3 className="mb-1 text-lg font-semibold text-slate-900">{hospitalToEdit ? "Hospital updated!" : "Hospital registered!"}</h3>
+                <p className="mb-6 max-w-md text-sm leading-relaxed text-slate-500">
+                    {hospitalToEdit
+                        ? "The medical facility details have been successfully saved and synchronized."
                         : "The hospital directory has been successfully updated and a welcome kit was triggered."}
                 </p>
-                
+
                 {credentials && (
-                    <div className="w-full max-w-md bg-white p-6 rounded-2xl border border-emerald-200 shadow-xl shadow-emerald-900/5 mb-8">
-                        <div className="flex items-center gap-2 text-emerald-600 font-bold mb-4 uppercase tracking-wider text-xs">
-                            <Lock className="w-4 h-4" /> Credentials Generated
+                    <div className="mb-6 w-full max-w-md rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 sm:p-5">
+                        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-emerald-800">
+                            <Lock className="h-4 w-4" /> Credentials generated
                         </div>
-                        <div className="space-y-4 text-left">
+                        <div className="space-y-3 text-left">
                             <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase">Username / Email</label>
-                                <div className="p-3 bg-gray-50 border border-gray-100 rounded-lg font-mono text-sm break-all">{credentials.username}</div>
+                                <label className="text-xs font-medium text-slate-500">Username / email</label>
+                                <div className="mt-1 break-all rounded-lg border border-slate-200 bg-white p-3 font-mono text-sm text-slate-900">{credentials.username}</div>
                             </div>
                             <div>
-                                <label className="text-[10px] font-black text-gray-400 uppercase">Temporary Password</label>
-                                <div className="p-3 bg-gray-50 border border-gray-100 rounded-lg font-mono text-sm tracking-wider select-all">{credentials.temporaryPassword}</div>
+                                <label className="text-xs font-medium text-slate-500">Temporary password</label>
+                                <div className="mt-1 select-all rounded-lg border border-slate-200 bg-white p-3 font-mono text-sm tracking-wider text-slate-900">{credentials.temporaryPassword}</div>
                             </div>
                         </div>
                     </div>
                 )}
-                
-                <button 
+
+                <button
                     onClick={() => {
                         setSuccess(false);
                         if (onClose) onClose();
                     }}
-                    className="px-10 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-xl shadow-gray-900/20"
+                    className="ui-btn-dark w-full sm:w-auto"
                 >
-                    Return to Dashboard
+                    Return to dashboard
                 </button>
             </div>
         );
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                <div>
-                    <h2 className="text-xl sm:text-2xl font-black text-gray-900">{hospitalToEdit ? "Edit Hospital Details" : "Hospital Details"}</h2>
-                    <p className="text-xs sm:text-sm text-gray-500 font-medium">
-                        {hospitalToEdit ? "Modify and update healthcare facility parameters" : "Provide comprehensive facility information"}
-                    </p>
-                </div>
-            </div>
-
+        <form onSubmit={handleSubmit} className="space-y-6 p-5 sm:p-6">
             {error && (
-                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-100 text-sm font-bold flex items-center gap-2">
-                    <XCircle className="w-5 h-5" /> {error}
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-sm font-medium text-rose-700">
+                    <XCircle className="mt-0.5 h-4 w-4 shrink-0" /> {error}
                 </motion.div>
             )}
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                 {/* Basic Info Section */}
-                <div className="space-y-6">
-                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <Building2 className="w-5 h-5 text-primary" /> Basic Information
+                <div className="space-y-4">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                        <Building2 className="h-4 w-4 text-slate-400" /> Basic information
                     </h3>
-                    
+
                     <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Hospital Name</label>
+                        <div>
+                            <label htmlFor="hospital-name" className="ui-label">Hospital name</label>
                             <input
+                                id="hospital-name"
                                 required
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="e.g. Apollo Hospital"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900"
+                                className="ui-input"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Official Email (credentials login)</label>
+                        <div>
+                            <label htmlFor="hospital-email" className="ui-label">Official email (credentials login)</label>
                             <input
+                                id="hospital-email"
                                 required
                                 type="email"
                                 name="email"
@@ -285,96 +280,100 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                 onChange={handleChange}
                                 disabled={!!hospitalToEdit}
                                 placeholder="admin@hospital.com"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900 disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="ui-input"
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <div className="space-y-2 col-span-2 md:col-span-1">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-wider">City</label>
+                        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+                            <div className="col-span-2 md:col-span-1">
+                                <label htmlFor="hospital-city" className="ui-label">City</label>
                                 <input
+                                    id="hospital-city"
                                     required
                                     name="city"
                                     value={formData.city}
                                     onChange={handleChange}
                                     placeholder="Mumbai"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900"
+                                    className="ui-input"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Consultation Fee</label>
+                            <div>
+                                <label htmlFor="hospital-fee" className="ui-label">Consultation fee</label>
                                 <div className="relative">
-                                    <span className="absolute left-4 top-3.5 text-gray-400 font-bold text-sm">₹</span>
+                                    <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">₹</span>
                                     <input
+                                        id="hospital-fee"
                                         required
                                         type="number"
                                         name="consultationFee"
                                         value={formData.consultationFee}
                                         onChange={handleChange}
                                         placeholder="500"
-                                        className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900"
+                                        className="ui-input pl-8"
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Total Beds</label>
+                            <div>
+                                <label htmlFor="hospital-beds" className="ui-label">Total beds</label>
                                 <input
+                                    id="hospital-beds"
                                     required
                                     type="number"
                                     name="bedCapacity"
                                     value={formData.bedCapacity}
                                     onChange={handleChange}
                                     placeholder="50"
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-gray-900"
+                                    className="ui-input"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Full Address</label>
+                        <div>
+                            <label htmlFor="hospital-address" className="ui-label">Full address</label>
                             <textarea
+                                id="hospital-address"
                                 required
                                 name="address"
                                 value={formData.address}
                                 onChange={handleChange}
                                 rows={2}
                                 placeholder="Street name, landmark..."
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium resize-none text-gray-900"
+                                className="ui-input min-h-[72px] resize-none"
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                             <div className="flex items-center gap-3 p-3 bg-blue-50/50 border border-blue-100 rounded-xl cursor-pointer hover:bg-blue-50 transition-colors">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                             <div className="flex min-h-[44px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 transition-colors hover:bg-slate-50">
                                 <input
                                     type="checkbox"
                                     id="isOpen24Hours"
                                     name="isOpen24Hours"
                                     checked={formData.isOpen24Hours}
                                     onChange={handleChange}
-                                    className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                                    className="h-4 w-4 shrink-0 rounded border-slate-300 accent-blue-600"
                                 />
-                                <label htmlFor="isOpen24Hours" className="text-sm font-bold text-gray-700 cursor-pointer flex items-center gap-2">
-                                    <Clock className="w-4 h-4" /> Open 24/7
+                                <label htmlFor="isOpen24Hours" className="flex flex-1 cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+                                    <Clock className="h-4 w-4 text-slate-400" /> Open 24/7
                                 </label>
                             </div>
-                            <div className="flex items-center gap-3 p-3 bg-emerald-50/50 border border-emerald-100 rounded-xl cursor-pointer hover:bg-emerald-50 transition-colors">
+                            <div className="flex min-h-[44px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 transition-colors hover:bg-slate-50">
                                 <input
                                     type="checkbox"
                                     id="isOnlinePaymentAvailable"
                                     name="isOnlinePaymentAvailable"
                                     checked={formData.isOnlinePaymentAvailable}
                                     onChange={handleChange}
-                                    className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                    className="h-4 w-4 shrink-0 rounded border-slate-300 accent-blue-600"
                                 />
-                                <label htmlFor="isOnlinePaymentAvailable" className="text-sm font-bold text-gray-700 cursor-pointer flex items-center gap-2">
-                                    <CreditCard className="w-4 h-4" /> Online Pay
+                                <label htmlFor="isOnlinePaymentAvailable" className="flex flex-1 cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+                                    <CreditCard className="h-4 w-4 text-slate-400" /> Online pay
                                 </label>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Subscription Plan</label>
-                            <div className="grid grid-cols-1 gap-3">
+                        <div>
+                            <label className="ui-label">Subscription plan</label>
+                            <div className="grid grid-cols-1 gap-2">
                                 {[
                                     { id: 'Standard', price: '2,999', label: 'Clinic', desc: 'Up to 5 doctors · 3,000 WhatsApp messages a month', color: 'blue' },
                                     { id: 'Premium', price: '7,999', label: 'Hospital', desc: 'Up to 25 doctors · 10,000 WhatsApp messages · 500 AI call minutes a month', color: 'purple' },
@@ -383,20 +382,20 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                     <div 
                                         key={p.id}
                                         onClick={() => setFormData(prev => ({ ...prev, plan: p.id as any }))}
-                                        className={`relative p-4 rounded-2xl border-2 transition-all cursor-pointer group ${
-                                            formData.plan === p.id 
-                                            ? `border-${p.color}-500 bg-${p.color}-50/50 shadow-lg shadow-${p.color}-900/5` 
-                                            : 'border-gray-100 hover:border-gray-200 bg-white'
+                                        className={`relative cursor-pointer rounded-xl border p-3.5 transition ${
+                                            formData.plan === p.id
+                                            ? 'border-blue-500 bg-blue-50/60 ring-4 ring-blue-500/10'
+                                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                                         }`}
                                     >
-                                        <div className="flex items-center justify-between mb-1">
-                                            <span className={`text-sm font-black uppercase tracking-wider ${formData.plan === p.id ? `text-${p.color}-600` : 'text-gray-900'}`}>{p.label}</span>
-                                            <span className={`text-xs font-black ${formData.plan === p.id ? `text-${p.color}-700` : 'text-gray-400'}`}>₹{p.price}/mo + GST</span>
+                                        <div className="mb-0.5 flex items-center justify-between gap-3 pr-6">
+                                            <span className={`text-sm font-semibold ${formData.plan === p.id ? 'text-blue-700' : 'text-slate-900'}`}>{p.label}</span>
+                                            <span className={`text-xs font-semibold ${formData.plan === p.id ? 'text-blue-700' : 'text-slate-500'}`}>₹{p.price}/mo + GST</span>
                                         </div>
-                                        <p className="text-[10px] text-gray-500 font-medium">{p.desc}</p>
+                                        <p className="text-xs leading-relaxed text-slate-500">{p.desc}</p>
                                         {formData.plan === p.id && (
-                                            <motion.div layoutId="plan-check" className={`absolute -top-2 -right-2 w-6 h-6 bg-${p.color}-500 text-white rounded-full flex items-center justify-center shadow-lg`}>
-                                                <CheckCircle2 className="w-4 h-4" />
+                                            <motion.div layoutId="plan-check" className="absolute right-3 top-3.5 text-blue-600">
+                                                <CheckCircle2 className="h-4 w-4" />
                                             </motion.div>
                                         )}
                                     </div>
@@ -404,91 +403,92 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Management Mode</label>
+                        <div>
+                            <label htmlFor="hospital-management" className="ui-label">Management mode</label>
                             <select
+                                id="hospital-management"
                                 name="management_type"
                                 value={formData.management_type}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-gray-900 text-white border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all outline-none font-bold"
+                                className="ui-input"
                             >
-                                <option value="SELF">Self Managed (Hospital Controls Data)</option>
-                                <option value="PILLORA">Pillora Managed (View-Only for Hospital)</option>
+                                <option value="SELF">Self managed (hospital controls data)</option>
+                                <option value="PILLORA">Pillora managed (view-only for hospital)</option>
                             </select>
-                            <p className="text-[10px] text-gray-400 font-medium">Self-Managed gives hospitals CRUD access to doctors/slots.</p>
+                            <p className="ui-hint">Self-managed gives hospitals CRUD access to doctors/slots.</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Media & Contacts Section */}
-                <div className="space-y-6">
-                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <ImageIcon className="w-5 h-5 text-purple-500" /> Media & Contacts
+                <div className="space-y-4 border-t border-slate-100 pt-6 lg:border-t-0 lg:pt-0">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                        <ImageIcon className="h-4 w-4 text-slate-400" /> Media & contacts
                     </h3>
-                    
-                    <div className="space-y-4">
+
+                    <div className="space-y-5">
                         {/* Primary Image Upload */}
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Primary Cover Image</label>
-                            <div className="relative group">
+                        <div>
+                            <label className="ui-label">Primary cover image</label>
+                            <div className="group relative">
                                 {formData.image ? (
-                                    <div className="relative h-48 w-full rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg">
+                                    <div className="relative h-48 w-full overflow-hidden rounded-xl border border-slate-200">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={formData.image} alt="Primary" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                                            <label className="p-3 bg-white text-gray-900 rounded-full cursor-pointer hover:scale-110 transition-transform">
-                                                <Camera className="w-5 h-5" />
+                                        <img src={formData.image} alt="Primary" className="h-full w-full object-cover" />
+                                        <div className="absolute right-2 top-2 flex items-center gap-2">
+                                            <label className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-white text-slate-700 shadow-sm transition-colors hover:bg-slate-100" aria-label="Replace image">
+                                                <Camera className="h-4 w-4" />
                                                 <input type="file" className="hidden" accept="image/*" onChange={handlePrimaryImageUpload} />
                                             </label>
-                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, image: "" }))} className="p-3 bg-red-500 text-white rounded-full hover:scale-110 transition-transform">
-                                                <Trash2 className="w-5 h-5" />
+                                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, image: "" }))} className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-600 text-white shadow-sm transition-colors hover:bg-rose-700" aria-label="Remove image">
+                                                <Trash2 className="h-4 w-4" />
                                             </button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <label className="flex flex-col items-center justify-center h-48 w-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:bg-blue-50/50 hover:border-primary/50 transition-all group">
-                                        <div className="p-4 bg-white rounded-2xl shadow-sm mb-3 group-hover:scale-110 transition-transform">
+                                    <label className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/60 transition-colors hover:border-blue-300 hover:bg-blue-50/40">
+                                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white">
                                             {uploadingPrimary ? (
-                                                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                                                <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
                                             ) : (
-                                                <Upload className="w-6 h-6 text-gray-400 group-hover:text-primary" />
+                                                <Upload className="h-5 w-5 text-slate-400" />
                                             )}
                                         </div>
-                                        <p className="text-xs font-bold text-gray-500 group-hover:text-primary">Upload Primary Image</p>
-                                        <p className="text-[10px] text-gray-400 mt-1 uppercase font-black">PNG, JPG up to 10MB</p>
+                                        <p className="text-sm font-medium text-slate-700">Upload primary image</p>
+                                        <p className="mt-0.5 text-xs text-slate-500">PNG, JPG up to 10MB</p>
                                         <input type="file" className="hidden" accept="image/*" onChange={handlePrimaryImageUpload} />
                                     </label>
                                 )}
                             </div>
                         </div>
-                        
+
                         {/* Secondary Gallery Upload */}
-                        <div className="space-y-2">
+                        <div>
                             <div className="flex items-center justify-between">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Secondary Gallery Images</label>
-                                <span className="text-[10px] font-bold text-slate-400">{formData.images.length} uploaded</span>
+                                <label className="ui-label">Secondary gallery images</label>
+                                <span className="mb-1.5 text-xs text-slate-500">{formData.images.length} uploaded</span>
                             </div>
-                            
-                            <div className="grid grid-cols-3 gap-3">
+
+                            <div className="grid grid-cols-3 gap-2 sm:gap-3">
                                 {formData.images.map((url: string, idx: number) => (
-                                    <div key={idx} className="relative h-24 rounded-xl overflow-hidden group border border-gray-100">
+                                    <div key={idx} className="relative h-24 overflow-hidden rounded-xl border border-slate-200">
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={url} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <button type="button" onClick={() => handleRemoveListItem('images', idx)} className="p-1.5 bg-red-500 text-white rounded-lg hover:scale-110 transition-transform">
-                                                <Trash2 className="w-3 h-3" />
+                                        <img src={url} alt={`Gallery ${idx}`} className="h-full w-full object-cover" />
+                                        <div className="absolute right-1.5 top-1.5">
+                                            <button type="button" onClick={() => handleRemoveListItem('images', idx)} className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-rose-600 shadow-sm transition-colors hover:bg-white" aria-label="Remove image">
+                                                <Trash2 className="h-3.5 w-3.5" />
                                             </button>
                                         </div>
                                     </div>
                                 ))}
-                                
-                                <label className={`flex flex-col items-center justify-center h-24 rounded-xl border-2 border-dashed border-gray-100 bg-gray-50/50 cursor-pointer hover:border-primary/30 hover:bg-blue-50/30 transition-all ${uploadingSecondary ? 'pointer-events-none' : ''}`}>
+
+                                <label className={`flex h-24 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/60 transition-colors hover:border-blue-300 hover:bg-blue-50/40 ${uploadingSecondary ? 'pointer-events-none' : ''}`}>
                                     {uploadingSecondary ? (
-                                        <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                                        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
                                     ) : (
                                         <>
-                                            <Plus className="w-5 h-5 text-gray-300" />
-                                            <span className="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-widest">Add More</span>
+                                            <Plus className="h-5 w-5 text-slate-400" />
+                                            <span className="mt-1 text-xs font-medium text-slate-500">Add more</span>
                                         </>
                                     )}
                                     <input type="file" className="hidden" accept="image/*" multiple onChange={handleSecondaryImagesUpload} />
@@ -497,35 +497,37 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                         </div>
 
                         {/* Multiple Phone Numbers */}
-                        <div className="space-y-2">
+                        <div>
                             <div className="flex items-center justify-between">
-                                <label className="text-xs font-black text-gray-400 uppercase tracking-wider">Contact Numbers</label>
-                                <button type="button" onClick={() => handleAddListItem('phoneNumbers')} className="text-primary hover:text-primary/80 transition-colors">
-                                    <Plus className="w-4 h-4" />
+                                <label className="ui-label">Contact numbers</label>
+                                <button type="button" onClick={() => handleAddListItem('phoneNumbers')} className="ui-btn-soft ui-btn-sm mb-1.5" aria-label="Add phone number">
+                                    <Plus className="h-3.5 w-3.5" />
                                 </button>
                             </div>
-                            <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                                <div className="flex gap-2">
+                            <div className="space-y-2">
+                                <div className="relative">
                                     <input
                                         required
                                         name="contactNumber"
                                         value={formData.contactNumber}
                                         onChange={handleChange}
                                         placeholder="Hospital Phone Number"
-                                        className="flex-1 px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg text-sm font-bold text-blue-700 outline-none focus:border-primary"
+                                        aria-label="Hospital phone number"
+                                        className="ui-input pr-20"
                                     />
-                                    <div className="px-3 py-2 bg-blue-100 text-blue-600 rounded-lg text-[10px] font-black uppercase flex items-center">Phone</div>
+                                    <div className="ui-badge pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-blue-200 bg-blue-50 text-blue-700">Phone</div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="relative">
                                     <input
                                         required
                                         name="ambulanceContact"
                                         value={formData.ambulanceContact}
                                         onChange={handleChange}
                                         placeholder="Emergency Number"
-                                        className="flex-1 px-3 py-2 bg-rose-50 border border-rose-100 rounded-lg text-sm font-bold text-rose-700 outline-none"
+                                        aria-label="Emergency number"
+                                        className="ui-input pr-20"
                                     />
-                                    <div className="px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-[10px] font-black uppercase flex items-center">SOS</div>
+                                    <div className="ui-badge pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-rose-200 bg-rose-50 text-rose-700">SOS</div>
                                 </div>
                                 {formData.phoneNumbers.map((ph: string, idx: number) => (
                                     <div key={idx} className="flex gap-2">
@@ -533,10 +535,11 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                             value={ph}
                                             onChange={(e) => handleListItemChange('phoneNumbers', idx, e.target.value)}
                                             placeholder="Alternate Number"
-                                            className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium outline-none focus:border-primary text-gray-900"
+                                            aria-label="Alternate number"
+                                            className="ui-input flex-1"
                                         />
-                                        <button type="button" onClick={() => handleRemoveListItem('phoneNumbers', idx)} className="text-red-400 hover:text-red-600">
-                                            <Trash2 className="w-4 h-4" />
+                                        <button type="button" onClick={() => handleRemoveListItem('phoneNumbers', idx)} className="ui-btn-secondary w-11 shrink-0 px-0 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600" aria-label="Remove number">
+                                            <Trash2 className="h-4 w-4" />
                                         </button>
                                     </div>
                                 ))}
@@ -547,72 +550,74 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
             </div>
 
             {/* Subscription & Payment Management Section */}
-            <div className="p-6 bg-gradient-to-br from-indigo-50/50 via-white to-blue-50/40 rounded-2xl border border-indigo-100 shadow-sm space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-indigo-100/70 pb-4">
+            <div className="space-y-5 border-t border-slate-100 pt-6">
+                <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center">
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <CreditCard className="w-5 h-5 text-indigo-600" />
-                            Hospital Subscription & 30-Day Payment Setup
+                        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                            <CreditCard className="h-4 w-4 text-slate-400" />
+                            Hospital subscription & 30-day payment setup
                         </h3>
-                        <p className="text-xs text-gray-500 font-medium mt-0.5">
+                        <p className="mt-0.5 text-sm text-slate-500">
                             Each hospital operates on a strict 30-day payment cycle. Slot generation requires an active subscription.
                         </p>
                     </div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-100/70 text-indigo-700 rounded-xl text-xs font-black uppercase tracking-wider self-start md:self-auto">
-                        <Clock className="w-3.5 h-3.5" />
-                        30-Day Cycle
+                    <div className="ui-badge self-start border-indigo-200 bg-indigo-50 text-indigo-700 md:self-auto">
+                        <Clock className="h-3.5 w-3.5" />
+                        30-day cycle
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     {/* Joining Date */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-black text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5 text-indigo-600" />
-                            Hospital Joining Date <span className="text-red-500">*</span>
+                    <div>
+                        <label htmlFor="hospital-joining-date" className="ui-label flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                            Hospital joining date <span className="text-rose-500">*</span>
                         </label>
                         <input
+                            id="hospital-joining-date"
                             type="date"
                             required
                             name="joiningDate"
                             value={formData.joiningDate}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-medium text-gray-900 shadow-sm"
+                            className="ui-input"
                         />
-                        <p className="text-[11px] text-gray-400">Official onboarding date with Pillora network</p>
+                        <p className="ui-hint">Official onboarding date with Pillora network</p>
                     </div>
 
                     {/* Subscription Duration */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-black text-gray-700 uppercase tracking-wider">
-                            Subscription Duration
+                    <div>
+                        <label className="ui-label">
+                            Subscription duration
                         </label>
-                        <div className="w-full px-4 py-3 bg-gray-100/80 border border-gray-200 rounded-xl font-bold text-gray-700 flex items-center justify-between">
-                            <span>30 Calendar Days</span>
-                            <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-gray-200 text-gray-600 rounded">Standard</span>
+                        <div className="flex min-h-[44px] w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-700">
+                            <span>30 calendar days</span>
+                            <span className="ui-badge border-slate-200 bg-slate-100 text-slate-600">Standard</span>
                         </div>
-                        <p className="text-[11px] text-gray-400">Automatically calculated upon payment confirmation</p>
+                        <p className="ui-hint">Automatically calculated upon payment confirmation</p>
                     </div>
 
                     {/* Payment Status Selector */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-black text-gray-700 uppercase tracking-wider">
-                            Initial Payment Status <span className="text-red-500">*</span>
+                    <div>
+                        <label htmlFor="hospital-payment-status" className="ui-label">
+                            Initial payment status <span className="text-rose-500">*</span>
                         </label>
                         <select
+                            id="hospital-payment-status"
                             name="paymentStatus"
                             value={formData.paymentStatus}
                             onChange={handleChange}
-                            className={`w-full px-4 py-3 border rounded-xl font-bold transition-all outline-none shadow-sm ${
+                            className={`ui-input font-medium ${
                                 formData.paymentStatus === 'Paid'
-                                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 focus:ring-emerald-500/20'
-                                    : 'bg-amber-50 border-amber-300 text-amber-800 focus:ring-amber-500/20'
+                                    ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                                    : 'border-amber-300 bg-amber-50 text-amber-800'
                             }`}
                         >
-                            <option value="Pending">Pending Payment (Default)</option>
-                            <option value="Paid">Payment Received (Activate 30 Days)</option>
+                            <option value="Pending">Pending payment (default)</option>
+                            <option value="Paid">Payment received (activate 30 days)</option>
                         </select>
-                        <p className="text-[11px] text-gray-400">
+                        <p className="ui-hint">
                             {formData.paymentStatus === 'Pending' ? 'Slot generation blocked until confirmed' : 'Activates immediate 30-day cycle'}
                         </p>
                     </div>
@@ -623,46 +628,49 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
-                        className="p-5 bg-white border border-emerald-200 rounded-xl space-y-4 shadow-sm"
+                        className="space-y-4 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 sm:p-5"
                     >
-                        <div className="flex items-center gap-2 text-xs font-black text-emerald-700 uppercase tracking-wider border-b border-emerald-100 pb-2">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                            Confirmed Payment Details (Separate from Joining Date)
+                        <div className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
+                            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                            Confirmed payment details (separate from joining date)
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold text-gray-600 uppercase">Payment Received Date *</label>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <div>
+                                <label htmlFor="hospital-payment-date" className="ui-label">Payment received date *</label>
                                 <input
+                                    id="hospital-payment-date"
                                     type="date"
                                     required={formData.paymentStatus === 'Paid'}
                                     name="paymentReceivedDate"
                                     value={formData.paymentReceivedDate}
                                     onChange={handleChange}
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                    className="ui-input"
                                 />
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold text-gray-600 uppercase">Amount (₹) *</label>
+                            <div>
+                                <label htmlFor="hospital-payment-amount" className="ui-label">Amount (₹) *</label>
                                 <input
+                                    id="hospital-payment-amount"
                                     type="number"
                                     required={formData.paymentStatus === 'Paid'}
                                     name="paymentAmount"
                                     value={formData.paymentAmount}
                                     onChange={handleChange}
                                     placeholder="5000"
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                    className="ui-input"
                                 />
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold text-gray-600 uppercase">Payment Method *</label>
+                            <div>
+                                <label htmlFor="hospital-payment-method" className="ui-label">Payment method *</label>
                                 <select
+                                    id="hospital-payment-method"
                                     name="paymentMethod"
                                     value={formData.paymentMethod}
                                     onChange={handleChange}
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                    className="ui-input"
                                 >
                                     <option value="UPI">UPI / QR</option>
                                     <option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</option>
@@ -673,88 +681,96 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                 </select>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold text-gray-600 uppercase">Transaction Ref / UTR</label>
+                            <div>
+                                <label htmlFor="hospital-payment-ref" className="ui-label">Transaction ref / UTR</label>
                                 <input
+                                    id="hospital-payment-ref"
                                     type="text"
                                     name="transactionReference"
                                     value={formData.transactionReference}
                                     onChange={handleChange}
                                     placeholder="e.g. UTR12345678"
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                    className="ui-input"
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-bold text-gray-600 uppercase">Admin Notes / Receipt Remarks</label>
+                        <div>
+                            <label htmlFor="hospital-admin-notes" className="ui-label">Admin notes / receipt remarks</label>
                             <input
+                                id="hospital-admin-notes"
                                 type="text"
                                 name="adminNotes"
                                 value={formData.adminNotes}
                                 onChange={handleChange}
                                 placeholder="e.g. Initial 30-day subscription payment confirmed via HDFC UPI"
-                                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 outline-none focus:border-emerald-500"
+                                className="ui-input"
                             />
                         </div>
                     </motion.div>
                 )}
 
                 {/* Status Indicator Summary */}
-                <div className={`p-3 rounded-xl border flex items-center justify-between text-xs font-bold ${
+                <div className={`flex flex-col gap-2 rounded-xl border p-3.5 text-sm sm:flex-row sm:items-center sm:justify-between ${
                     formData.paymentStatus === 'Paid'
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                        : 'bg-amber-50 border-amber-200 text-amber-800'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                        : 'border-amber-200 bg-amber-50 text-amber-800'
                 }`}>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-start gap-2">
                         {formData.paymentStatus === 'Paid' ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                         ) : (
-                            <Clock className="w-4 h-4 text-amber-600" />
+                            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
                         )}
-                        <span>
+                        <span className="leading-relaxed">
                             {formData.paymentStatus === 'Paid'
                                 ? 'Subscription Status will be Active: Hospital can immediately generate & publish appointment slots.'
                                 : 'Subscription Status will be Pending Payment: Hospital slot generation will be locked until payment is recorded.'}
                         </span>
                     </div>
-                    <span className="uppercase text-[10px] tracking-wider px-2 py-0.5 rounded font-black bg-white/70">
-                        {formData.paymentStatus === 'Paid' ? 'Active (30 Days)' : 'Pending Payment'}
+                    <span className={`ui-badge self-start bg-white sm:self-auto ${formData.paymentStatus === 'Paid' ? 'border-emerald-200 text-emerald-700' : 'border-amber-200 text-amber-700'}`}>
+                        {formData.paymentStatus === 'Paid' ? 'Active (30 days)' : 'Pending payment'}
                     </span>
                 </div>
             </div>
 
             {/* About Hospital */}
-            <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-wider">About Hospital (Description)</label>
+            <div className="space-y-4 border-t border-slate-100 pt-6">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                    <FileText className="h-4 w-4 text-slate-400" /> About
+                </h3>
+                <div>
+                <label htmlFor="hospital-description" className="ui-label">About hospital (description)</label>
                 <textarea
+                    id="hospital-description"
                     required
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
                     placeholder="Write detailed information about the hospital, its history, specialties, and equipment..."
                     rows={4}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium resize-none text-gray-900"
+                    className="ui-input min-h-[120px] resize-y"
                 />
+                </div>
             </div>
 
             {/* Available Doctors Section */}
             {!hospitalToEdit && (
-                <div className="space-y-6 pt-4">
-                    <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                            <User className="w-5 h-5 text-blue-500" /> Available Doctors
+                <div className="space-y-4 border-t border-slate-100 pt-6">
+                    <div className="flex items-center justify-between gap-3">
+                        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                            <User className="h-4 w-4 text-slate-400" /> Available doctors
                         </h3>
                         <button
                             type="button"
                             onClick={handleAddDoctor}
-                            className="flex items-center gap-1 text-sm font-bold text-primary bg-primary/5 px-3 py-1.5 rounded-lg hover:bg-primary/10 transition-all"
+                            className="ui-btn-secondary"
                         >
-                            <Plus className="w-4 h-4" /> Add Doctor
+                            <Plus className="h-4 w-4" /> Add doctor
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
                         <AnimatePresence>
                             {formData.doctors.map((doc, docIdx) => (
                                 <motion.div
@@ -762,69 +778,75 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="p-5 bg-gray-50 border border-gray-200 rounded-[1.5rem] space-y-4 relative group"
+                                    className="relative space-y-4 rounded-xl border border-slate-200 bg-slate-50/60 p-4"
                                 >
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveDoctor(docIdx)}
-                                        className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors"
+                                        className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                                        aria-label="Remove doctor"
                                     >
-                                        <Trash2 className="w-5 h-5" />
+                                        <Trash2 className="h-4 w-4" />
                                     </button>
 
                                     <div className="space-y-3">
-                                        <div className="flex gap-3">
-                                            <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center shrink-0">
-                                                <User className="w-5 h-5 text-gray-400" />
+                                        <div className="flex gap-3 pr-10">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white">
+                                                <User className="h-5 w-5 text-slate-400" />
                                             </div>
-                                            <div className="flex-1 space-y-1">
+                                            <div className="min-w-0 flex-1 space-y-2">
                                                 <input
                                                     required
                                                     value={doc.name}
                                                     onChange={(e) => handleDoctorChange(docIdx, 'name', e.target.value)}
                                                     placeholder="Doctor's Name"
-                                                    className="w-full bg-transparent border-b border-gray-200 focus:border-primary outline-none font-bold text-gray-800"
+                                                    aria-label="Doctor's name"
+                                                    className="ui-input"
                                                 />
-                                                <div className="flex items-center gap-1 text-xs text-primary font-bold">
-                                                    <GraduationCap className="w-3 h-3" />
+                                                <div className="relative">
+                                                    <GraduationCap className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                                     <input
                                                         required
                                                         value={doc.specialization}
                                                         onChange={(e) => handleDoctorChange(docIdx, 'specialization', e.target.value)}
                                                         placeholder="Degree / Specialization"
-                                                        className="bg-transparent outline-none w-full"
+                                                        aria-label="Degree or specialization"
+                                                        className="ui-input pl-10"
                                                     />
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest">
-                                                <Clock className="w-3 h-3" /> Timing
+                                        <div>
+                                            <div className="ui-label flex items-center gap-1.5">
+                                                <Clock className="h-3.5 w-3.5 text-slate-400" /> Timing
                                             </div>
                                             <input
                                                 required
                                                 value={doc.timing}
                                                 onChange={(e) => handleDoctorChange(docIdx, 'timing', e.target.value)}
                                                 placeholder="e.g. 10:00 AM - 04:00 PM"
-                                                className="w-full px-3 py-2 bg-white border border-gray-100 rounded-lg text-sm font-medium outline-none focus:border-primary text-gray-900"
+                                                aria-label="Timing"
+                                                className="ui-input"
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest">
-                                                <Calendar className="w-3 h-3" /> Available Days
+                                        <div>
+                                            <div className="ui-label flex items-center gap-1.5">
+                                                <Calendar className="h-3.5 w-3.5 text-slate-400" /> Available days
                                             </div>
-                                            <div className="flex flex-wrap gap-1">
+                                            <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-7" role="group" aria-label="Available days">
                                                 {DAYS.map(day => (
                                                     <button
                                                         type="button"
                                                         key={day}
                                                         onClick={() => handleDayToggle(docIdx, day)}
-                                                        className={`px-2 py-1 text-[10px] font-black rounded-md border transition-all ${
+                                                        aria-pressed={doc.daysAvailable.includes(day)}
+                                                        aria-label={day}
+                                                        className={`min-h-[40px] rounded-lg border text-xs font-semibold transition-colors ${
                                                             doc.daysAvailable.includes(day)
-                                                                ? 'bg-primary border-primary text-white shadow-sm'
-                                                                : 'bg-white border-gray-200 text-gray-400 hover:border-primary/30'
+                                                                ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                                                                : 'border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-700'
                                                         }`}
                                                     >
                                                         {day.slice(0, 3)}
@@ -840,12 +862,12 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                 </div>
             )}
 
-            <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+            <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end sm:gap-3">
                 {onClose && (
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-8 py-3 font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all active:scale-95"
+                        className="ui-btn-secondary w-full sm:w-auto"
                     >
                         Discard
                     </button>
@@ -853,9 +875,9 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                 <button
                     type="submit"
                     disabled={loading}
-                    className="flex items-center gap-2 px-10 py-3 font-bold text-white bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-70 disabled:pointer-events-none"
+                    className="ui-btn-primary w-full min-w-[160px] sm:w-auto"
                 >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (hospitalToEdit ? "Update Hospital" : "Publish Hospital")}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (hospitalToEdit ? "Update hospital" : "Publish hospital")}
                 </button>
             </div>
         </form>

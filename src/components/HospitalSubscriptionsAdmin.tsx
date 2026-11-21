@@ -30,7 +30,8 @@ import {
     Loader2,
     CalendarCheck,
     CalendarX,
-    Eye
+    Eye,
+    X
 } from "lucide-react";
 
 interface IHospitalSub {
@@ -425,27 +426,27 @@ export default function HospitalSubscriptionsAdmin() {
         switch (status) {
             case "Active":
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-black uppercase tracking-wider">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Active
+                    <span className="ui-badge border-emerald-200 bg-emerald-50 text-emerald-700">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Active
                     </span>
                 );
             case "Expiring Soon":
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-xs font-black uppercase tracking-wider">
-                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> Expiring Soon
+                    <span className="ui-badge border-amber-200 bg-amber-50 text-amber-700">
+                        <AlertTriangle className="h-3.5 w-3.5" /> Expiring Soon
                     </span>
                 );
             case "Expired":
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-full text-xs font-black uppercase tracking-wider">
-                        <CalendarX className="w-3.5 h-3.5 text-rose-600" /> Expired
+                    <span className="ui-badge border-rose-200 bg-rose-50 text-rose-700">
+                        <CalendarX className="h-3.5 w-3.5" /> Expired
                     </span>
                 );
             case "Pending Payment":
             default:
                 return (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 border border-slate-200 rounded-full text-xs font-black uppercase tracking-wider">
-                        <Clock className="w-3.5 h-3.5 text-slate-500" /> Pending Payment
+                    <span className="ui-badge border-slate-200 bg-slate-100 text-slate-600">
+                        <Clock className="h-3.5 w-3.5" /> Pending Payment
                     </span>
                 );
         }
@@ -454,34 +455,34 @@ export default function HospitalSubscriptionsAdmin() {
     const getDaysRemainingBadge = (days: number, status: string) => {
         if (status === 'Pending Payment') {
             return (
-                <span className="inline-flex items-center px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-bold">
-                    No Active Cycle
+                <span className="ui-badge border-slate-200 bg-slate-50 text-slate-500">
+                    No active cycle
                 </span>
             );
         }
         if (days <= 0 || status === 'Expired') {
             return (
-                <span className="inline-flex items-center px-2.5 py-1 bg-rose-100 text-rose-700 rounded-lg text-xs font-extrabold">
+                <span className="ui-badge border-rose-200 bg-rose-50 text-rose-700">
                     Expired (0 days)
                 </span>
             );
         }
         if (days <= 5) {
             return (
-                <span className="inline-flex items-center px-2.5 py-1 bg-amber-100 text-amber-800 rounded-lg text-xs font-extrabold animate-pulse">
+                <span className="ui-badge border-amber-200 bg-amber-50 text-amber-700">
                     {days} {days === 1 ? 'day' : 'days'} left
                 </span>
             );
         }
         return (
-            <span className="inline-flex items-center px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-extrabold">
+            <span className="ui-badge border-emerald-200 bg-emerald-50 text-emerald-700">
                 {days} days left
             </span>
         );
     };
 
     return (
-        <div className="space-y-10">
+        <div className="flex flex-col gap-6">
             {/* Toast Notification */}
             <AnimatePresence>
                 {toastMessage && (
@@ -489,7 +490,9 @@ export default function HospitalSubscriptionsAdmin() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="fixed top-8 right-8 z-[100] bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 font-medium text-sm"
+                        role="status"
+                        aria-live="polite"
+                        className="fixed left-4 right-4 top-4 z-[100] flex items-center gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-lg sm:left-auto sm:right-6 sm:top-6 sm:max-w-md"
                     >
                         <span>{toastMessage}</span>
                     </motion.div>
@@ -497,12 +500,12 @@ export default function HospitalSubscriptionsAdmin() {
             </AnimatePresence>
 
             {/* Header Title Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight font-jakarta">
-                        Hospital Subscriptions & 30-Day Cycles
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <h2 className="ui-title">
+                        Hospital subscriptions & 30-day cycles
                     </h2>
-                    <p className="text-slate-500 font-medium text-xs sm:text-sm mt-1">
+                    <p className="ui-subtitle">
                         Automated 30-day billing enforcement. Hospitals require an active subscription to generate and publish appointment slots.
                     </p>
                 </div>
@@ -511,83 +514,84 @@ export default function HospitalSubscriptionsAdmin() {
                         fetchSummary();
                         fetchHospitals();
                     }}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all self-start md:self-auto"
+                    className="ui-btn-secondary w-full shrink-0 sm:w-auto"
                 >
-                    <RotateCcw className="w-3.5 h-3.5" /> Refresh Statuses
+                    <RotateCcw className="h-4 w-4" /> Refresh statuses
                 </button>
             </div>
 
             {/* Section 7 Summary Cards */}
             {summary && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                    <div className="p-3.5 sm:p-5 bg-white border border-slate-100 rounded-2xl shadow-sm space-y-1">
-                        <div className="flex items-center justify-between text-slate-400">
-                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Total Hospitals</span>
-                            <Building2 className="w-4 h-4 text-slate-400" />
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+                    <div className="ui-card p-4 sm:p-5">
+                        <div className="flex items-start justify-between gap-3">
+                            <span className="text-[13px] font-medium leading-snug text-slate-500">Total hospitals</span>
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><Building2 className="h-5 w-5" /></span>
                         </div>
-                        <p className="text-xl sm:text-2xl font-black text-slate-900">{summary.totalHospitals ?? 0}</p>
-                        <p className="text-[10px] text-slate-400 font-medium">Registered in network</p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{summary.totalHospitals ?? 0}</p>
+                        <p className="mt-1 text-xs leading-snug text-slate-500">Registered in network</p>
                     </div>
 
-                    <div className="p-3.5 sm:p-5 bg-emerald-50/50 border border-emerald-100 rounded-2xl shadow-sm space-y-1">
-                        <div className="flex items-center justify-between text-emerald-600">
-                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Active</span>
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    <div className="ui-card p-4 sm:p-5">
+                        <div className="flex items-start justify-between gap-3">
+                            <span className="text-[13px] font-medium leading-snug text-slate-500">Active</span>
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600"><CheckCircle2 className="h-5 w-5" /></span>
                         </div>
-                        <p className="text-xl sm:text-2xl font-black text-emerald-700">{summary.activeSubscriptions ?? 0}</p>
-                        <p className="text-[10px] text-emerald-600 font-medium">Slots enabled</p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{summary.activeSubscriptions ?? 0}</p>
+                        <p className="mt-1 text-xs leading-snug text-slate-500">Slots enabled</p>
                     </div>
 
-                    <div className="p-3.5 sm:p-5 bg-amber-50/50 border border-amber-100 rounded-2xl shadow-sm space-y-1">
-                        <div className="flex items-center justify-between text-amber-600">
-                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Pending Pay</span>
-                            <Clock className="w-4 h-4 text-amber-500" />
+                    <div className="ui-card p-4 sm:p-5">
+                        <div className="flex items-start justify-between gap-3">
+                            <span className="text-[13px] font-medium leading-snug text-slate-500">Pending pay</span>
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600"><Clock className="h-5 w-5" /></span>
                         </div>
-                        <p className="text-xl sm:text-2xl font-black text-amber-700">{summary.pendingPayments ?? 0}</p>
-                        <p className="text-[10px] text-amber-600 font-medium">Awaiting confirmation</p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{summary.pendingPayments ?? 0}</p>
+                        <p className="mt-1 text-xs leading-snug text-slate-500">Awaiting confirmation</p>
                     </div>
 
-                    <div className="p-3.5 sm:p-5 bg-orange-50/50 border border-orange-100 rounded-2xl shadow-sm space-y-1">
-                        <div className="flex items-center justify-between text-orange-600">
-                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Expiring &le; 5 Days</span>
-                            <AlertTriangle className="w-4 h-4 text-orange-500" />
+                    <div className="ui-card p-4 sm:p-5">
+                        <div className="flex items-start justify-between gap-3">
+                            <span className="text-[13px] font-medium leading-snug text-slate-500">Expiring &le; 5 days</span>
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600"><AlertTriangle className="h-5 w-5" /></span>
                         </div>
-                        <p className="text-xl sm:text-2xl font-black text-orange-700">{summary.expiringWithin5Days ?? 0}</p>
-                        <p className="text-[10px] text-orange-600 font-medium">Needs renewal soon</p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{summary.expiringWithin5Days ?? 0}</p>
+                        <p className="mt-1 text-xs leading-snug text-slate-500">Needs renewal soon</p>
                     </div>
 
-                    <div className="p-3.5 sm:p-5 bg-rose-50/50 border border-rose-100 rounded-2xl shadow-sm space-y-1">
-                        <div className="flex items-center justify-between text-rose-600">
-                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Expired</span>
-                            <CalendarX className="w-4 h-4 text-rose-500" />
+                    <div className="ui-card p-4 sm:p-5">
+                        <div className="flex items-start justify-between gap-3">
+                            <span className="text-[13px] font-medium leading-snug text-slate-500">Expired</span>
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><CalendarX className="h-5 w-5" /></span>
                         </div>
-                        <p className="text-xl sm:text-2xl font-black text-rose-700">{summary.expiredSubscriptions ?? 0}</p>
-                        <p className="text-[10px] text-rose-600 font-medium">Slot gen blocked</p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{summary.expiredSubscriptions ?? 0}</p>
+                        <p className="mt-1 text-xs leading-snug text-slate-500">Slot gen blocked</p>
                     </div>
 
-                    <div className="p-3.5 sm:p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl shadow-sm space-y-1">
-                        <div className="flex items-center justify-between text-indigo-600">
-                            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">Paid This Month</span>
-                            <IndianRupee className="w-4 h-4 text-indigo-500" />
+                    <div className="ui-card p-4 sm:p-5">
+                        <div className="flex items-start justify-between gap-3">
+                            <span className="text-[13px] font-medium leading-snug text-slate-500">Paid this month</span>
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600"><IndianRupee className="h-5 w-5" /></span>
                         </div>
-                        <p className="text-xl sm:text-2xl font-black text-indigo-700">₹{(Number(summary.paymentsReceivedThisMonth) || 0).toLocaleString('en-IN')}</p>
-                        <p className="text-[10px] text-indigo-600 font-medium">Current cycle revenue</p>
+                        <p className="mt-1 break-words text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">₹{(Number(summary.paymentsReceivedThisMonth) || 0).toLocaleString('en-IN')}</p>
+                        <p className="mt-1 text-xs leading-snug text-slate-500">Current cycle revenue</p>
                     </div>
                 </div>
             )}
 
             {/* Filter & Search Bar */}
-            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="ui-card p-4 sm:p-5">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     {/* Search */}
-                    <div className="relative md:col-span-1">
-                        <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
+                    <div className="relative">
+                        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
                             placeholder="Search hospital or city..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-blue-500 focus:bg-white text-slate-900 transition-all"
+                            aria-label="Search hospital or city"
+                            className="ui-input pl-10"
                         />
                     </div>
 
@@ -596,13 +600,14 @@ export default function HospitalSubscriptionsAdmin() {
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-blue-500 text-slate-800"
+                            aria-label="Filter by subscription status"
+                            className="ui-input"
                         >
-                            <option value="all">All Subscription Statuses</option>
-                            <option value="Active">Active Only</option>
-                            <option value="Expiring Soon">Expiring Soon (Within 5 Days)</option>
-                            <option value="Pending Payment">Pending Payment Only</option>
-                            <option value="Expired">Expired Only</option>
+                            <option value="all">All subscription statuses</option>
+                            <option value="Active">Active only</option>
+                            <option value="Expiring Soon">Expiring Soon (within 5 days)</option>
+                            <option value="Pending Payment">Pending Payment only</option>
+                            <option value="Expired">Expired only</option>
                         </select>
                     </div>
 
@@ -611,11 +616,12 @@ export default function HospitalSubscriptionsAdmin() {
                         <select
                             value={paymentFilter}
                             onChange={(e) => setPaymentFilter(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-blue-500 text-slate-800"
+                            aria-label="Filter by payment status"
+                            className="ui-input"
                         >
-                            <option value="all">All Payment Statuses</option>
-                            <option value="Paid">Paid Only</option>
-                            <option value="Pending">Pending Only</option>
+                            <option value="all">All payment statuses</option>
+                            <option value="Paid">Paid only</option>
+                            <option value="Pending">Pending only</option>
                         </select>
                     </div>
 
@@ -624,13 +630,14 @@ export default function HospitalSubscriptionsAdmin() {
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
-                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:border-blue-500 text-slate-800"
+                            aria-label="Sort hospitals"
+                            className="ui-input"
                         >
-                            <option value="expiry_asc">Sort: Expiry Date (Soonest first)</option>
-                            <option value="expiry_desc">Sort: Expiry Date (Furthest first)</option>
-                            <option value="days_asc">Sort: Days Remaining (Low to High)</option>
-                            <option value="name_asc">Sort: Hospital Name (A to Z)</option>
-                            <option value="joining_desc">Sort: Joining Date (Newest first)</option>
+                            <option value="expiry_asc">Sort: expiry date (soonest first)</option>
+                            <option value="expiry_desc">Sort: expiry date (furthest first)</option>
+                            <option value="days_asc">Sort: days remaining (low to high)</option>
+                            <option value="name_asc">Sort: hospital name (A to Z)</option>
+                            <option value="joining_desc">Sort: joining date (newest first)</option>
                         </select>
                     </div>
                 </div>
@@ -638,115 +645,118 @@ export default function HospitalSubscriptionsAdmin() {
 
             {/* Error Message */}
             {error && (
-                <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm font-bold flex items-center gap-2">
-                    <XCircle className="w-5 h-5" /> {error}
+                <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700">
+                    <XCircle className="h-5 w-5 shrink-0" /> {error}
                 </div>
             )}
 
             {/* Hospital Subscriptions Table */}
-            <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+            <div className="ui-card overflow-hidden">
                 {loading ? (
-                    <div className="p-16 flex flex-col items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-3" />
-                        <p className="text-sm font-bold text-slate-400">Loading subscription records...</p>
+                    <div className="flex flex-col items-center justify-center px-4 py-16">
+                        <Loader2 className="mb-3 h-7 w-7 animate-spin text-blue-600" />
+                        <p className="text-sm text-slate-500">Loading subscription records...</p>
                     </div>
                 ) : sortedHospitals.length === 0 ? (
-                    <div className="p-16 text-center">
-                        <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                        <h4 className="text-base font-bold text-slate-700">No Hospitals Found</h4>
-                        <p className="text-xs text-slate-400 mt-1">Try adjusting your filters or search keywords.</p>
+                    <div className="ui-empty m-4 sm:m-5">
+                        <Building2 className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                        <h4 className="font-medium text-slate-700">No hospitals found</h4>
+                        <p className="mt-1">Try adjusting your filters or search keywords.</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm min-w-[760px]">
-                            <thead className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-black uppercase text-slate-500 tracking-wider">
+                        <table className="w-full min-w-[760px] text-left">
+                            <thead className="border-b border-slate-100 bg-slate-50/80">
                                 <tr>
-                                    <th className="py-4 px-6">Hospital Details</th>
-                                    <th className="py-4 px-4">Joining Date</th>
-                                    <th className="py-4 px-4">Last Payment</th>
-                                    <th className="py-4 px-4">Cycle Period</th>
-                                    <th className="py-4 px-4 text-center">Remaining</th>
-                                    <th className="py-4 px-4 text-center">Status</th>
-                                    <th className="py-4 px-6 text-right">Actions</th>
+                                    <th className="ui-th pl-5 sm:pl-6">Hospital details</th>
+                                    <th className="ui-th">Joining date</th>
+                                    <th className="ui-th">Last payment</th>
+                                    <th className="ui-th">Cycle period</th>
+                                    <th className="ui-th text-center">Remaining</th>
+                                    <th className="ui-th text-center">Status</th>
+                                    <th className="ui-th pr-5 text-right sm:pr-6">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+                            <tbody className="divide-y divide-slate-100">
                                 {sortedHospitals.map((h) => (
-                                    <tr key={h._id} className="hover:bg-slate-50/60 transition-colors">
-                                        <td className="py-4 px-6">
-                                            <div className="font-bold text-slate-900 text-base">{h.name}</div>
-                                            <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                                    <tr key={h._id} className="transition-colors hover:bg-slate-50/60">
+                                        <td className="ui-td pl-5 sm:pl-6">
+                                            <div className="font-semibold text-slate-900">{h.name}</div>
+                                            <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
                                                 <span>{h.city}</span>
                                                 {h.contactNumber && <span>• {h.contactNumber}</span>}
                                             </div>
                                         </td>
-                                        <td className="py-4 px-4 whitespace-nowrap">
-                                            <div className="text-xs font-bold text-slate-700">{formatDate(h.joiningDate)}</div>
-                                            <div className="text-[10px] text-slate-400">Onboarded</div>
+                                        <td className="ui-td whitespace-nowrap">
+                                            <div className="font-medium text-slate-900">{formatDate(h.joiningDate)}</div>
+                                            <div className="text-xs text-slate-500">Onboarded</div>
                                         </td>
-                                        <td className="py-4 px-4 whitespace-nowrap">
-                                            <div className="text-xs font-bold text-slate-900">
+                                        <td className="ui-td whitespace-nowrap">
+                                            <div className="font-medium text-slate-900">
                                                 {formatDate(h.lastPaymentDate)}
                                             </div>
                                             {h.lastPaymentAmount ? (
-                                                <div className="text-[11px] text-emerald-600 font-bold">
+                                                <div className="text-xs font-medium text-emerald-600">
                                                     ₹{(Number(h.lastPaymentAmount) || 0).toLocaleString('en-IN')} via {h.lastPaymentMethod || 'UPI'}
                                                 </div>
                                             ) : (
-                                                <div className="text-[10px] text-amber-600 font-semibold">No payment on file</div>
+                                                <div className="text-xs font-medium text-amber-600">No payment on file</div>
                                             )}
                                         </td>
-                                        <td className="py-4 px-4 whitespace-nowrap">
+                                        <td className="ui-td whitespace-nowrap">
                                             {h.subscriptionStartDate && h.subscriptionExpiryDate ? (
                                                 <div>
-                                                    <div className="text-xs font-bold text-slate-800">
+                                                    <div className="font-medium text-slate-900">
                                                         {formatDate(h.subscriptionStartDate)} – {formatDate(h.subscriptionExpiryDate)}
                                                     </div>
-                                                    <div className="text-[10px] text-slate-400">30 Calendar Days</div>
+                                                    <div className="text-xs text-slate-500">30 calendar days</div>
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-slate-400 italic">Not yet started</span>
+                                                <span className="text-slate-400">Not yet started</span>
                                             )}
                                         </td>
-                                        <td className="py-4 px-4 text-center whitespace-nowrap">
+                                        <td className="ui-td whitespace-nowrap text-center">
                                             {getDaysRemainingBadge(h.daysRemaining, h.subscriptionStatus)}
                                         </td>
-                                        <td className="py-4 px-4 text-center whitespace-nowrap">
+                                        <td className="ui-td whitespace-nowrap text-center">
                                             {getStatusBadge(h.subscriptionStatus)}
                                         </td>
-                                        <td className="py-4 px-6 text-right whitespace-nowrap">
-                                            <div className="inline-flex items-center gap-2">
+                                        <td className="ui-td whitespace-nowrap pr-5 text-right sm:pr-6">
+                                            <div className="inline-flex items-center gap-1.5">
                                                 <button
                                                     onClick={() => handleOpenPaymentModal(h)}
-                                                    className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 active:scale-95"
+                                                    className="ui-btn-primary ui-btn-sm min-h-[40px] md:min-h-[32px]"
                                                     title="Record payment and activate or renew subscription"
                                                 >
-                                                    <CreditCard className="w-3.5 h-3.5" />
-                                                    {h.subscriptionStatus === 'Active' ? 'Renew 30 Days' : 'Record Payment'}
+                                                    <CreditCard className="h-3.5 w-3.5" />
+                                                    {h.subscriptionStatus === 'Active' ? 'Renew 30 days' : 'Record payment'}
                                                 </button>
 
                                                 <button
                                                     onClick={() => handleOpenHistoryModal(h)}
-                                                    className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all"
+                                                    className="ui-btn-secondary ui-btn-sm h-10 w-10 px-0 text-slate-500 hover:text-slate-900 md:h-8 md:w-8"
                                                     title="View all past payment transactions"
+                                                    aria-label="View payment history"
                                                 >
-                                                    <History className="w-4 h-4" />
+                                                    <History className="h-4 w-4" />
                                                 </button>
 
                                                 <button
                                                     onClick={() => setUsageHospital({ _id: h._id, name: h.name })}
-                                                    className="p-2 bg-violet-50 hover:bg-violet-100 text-violet-700 rounded-xl transition-all"
+                                                    className="ui-btn-secondary ui-btn-sm h-10 w-10 px-0 text-violet-600 hover:text-violet-700 md:h-8 md:w-8"
                                                     title="Usage, add-on packs and AI receptionist number"
+                                                    aria-label="Usage, add-on packs and AI receptionist number"
                                                 >
-                                                    <Gauge className="w-4 h-4" />
+                                                    <Gauge className="h-4 w-4" />
                                                 </button>
 
                                                 <button
                                                     onClick={() => handleOpenEditModal(h)}
-                                                    className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all"
+                                                    className="ui-btn-secondary ui-btn-sm h-10 w-10 px-0 text-slate-500 hover:text-slate-900 md:h-8 md:w-8"
                                                     title="Edit subscription dates and notes"
+                                                    aria-label="Edit subscription dates and notes"
                                                 >
-                                                    <Edit3 className="w-4 h-4" />
+                                                    <Edit3 className="h-4 w-4" />
                                                 </button>
                                             </div>
                                         </td>
@@ -761,87 +771,96 @@ export default function HospitalSubscriptionsAdmin() {
             {/* MODAL 1: RECORD PAYMENT / RENEW */}
             <AnimatePresence>
                 {paymentModalHospital && (
-                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="ui-overlay">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl space-y-6 relative border border-slate-100 max-h-[90vh] overflow-y-auto"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="record-payment-title"
+                            className="ui-dialog sm:max-w-xl"
                         >
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                <div>
-                                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta">
-                                        Record Payment & Renew Subscription
+                            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                                <div className="min-w-0">
+                                    <h3 id="record-payment-title" className="text-lg font-semibold leading-tight text-slate-900">
+                                        Record payment & renew subscription
                                     </h3>
-                                    <p className="text-xs text-slate-500 font-medium">
-                                        Hospital: <strong className="text-slate-800">{paymentModalHospital.name}</strong> ({paymentModalHospital.city})
+                                    <p className="mt-0.5 text-sm text-slate-500">
+                                        Hospital: <strong className="font-medium text-slate-800">{paymentModalHospital.name}</strong> ({paymentModalHospital.city})
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => setPaymentModalHospital(null)}
-                                    className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
+                                    aria-label="Close"
+                                    className="-mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                                 >
-                                    <XCircle className="w-6 h-6" />
+                                    <X className="h-5 w-5" />
                                 </button>
                             </div>
 
+                            <div className="flex-1 space-y-5 overflow-y-auto px-5 pt-5 sm:px-6">
                             {/* Live Renewal Preview Box */}
                             {previewRenewal && (
-                                <div className="p-4 bg-gradient-to-br from-indigo-50/80 to-blue-50/80 border border-indigo-100 rounded-2xl space-y-2">
-                                    <div className="flex items-center justify-between text-xs font-black uppercase text-indigo-700 tracking-wider">
-                                        <span>Renewal Policy: {previewRenewal.type}</span>
-                                        <Clock className="w-4 h-4" />
+                                <div className="space-y-3 rounded-xl border border-blue-100 bg-blue-50/60 p-4">
+                                    <div className="flex items-start justify-between gap-3 text-sm font-semibold text-blue-900">
+                                        <span>Renewal policy: {previewRenewal.type}</span>
+                                        <Clock className="h-4 w-4 shrink-0 text-blue-600" />
                                     </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs pt-1">
+                                    <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 sm:gap-4">
                                         <div>
-                                            <span className="text-slate-400 font-semibold">Start Date:</span>
-                                            <p className="font-bold text-slate-800">{previewRenewal.startDate}</p>
+                                            <span className="text-xs font-medium text-slate-500">Start date:</span>
+                                            <p className="mt-0.5 font-semibold text-slate-900">{previewRenewal.startDate}</p>
                                         </div>
                                         <div>
-                                            <span className="text-slate-400 font-semibold">New Expiry Date (30 Days):</span>
-                                            <p className="font-bold text-indigo-600">{previewRenewal.newExpiry}</p>
+                                            <span className="text-xs font-medium text-slate-500">New expiry date (30 days):</span>
+                                            <p className="mt-0.5 font-semibold text-blue-700">{previewRenewal.newExpiry}</p>
                                         </div>
                                     </div>
-                                    <p className="text-[11px] text-slate-500 font-medium pt-1 border-t border-indigo-100/60">
-                                        ℹ️ {previewRenewal.note}
+                                    <p className="flex items-start gap-2 border-t border-blue-100 pt-2.5 text-xs leading-relaxed text-slate-600">
+                                        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />
+                                        <span>{previewRenewal.note}</span>
                                     </p>
                                 </div>
                             )}
 
                             {/* Payment Input Form */}
                             <form onSubmit={handleRecordPayment} className="space-y-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 uppercase">Payment Received Date *</label>
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="min-w-0">
+                                        <label htmlFor="record-payment-date" className="ui-label">Payment received date *</label>
                                         <input
+                                            id="record-payment-date"
                                             type="date"
                                             required
                                             value={paymentForm.paymentDate}
                                             onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentDate: e.target.value }))}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                                            className="ui-input"
                                         />
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 uppercase">Payment Amount (₹) *</label>
+                                    <div className="min-w-0">
+                                        <label htmlFor="record-payment-amount" className="ui-label">Payment amount (₹) *</label>
                                         <input
+                                            id="record-payment-amount"
                                             type="number"
                                             required
                                             value={paymentForm.amount}
                                             onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
                                             placeholder="5000"
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                                            className="ui-input"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 uppercase">Payment Method *</label>
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="min-w-0">
+                                        <label htmlFor="record-payment-method" className="ui-label">Payment method *</label>
                                         <select
+                                            id="record-payment-method"
                                             value={paymentForm.paymentMethod}
                                             onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                                            className="ui-input"
                                         >
                                             <option value="UPI">UPI / QR</option>
                                             <option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</option>
@@ -852,47 +871,50 @@ export default function HospitalSubscriptionsAdmin() {
                                         </select>
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 uppercase">Transaction Ref / UTR</label>
+                                    <div className="min-w-0">
+                                        <label htmlFor="record-payment-reference" className="ui-label">Transaction ref / UTR</label>
                                         <input
+                                            id="record-payment-reference"
                                             type="text"
                                             value={paymentForm.transactionReference}
                                             onChange={(e) => setPaymentForm(prev => ({ ...prev, transactionReference: e.target.value }))}
                                             placeholder="e.g. UTR847291038"
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                                            className="ui-input"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-700 uppercase">Admin Remarks / Notes</label>
+                                <div>
+                                    <label htmlFor="record-payment-notes" className="ui-label">Admin remarks / notes</label>
                                     <textarea
+                                        id="record-payment-notes"
                                         rows={2}
                                         value={paymentForm.adminNotes}
                                         onChange={(e) => setPaymentForm(prev => ({ ...prev, adminNotes: e.target.value }))}
                                         placeholder="Optional payment confirmation notes..."
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500 resize-none"
+                                        className="ui-input min-h-[96px] resize-none"
                                     />
                                 </div>
 
-                                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                                <div className="sticky bottom-0 -mx-5 flex flex-col-reverse gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:-mx-6 sm:flex-row sm:justify-end sm:gap-3 sm:px-6">
                                     <button
                                         type="button"
                                         onClick={() => setPaymentModalHospital(null)}
-                                        className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-all"
+                                        className="ui-btn-secondary w-full sm:w-auto"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={submittingPayment}
-                                        className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2 disabled:opacity-50"
+                                        className="ui-btn-primary w-full sm:w-auto"
                                     >
-                                        {submittingPayment ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                                        Confirm & Activate Subscription
+                                        {submittingPayment ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                                        Confirm & activate subscription
                                     </button>
                                 </div>
                             </form>
+                            </div>
                         </motion.div>
                     </div>
                 )}
@@ -901,88 +923,93 @@ export default function HospitalSubscriptionsAdmin() {
             {/* MODAL 2: PAYMENT HISTORY */}
             <AnimatePresence>
                 {historyModalHospital && (
-                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="ui-overlay">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-3xl max-w-3xl w-full p-8 shadow-2xl space-y-6 relative border border-slate-100 max-h-[90vh] overflow-y-auto"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="payment-history-title"
+                            className="ui-dialog sm:max-w-3xl"
                         >
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 font-jakarta flex items-center gap-2">
-                                        <History className="w-5 h-5 text-blue-600" />
-                                        Payment History & Audit Trail
+                            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                                <div className="min-w-0">
+                                    <h3 id="payment-history-title" className="flex items-center gap-2 text-lg font-semibold leading-tight text-slate-900">
+                                        <History className="h-5 w-5 shrink-0 text-blue-600" />
+                                        Payment history & audit trail
                                     </h3>
-                                    <p className="text-xs text-slate-500 font-medium">
-                                        All historical transactions for <strong className="text-slate-800">{historyModalHospital.name}</strong>
+                                    <p className="mt-0.5 text-sm text-slate-500">
+                                        All historical transactions for <strong className="font-medium text-slate-800">{historyModalHospital.name}</strong>
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => setHistoryModalHospital(null)}
-                                    className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
+                                    aria-label="Close"
+                                    className="-mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                                 >
-                                    <XCircle className="w-6 h-6" />
+                                    <X className="h-5 w-5" />
                                 </button>
                             </div>
 
+                            <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
                             {loadingHistory ? (
-                                <div className="p-12 text-center">
-                                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-2" />
-                                    <p className="text-xs text-slate-400 font-semibold">Fetching transactions...</p>
+                                <div className="py-12 text-center">
+                                    <Loader2 className="mx-auto mb-2 h-7 w-7 animate-spin text-blue-600" />
+                                    <p className="text-sm text-slate-500">Fetching transactions...</p>
                                 </div>
                             ) : paymentHistory.length === 0 ? (
-                                <div className="p-12 text-center bg-slate-50 rounded-2xl">
-                                    <Receipt className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                                    <h4 className="text-sm font-bold text-slate-700">No Payment Records Yet</h4>
-                                    <p className="text-xs text-slate-400 mt-1">
+                                <div className="ui-empty">
+                                    <Receipt className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                                    <h4 className="font-medium text-slate-700">No payment records yet</h4>
+                                    <p className="mt-1">
                                         This hospital has not recorded any payments yet. Subscription remains in Pending status.
                                     </p>
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-xs min-w-[650px]">
-                                        <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                                    <table className="w-full min-w-[650px] text-left">
+                                        <thead className="border-b border-slate-100 bg-slate-50/80">
                                             <tr>
-                                                <th className="py-3 px-3">Date</th>
-                                                <th className="py-3 px-3">Amount</th>
-                                                <th className="py-3 px-3">Method / Ref</th>
-                                                <th className="py-3 px-3">Cycle Granted</th>
-                                                <th className="py-3 px-3">Type</th>
-                                                <th className="py-3 px-3">Admin Notes</th>
+                                                <th className="ui-th">Date</th>
+                                                <th className="ui-th">Amount</th>
+                                                <th className="ui-th">Method / ref</th>
+                                                <th className="ui-th">Cycle granted</th>
+                                                <th className="ui-th">Type</th>
+                                                <th className="ui-th">Admin notes</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                                        <tbody className="divide-y divide-slate-100">
                                             {paymentHistory.map((rec) => (
-                                                <tr key={rec._id} className="hover:bg-slate-50/50">
-                                                    <td className="py-3 px-3 whitespace-nowrap font-bold text-slate-900">
+                                                <tr key={rec._id} className="hover:bg-slate-50/60">
+                                                    <td className="ui-td whitespace-nowrap font-medium text-slate-900">
                                                         {formatDate(rec.paymentDate)}
                                                     </td>
-                                                    <td className="py-3 px-3 whitespace-nowrap font-black text-emerald-600">
+                                                    <td className="ui-td whitespace-nowrap font-semibold text-emerald-600">
                                                         ₹{(Number(rec.amount) || 0).toLocaleString('en-IN')}
                                                     </td>
-                                                    <td className="py-3 px-3">
-                                                        <div className="font-semibold text-slate-800">{rec.paymentMethod}</div>
+                                                    <td className="ui-td">
+                                                        <div className="font-medium text-slate-800">{rec.paymentMethod}</div>
                                                         {rec.transactionReference && (
-                                                            <div className="text-[10px] font-mono text-slate-400">{rec.transactionReference}</div>
+                                                            <div className="font-mono text-xs text-slate-500">{rec.transactionReference}</div>
                                                         )}
                                                     </td>
-                                                    <td className="py-3 px-3 whitespace-nowrap">
-                                                        <div className="font-semibold text-slate-800">
+                                                    <td className="ui-td whitespace-nowrap">
+                                                        <div className="font-medium text-slate-800">
                                                             {formatDate(rec.newStartDate)} – {formatDate(rec.newExpiryDate)}
                                                         </div>
-                                                        <div className="text-[10px] text-slate-400">30 Days</div>
+                                                        <div className="text-xs text-slate-500">30 days</div>
                                                     </td>
-                                                    <td className="py-3 px-3 whitespace-nowrap">
-                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                                    <td className="ui-td whitespace-nowrap">
+                                                        <span className={`ui-badge ${
                                                             rec.renewalType === 'EXTENSION'
-                                                                ? 'bg-blue-100 text-blue-700'
-                                                                : 'bg-emerald-100 text-emerald-700'
+                                                                ? 'border-blue-200 bg-blue-50 text-blue-700'
+                                                                : 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                                         }`}>
                                                             {rec.renewalType}
                                                         </span>
                                                     </td>
-                                                    <td className="py-3 px-3 text-slate-500 max-w-[200px] truncate" title={rec.adminNotes}>
+                                                    <td className="ui-td max-w-[200px] truncate text-slate-500" title={rec.adminNotes}>
                                                         {rec.adminNotes || "—"}
                                                     </td>
                                                 </tr>
@@ -991,13 +1018,14 @@ export default function HospitalSubscriptionsAdmin() {
                                     </table>
                                 </div>
                             )}
+                            </div>
 
-                            <div className="pt-4 flex justify-end border-t border-slate-100">
+                            <div className="flex shrink-0 justify-end border-t border-slate-100 px-5 py-4 sm:px-6">
                                 <button
                                     onClick={() => setHistoryModalHospital(null)}
-                                    className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800"
+                                    className="ui-btn-secondary w-full sm:w-auto"
                                 >
-                                    Close History
+                                    Close history
                                 </button>
                             </div>
                         </motion.div>
@@ -1008,94 +1036,104 @@ export default function HospitalSubscriptionsAdmin() {
             {/* MODAL 3: EDIT SUBSCRIPTION DATES & DETAILS */}
             <AnimatePresence>
                 {editModalHospital && (
-                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="ui-overlay">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl space-y-6 relative border border-slate-100 max-h-[90vh] overflow-y-auto"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="edit-subscription-title"
+                            className="ui-dialog sm:max-w-lg"
                         >
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                                <div>
-                                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta">
-                                        Edit Subscription Details
+                            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                                <div className="min-w-0">
+                                    <h3 id="edit-subscription-title" className="text-lg font-semibold leading-tight text-slate-900">
+                                        Edit subscription details
                                     </h3>
-                                    <p className="text-xs text-slate-500 font-medium">
-                                        Hospital: <strong className="text-slate-800">{editModalHospital.name}</strong>
+                                    <p className="mt-0.5 text-sm text-slate-500">
+                                        Hospital: <strong className="font-medium text-slate-800">{editModalHospital.name}</strong>
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => setEditModalHospital(null)}
-                                    className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
+                                    aria-label="Close"
+                                    className="-mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                                 >
-                                    <XCircle className="w-6 h-6" />
+                                    <X className="h-5 w-5" />
                                 </button>
                             </div>
 
+                            <div className="flex-1 overflow-y-auto px-5 pt-5 sm:px-6">
                             <form onSubmit={handleUpdateDetails} className="space-y-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-700 uppercase">Hospital Joining Date</label>
+                                <div>
+                                    <label htmlFor="edit-sub-joining-date" className="ui-label">Hospital joining date</label>
                                     <input
+                                        id="edit-sub-joining-date"
                                         type="date"
                                         required
                                         value={editForm.joiningDate}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, joiningDate: e.target.value }))}
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                                        className="ui-input"
                                     />
-                                    <p className="text-[10px] text-slate-400">Official onboarding date</p>
+                                    <p className="ui-hint">Official onboarding date</p>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 uppercase">Start Date</label>
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="min-w-0">
+                                        <label htmlFor="edit-sub-start-date" className="ui-label">Start date</label>
                                         <input
+                                            id="edit-sub-start-date"
                                             type="date"
                                             value={editForm.subscriptionStartDate}
                                             onChange={(e) => setEditForm(prev => ({ ...prev, subscriptionStartDate: e.target.value }))}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                                            className="ui-input"
                                         />
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 uppercase">Expiry Date</label>
+                                    <div className="min-w-0">
+                                        <label htmlFor="edit-sub-expiry-date" className="ui-label">Expiry date</label>
                                         <input
+                                            id="edit-sub-expiry-date"
                                             type="date"
                                             value={editForm.subscriptionExpiryDate}
                                             onChange={(e) => setEditForm(prev => ({ ...prev, subscriptionExpiryDate: e.target.value }))}
-                                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
+                                            className="ui-input"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-700 uppercase">Admin Notes</label>
+                                <div>
+                                    <label htmlFor="edit-sub-notes" className="ui-label">Admin notes</label>
                                     <textarea
+                                        id="edit-sub-notes"
                                         rows={3}
                                         value={editForm.adminNotes}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, adminNotes: e.target.value }))}
                                         placeholder="Internal notes regarding this hospital's account..."
-                                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 outline-none focus:border-blue-500 resize-none"
+                                        className="ui-input min-h-[96px] resize-none"
                                     />
                                 </div>
 
-                                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                                <div className="sticky bottom-0 -mx-5 flex flex-col-reverse gap-2 border-t border-slate-100 bg-white px-5 py-4 sm:-mx-6 sm:flex-row sm:justify-end sm:gap-3 sm:px-6">
                                     <button
                                         type="button"
                                         onClick={() => setEditModalHospital(null)}
-                                        className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-all"
+                                        className="ui-btn-secondary w-full sm:w-auto"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={submittingEdit}
-                                        className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-2 disabled:opacity-50"
+                                        className="ui-btn-dark w-full sm:w-auto"
                                     >
-                                        {submittingEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                                        Save Changes
+                                        {submittingEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                                        Save changes
                                     </button>
                                 </div>
                             </form>
+                            </div>
                         </motion.div>
                     </div>
                 )}

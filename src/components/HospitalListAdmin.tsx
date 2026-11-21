@@ -116,23 +116,23 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
 
     if (loading) {
         return (
-            <div className="py-24 flex flex-col items-center justify-center">
-                <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
-                <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.3em] italic">Accessing Facility Database...</p>
+            <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="mb-3 h-7 w-7 animate-spin text-blue-600" />
+                <p className="text-sm text-slate-500">Accessing facility database...</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {hospitals.length === 0 ? (
-                <div className="text-center py-20 bg-slate-50/50 rounded-[3rem] border-2 border-dashed border-slate-100">
-                    <Building2 className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-                    <h4 className="text-xl font-bold text-slate-400 uppercase tracking-widest">Directory Empty</h4>
-                    <p className="text-slate-500 mt-2 font-medium">No medical facilities have been registered yet.</p>
+                <div className="ui-empty">
+                    <Building2 className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                    <h4 className="font-medium text-slate-700">Directory empty</h4>
+                    <p className="mt-1">No medical facilities have been registered yet.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-3 sm:gap-4">
                     <AnimatePresence>
                         {hospitals.map((hospital) => (
                             <motion.div
@@ -140,86 +140,89 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                 layout
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className={`group bg-white border rounded-[2.5rem] transition-all duration-500 overflow-hidden ${
-                                    expandedId === hospital._id 
-                                    ? 'border-blue-200 shadow-2xl shadow-blue-900/10' 
-                                    : 'border-slate-100 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5'
+                                className={`overflow-hidden rounded-xl border bg-white transition-colors ${
+                                    expandedId === hospital._id
+                                    ? 'border-blue-200'
+                                    : 'border-slate-200 hover:border-slate-300'
                                 }`}
                             >
                                 {/* Header Section */}
-                                <div className="p-4 sm:p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 relative">
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0 shadow-inner relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                                <div className="relative flex flex-col justify-between gap-4 p-4 sm:p-5 md:flex-row md:items-center">
+                                    <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
+                                        <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-blue-50 sm:h-16 sm:w-16">
                                             {hospital.image ? (
                                                 <Image src={hospital.image} alt={hospital.name} fill className="object-cover" unoptimized />
                                             ) : (
-                                                <Building2 className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
+                                                <Building2 className="h-7 w-7 text-blue-600" />
                                             )}
                                         </div>
-                                        <div>
-                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                                                <h4 className="font-black text-slate-900 text-lg sm:text-xl tracking-tight leading-tight">{hospital.name}</h4>
+                                        <div className="min-w-0">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <h4 className="text-base font-semibold leading-tight tracking-tight text-slate-900 sm:text-lg">{hospital.name}</h4>
                                                 {hospital.plan && (
-                                                    <div className={`px-2 py-0.5 rounded-lg text-[10px] font-black border uppercase tracking-widest ${
-                                                        hospital.plan === 'Enterprise' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                                                        hospital.plan === 'Premium' ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                                                        'bg-blue-50 text-blue-600 border-blue-100'
+                                                    <div className={`ui-badge ${
+                                                        hospital.plan === 'Enterprise' ? 'border-amber-200 bg-amber-50 text-amber-700' :
+                                                        hospital.plan === 'Premium' ? 'border-violet-200 bg-violet-50 text-violet-700' :
+                                                        'border-blue-200 bg-blue-50 text-blue-700'
                                                     }`}>
                                                         {PLAN_LABEL[hospital.plan] ?? hospital.plan}
                                                     </div>
                                                 )}
                                                 {hospital.rating && (
-                                                    <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 rounded-lg text-[10px] font-black border border-amber-100">
-                                                        <Star className="w-3 h-3 fill-amber-600" /> {hospital.rating}
+                                                    <div className="ui-badge border-amber-200 bg-amber-50 text-amber-700">
+                                                        <Star className="h-3 w-3 fill-amber-500 text-amber-500" /> {hospital.rating}
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2">
-                                                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter">
-                                                    <MapPin className="w-3.5 h-3.5 text-blue-500" /> {hospital.city}
+                                            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                                                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                                                    <MapPin className="h-4 w-4 text-slate-400" /> {hospital.city}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter">
-                                                    <IndianRupee className="w-3.5 h-3.5 text-emerald-500" /> ₹{hospital.consultationFee} Fee
+                                                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                                                    <IndianRupee className="h-4 w-4 text-slate-400" /> ₹{hospital.consultationFee} fee
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter">
-                                                    <User className="w-3.5 h-3.5 text-indigo-500" /> {hospital.doctors?.length || 0} Doctors
+                                                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                                                    <User className="h-4 w-4 text-slate-400" /> {hospital.doctors?.length || 0} doctors
                                                 </div>
-                                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                                <div className="flex flex-wrap gap-1.5">
                                                     {hospital.is_featured && (
-                                                        <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-md text-[8px] font-black uppercase tracking-widest border border-indigo-100">Top Results</span>
+                                                        <span className="ui-badge border-indigo-200 bg-indigo-50 text-indigo-700">Top results</span>
                                                     )}
                                                     {hospital.has_govt_schemes && (
-                                                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-md text-[8px] font-black uppercase tracking-widest border border-emerald-100">Govt Schemes</span>
+                                                        <span className="ui-badge border-emerald-200 bg-emerald-50 text-emerald-700">Govt schemes</span>
                                                     )}
                                                     {hospital.is_spotlight && (
-                                                        <span className="px-2 py-0.5 bg-amber-50 text-amber-600 rounded-md text-[8px] font-black uppercase tracking-widest border border-amber-100">Spotlight</span>
+                                                        <span className="ui-badge border-amber-200 bg-amber-50 text-amber-700">Spotlight</span>
                                                     )}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2 sm:gap-3 self-end md:self-auto">
-                                         <button 
+                                    <div className="flex shrink-0 items-center gap-2">
+                                         <button
                                              onClick={() => onEdit(hospital)}
-                                             className="p-3 sm:p-4 bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600 rounded-xl sm:rounded-2xl transition-all group/edit"
-                                             title="Edit Hospital Details"
+                                             className="ui-btn-secondary w-10 px-0 text-slate-500 hover:text-blue-600"
+                                             title="Edit hospital details"
+                                             aria-label="Edit hospital details"
                                          >
-                                             <Edit3 className="w-4 h-4 sm:w-5 sm:h-5 group-hover/edit:scale-110 transition-transform" />
+                                             <Edit3 className="h-4 w-4" />
                                          </button>
-                                         <button 
+                                         <button
                                              onClick={() => handleDelete(hospital._id, hospital.name)}
-                                             className="p-3 sm:p-4 bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 rounded-xl sm:rounded-2xl transition-all group/del"
-                                             title="Delete Hospital"
+                                             className="ui-btn-secondary w-10 px-0 text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                                             title="Delete hospital"
+                                             aria-label="Delete hospital"
                                          >
-                                             <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 group-hover/del:rotate-12 transition-transform" />
+                                             <Trash2 className="h-4 w-4" />
                                          </button>
-                                        <button 
+                                        <button
                                             onClick={() => toggleExpand(hospital._id)}
-                                            className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest ${
-                                                expandedId === hospital._id 
-                                                ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/30' 
-                                                : 'bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600'
+                                            aria-expanded={expandedId === hospital._id}
+                                            className={`flex-1 md:flex-none ${
+                                                expandedId === hospital._id
+                                                ? 'ui-btn border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                                                : 'ui-btn-secondary'
                                             }`}
                                         >
                                             {expandedId === hospital._id ? 'Close' : 'Details'}
@@ -236,61 +239,61 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                             animate={{ height: 'auto', opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
                                             transition={{ duration: 0.4, ease: "circOut" }}
-                                            className="border-t border-slate-50 bg-slate-50/30"
+                                            className="border-t border-slate-100 bg-slate-50/60"
                                         >
-                                            <div className="p-4 sm:p-8 md:p-12 space-y-6 sm:space-y-12">
+                                            <div className="space-y-6 p-4 sm:p-5 md:p-6">
                                                 {/* Top Grid: Info & Description */}
-                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12">
-                                                    <div className="space-y-8">
+                                                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
+                                                    <div className="space-y-4">
                                                         <div>
-                                                            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Official Bio</h5>
-                                                            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm leading-relaxed text-slate-600 italic">
+                                                            <h5 className="mb-2 text-sm font-semibold text-slate-900">Official bio</h5>
+                                                            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-600">
                                                                 {hospital.description || "No description provided for this facility."}
                                                             </div>
                                                         </div>
 
-                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Emergency Contact</p>
-                                                                <a href={`tel:${hospital.ambulanceContact}`} className="flex items-center gap-3 text-lg font-black text-rose-600 hover:underline">
-                                                                    <Phone className="w-5 h-5" /> {hospital.ambulanceContact || "N/A"}
+                                                        <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+                                                            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3">
+                                                                <p className="text-xs font-medium text-slate-500">Emergency contact</p>
+                                                                <a href={`tel:${hospital.ambulanceContact}`} className="flex items-center gap-2 text-sm font-semibold text-rose-600 hover:underline">
+                                                                    <Phone className="h-4 w-4 shrink-0" /> {hospital.ambulanceContact || "N/A"}
                                                                 </a>
                                                             </div>
-                                                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Hospital Phone No</p>
-                                                                <a href={`tel:${hospital.contactNumber}`} className="flex items-center gap-3 text-lg font-black text-blue-600 hover:underline">
-                                                                    <Phone className="w-5 h-5" /> {hospital.contactNumber || "N/A"}
+                                                            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3">
+                                                                <p className="text-xs font-medium text-slate-500">Hospital phone no</p>
+                                                                <a href={`tel:${hospital.contactNumber}`} className="flex items-center gap-2 text-sm font-semibold text-blue-600 hover:underline">
+                                                                    <Phone className="h-4 w-4 shrink-0" /> {hospital.contactNumber || "N/A"}
                                                                 </a>
                                                             </div>
-                                                            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-                                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Management</p>
-                                                                <p className="font-black text-slate-900 uppercase tracking-tighter text-lg">{hospital.management_type || "SELF"}</p>
+                                                            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3">
+                                                                <p className="text-xs font-medium text-slate-500">Management</p>
+                                                                <p className="text-sm font-semibold text-slate-900">{hospital.management_type || "SELF"}</p>
                                                             </div>
                                                         </div>
 
                                                         {/* Administrative Credentials Card */}
-                                                        <div className="p-6 bg-slate-900 text-white rounded-[2rem] border border-slate-800 shadow-xl relative overflow-hidden group">
-                                                            <div className="absolute -right-12 -top-12 w-32 h-32 rounded-full bg-blue-600/20 blur-2xl group-hover:scale-110 transition-transform duration-500" />
-                                                            <div className="flex items-center gap-2 text-blue-400 font-bold mb-4 uppercase tracking-widest text-[10px]">
-                                                                <Lock className="w-4 h-4" /> Administrative Access
+                                                        <div className="rounded-xl border border-slate-200 bg-white p-4">
+                                                            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
+                                                                <Lock className="h-4 w-4 text-slate-400" /> Administrative access
                                                             </div>
-                                                            <div className="space-y-4">
+                                                            <div className="space-y-3">
                                                                 <div>
-                                                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Hospital Email / Login ID</label>
-                                                                    <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl font-mono text-xs break-all mt-1">
+                                                                    <label className="text-xs font-medium text-slate-500">Hospital email / login ID</label>
+                                                                    <div className="mt-1 flex min-h-[42px] items-center justify-between break-all rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-xs text-slate-900">
                                                                         <span>{hospital.user?.email || "N/A"}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Access Password</label>
-                                                                    <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl font-mono text-xs tracking-wider mt-1">
-                                                                        <span>{showPasswords[hospital._id] ? (hospital.tempPassword || "Saved Securely (Encrypted)") : "••••••••"}</span>
-                                                                        <button 
+                                                                    <label className="text-xs font-medium text-slate-500">Access password</label>
+                                                                    <div className="mt-1 flex min-h-[42px] items-center justify-between rounded-lg border border-slate-200 bg-slate-50 py-0.5 pl-3 pr-0.5 font-mono text-xs tracking-wider text-slate-900">
+                                                                        <span className="break-all">{showPasswords[hospital._id] ? (hospital.tempPassword || "Saved Securely (Encrypted)") : "••••••••"}</span>
+                                                                        <button
                                                                             onClick={() => setShowPasswords(prev => ({ ...prev, [hospital._id]: !prev[hospital._id] }))}
-                                                                            className="ml-2 text-slate-400 hover:text-white transition-colors"
+                                                                            className="ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700"
                                                                             type="button"
+                                                                            aria-label={showPasswords[hospital._id] ? "Hide password" : "Show password"}
                                                                         >
-                                                                            {showPasswords[hospital._id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                                            {showPasswords[hospital._id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                                         </button>
                                                                     </div>
                                                                 </div>
@@ -299,53 +302,53 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
 
                                                         {/* Zoho Mail Button */}
                                                         {hospital.user?.email && (
-                                                            <a 
+                                                            <a
                                                                 href={`https://mail.zoho.com/zm/#mail/compose?to=${hospital.user.email}&subject=Regarding Hospital: ${hospital.name}&body=Hello ${hospital.name} Team,%0D%0A%0D%0AWe are contacting you regarding your hospital's profile on Pillora...`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="flex items-center justify-center gap-3 w-full py-4 bg-blue-600 text-white rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 mt-4 group"
+                                                                className="ui-btn-primary w-full"
                                                             >
-                                                                <Mail className="w-5 h-5 group-hover:scale-110 transition-transform" /> Contact via Zoho Mail
+                                                                <Mail className="h-4 w-4" /> Contact via Zoho Mail
                                                             </a>
                                                         )}
                                                     </div>
 
-                                                    <div className="space-y-8">
+                                                    <div className="space-y-4">
                                                         <div>
-                                                            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Facility Features</h5>
-                                                            <div className="flex flex-wrap gap-3">
+                                                            <h5 className="mb-2 text-sm font-semibold text-slate-900">Facility features</h5>
+                                                            <div className="flex flex-wrap gap-2">
                                                                 {hospital.isOpen24Hours && (
-                                                                    <div className="px-5 py-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-600/20 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                                                        <Clock className="w-4 h-4" /> 24/7 Operations
+                                                                    <div className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+                                                                        <Clock className="h-4 w-4" /> 24/7 operations
                                                                     </div>
                                                                 )}
                                                                 {hospital.isOnlinePaymentAvailable && (
-                                                                    <div className="px-5 py-3 bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-600/20 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                                                        <CreditCard className="w-4 h-4" /> Digital Pay
+                                                                    <div className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700">
+                                                                        <CreditCard className="h-4 w-4" /> Digital pay
                                                                     </div>
                                                                 )}
                                                                 {hospital.contactNumber && (
-                                                                    <div className="px-5 py-3 bg-blue-50 text-blue-700 rounded-2xl border border-blue-200 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                                                        <Phone className="w-4 h-4 text-blue-500" /> {hospital.contactNumber} (Primary)
+                                                                    <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700">
+                                                                        <Phone className="h-4 w-4 text-blue-600" /> {hospital.contactNumber} (primary)
                                                                     </div>
                                                                 )}
                                                                 {hospital.phoneNumbers?.map((ph: string, idx: number) => (
-                                                                    <div key={idx} className="px-5 py-3 bg-white text-slate-700 rounded-2xl border border-slate-200 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                                                        <Phone className="w-4 h-4 text-slate-400" /> {ph}
+                                                                    <div key={idx} className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700">
+                                                                        <Phone className="h-4 w-4 text-slate-400" /> {ph}
                                                                     </div>
                                                                 ))}
                                                             </div>
                                                         </div>
 
                                                         <div>
-                                                            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Location Mapping</h5>
-                                                            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-start gap-4">
-                                                                <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
-                                                                    <MapPin className="w-6 h-6" />
+                                                            <h5 className="mb-2 text-sm font-semibold text-slate-900">Location mapping</h5>
+                                                            <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4">
+                                                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                                                    <MapPin className="h-4 w-4" />
                                                                 </div>
-                                                                <div>
-                                                                    <p className="text-sm font-bold text-slate-900 leading-relaxed">{hospital.address}</p>
-                                                                    <p className="text-[10px] font-black text-blue-600 uppercase mt-2 tracking-widest">{hospital.city}</p>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-sm font-medium leading-relaxed text-slate-900">{hospital.address}</p>
+                                                                    <p className="mt-0.5 text-xs font-medium text-blue-600">{hospital.city}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -354,76 +357,76 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
 
                                                 {/* Doctor Directory */}
                                                 <div>
-                                                    <div className="flex items-center justify-between mb-6">
-                                                        <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Internal Medical Board</h5>
-                                                        <button 
+                                                    <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                                        <h5 className="text-sm font-semibold text-slate-900">Internal medical board</h5>
+                                                        <button
                                                             onClick={() => setShowAddDoctor(hospital._id)}
-                                                            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all"
+                                                            className="ui-btn-dark w-full sm:w-auto"
                                                         >
-                                                            <PlusCircle className="w-4 h-4" /> Recruit Doctor
+                                                            <PlusCircle className="h-4 w-4" /> Recruit doctor
                                                         </button>
                                                     </div>
 
                                                     {showAddDoctor === hospital._id && (
-                                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-4 sm:p-8 bg-white rounded-2xl sm:rounded-[2rem] border-2 border-blue-100 shadow-xl shadow-blue-900/5">
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
-                                                                <div className="space-y-2">
-                                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Doctor Name</label>
-                                                                    <input type="text" placeholder="Dr. Jane Smith" value={newDoctor.name} onChange={e => setNewDoctor({...newDoctor, name: e.target.value})} className="w-full p-3.5 sm:p-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl font-bold outline-none text-sm" />
+                                                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 rounded-xl border border-blue-200 bg-white p-4 sm:p-5">
+                                                            <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                                                                <div>
+                                                                    <label htmlFor="new-doctor-name" className="ui-label">Doctor name</label>
+                                                                    <input id="new-doctor-name" type="text" placeholder="Dr. Jane Smith" value={newDoctor.name} onChange={e => setNewDoctor({...newDoctor, name: e.target.value})} className="ui-input" />
                                                                 </div>
-                                                                <div className="space-y-2">
-                                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Specialization</label>
-                                                                    <input type="text" placeholder="Cardiologist" value={newDoctor.specialization} onChange={e => setNewDoctor({...newDoctor, specialization: e.target.value})} className="w-full p-3.5 sm:p-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl font-bold outline-none text-sm" />
+                                                                <div>
+                                                                    <label htmlFor="new-doctor-specialization" className="ui-label">Specialization</label>
+                                                                    <input id="new-doctor-specialization" type="text" placeholder="Cardiologist" value={newDoctor.specialization} onChange={e => setNewDoctor({...newDoctor, specialization: e.target.value})} className="ui-input" />
                                                                 </div>
-                                                                <div className="space-y-2">
-                                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Consultation Fee</label>
-                                                                    <input type="number" value={newDoctor.fee} onChange={e => setNewDoctor({...newDoctor, fee: Number(e.target.value)})} className="w-full p-3.5 sm:p-4 bg-slate-50 border-none rounded-xl sm:rounded-2xl font-bold outline-none text-sm" />
+                                                                <div>
+                                                                    <label htmlFor="new-doctor-fee" className="ui-label">Consultation fee</label>
+                                                                    <input id="new-doctor-fee" type="number" value={newDoctor.fee} onChange={e => setNewDoctor({...newDoctor, fee: Number(e.target.value)})} className="ui-input" />
                                                                 </div>
                                                             </div>
-                                                            <div className="flex flex-col sm:flex-row gap-3">
-                                                                <button onClick={() => handleAddDoctor(hospital._id)} className="flex-1 py-3.5 sm:py-4 bg-blue-600 text-white rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-100">Confirm Appointment</button>
-                                                                <button onClick={() => setShowAddDoctor(null)} className="px-6 sm:px-8 py-3.5 sm:py-4 bg-slate-100 text-slate-500 rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200">Cancel</button>
+                                                            <div className="flex flex-col gap-2 sm:flex-row-reverse sm:justify-start">
+                                                                <button onClick={() => handleAddDoctor(hospital._id)} className="ui-btn-primary w-full sm:w-auto">Confirm appointment</button>
+                                                                <button onClick={() => setShowAddDoctor(null)} className="ui-btn-secondary w-full sm:w-auto">Cancel</button>
                                                             </div>
                                                         </motion.div>
                                                     )}
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                                                         {docsLoading ? (
-                                                            <div className="col-span-full py-12 flex flex-col items-center justify-center">
-                                                                <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-2" />
-                                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Retrieving Board Members...</p>
+                                                            <div className="col-span-full flex flex-col items-center justify-center py-10">
+                                                                <Loader2 className="mb-2 h-6 w-6 animate-spin text-blue-600" />
+                                                                <p className="text-sm text-slate-500">Retrieving board members...</p>
                                                             </div>
                                                         ) : expandedDoctors && expandedDoctors.length > 0 ? (
                                                             expandedDoctors.map((doc: any, i: number) => (
-                                                                <div key={i} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm group/doc hover:border-blue-200 transition-all">
-                                                                    <div className="flex items-center gap-4 mb-4">
-                                                                        <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 group-hover/doc:bg-blue-600 group-hover/doc:text-white transition-all duration-300">
-                                                                            <Stethoscope className="w-6 h-6" />
+                                                                <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                                                            <Stethoscope className="h-5 w-5" />
                                                                         </div>
-                                                                        <div className="flex-1">
-                                                                            <p className="font-black text-slate-900 leading-none">{doc.name}</p>
-                                                                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">{doc.specialty || doc.specialization}</p>
+                                                                        <div className="min-w-0 flex-1">
+                                                                            <p className="truncate font-semibold leading-tight text-slate-900">{doc.name}</p>
+                                                                            <p className="mt-0.5 truncate text-sm text-slate-500">{doc.specialty || doc.specialization}</p>
                                                                         </div>
                                                                     </div>
-                                                                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-50">
+                                                                    <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
                                                                         <div className="flex flex-col">
-                                                                            <span className="text-xs font-black text-emerald-600">₹{doc.fee || hospital.consultationFee}</span>
+                                                                            <span className="text-sm font-semibold text-emerald-600">₹{doc.fee || hospital.consultationFee}</span>
                                                                             {hospital.management_type === 'PILLORA' && (
-                                                                                <span className="text-[8px] font-black text-blue-500 uppercase tracking-tighter">Pillora Managed</span>
+                                                                                <span className="text-xs font-medium text-blue-600">Pillora managed</span>
                                                                             )}
                                                                         </div>
-                                                                        <button 
+                                                                        <button
                                                                             onClick={() => setShowSlotGen({ ...doc, hospital: hospital._id })}
-                                                                            className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all"
+                                                                            className="ui-btn-soft ui-btn-sm min-h-[40px]"
                                                                         >
-                                                                            Manage Slots
+                                                                            Manage slots
                                                                         </button>
                                                                     </div>
                                                                 </div>
                                                             ))
                                                         ) : (
-                                                            <div className="col-span-full py-8 text-center bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
-                                                                <p className="text-slate-400 text-sm font-bold uppercase tracking-widest italic">No doctor data available</p>
+                                                            <div className="ui-empty col-span-full py-8">
+                                                                <p>No doctor data available</p>
                                                             </div>
                                                         )}
                                                     </div>
@@ -432,10 +435,10 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                 {/* Visual Assets */}
                                                 {hospital.images && hospital.images.length > 0 && (
                                                     <div>
-                                                        <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6">Facility Gallery</h5>
-                                                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                                        <h5 className="mb-3 text-sm font-semibold text-slate-900">Facility gallery</h5>
+                                                        <div className="grid grid-cols-3 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-6">
                                                             {hospital.images.map((img: string, i: number) => (
-                                                                <div key={i} className="aspect-square relative rounded-2xl overflow-hidden border border-slate-100 hover:scale-105 transition-transform duration-500 shadow-sm">
+                                                                <div key={i} className="relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-white">
                                                                     <Image src={img} alt={`${hospital.name} gallery ${i}`} fill className="object-cover" unoptimized />
                                                                 </div>
                                                             ))}
@@ -454,15 +457,19 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
 
             {/* Slot Gen Modal for Admin */}
             {showSlotGen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white w-full max-w-lg rounded-2xl sm:rounded-[2.5rem] p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-                        <button onClick={() => setShowSlotGen(null)} className="absolute top-5 right-5 sm:top-8 sm:right-8 text-slate-300 hover:text-slate-900"><XCircle className="w-6 h-6" /></button>
-                        <h3 className="text-xl sm:text-2xl font-black mb-6 sm:mb-8 pr-8">System Slot Generator</h3>
-                        <SlotGenTool 
-                            doctor={showSlotGen} 
-                            hospitalId={showSlotGen.hospital} 
-                            onClose={() => { setShowSlotGen(null); fetchHospitals(); }} 
+                <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-900/50 backdrop-blur-[2px] sm:items-center sm:p-4">
+                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} role="dialog" aria-modal="true" aria-label="System slot generator" className="ui-dialog relative sm:max-w-lg">
+                        <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                            <h3 className="text-lg font-semibold leading-tight text-slate-900">System slot generator</h3>
+                            <button onClick={() => setShowSlotGen(null)} className="-mr-2 rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700" aria-label="Close"><XCircle className="h-5 w-5" /></button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+                        <SlotGenTool
+                            doctor={showSlotGen}
+                            hospitalId={showSlotGen.hospital}
+                            onClose={() => { setShowSlotGen(null); fetchHospitals(); }}
                         />
+                        </div>
                     </motion.div>
                 </div>
             )}

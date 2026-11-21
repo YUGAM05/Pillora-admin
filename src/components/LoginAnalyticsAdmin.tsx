@@ -11,8 +11,9 @@ import {
     ShieldAlert, 
     Smartphone, 
     Laptop, 
-    Globe, 
-    Droplets 
+    Globe,
+    Droplets,
+    LoaderCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -123,101 +124,103 @@ export default function LoginAnalyticsAdmin() {
 
     if (loading && !stats) {
         return (
-            <div className="flex flex-col items-center justify-center py-32 space-y-4">
-                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em]">Accessing Authentication Logs</p>
+            <div className="ui-card flex flex-col items-center justify-center gap-3 py-20">
+                <LoaderCircle className="h-7 w-7 animate-spin text-blue-600" />
+                <p className="text-sm text-slate-500">Accessing authentication logs…</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-10 px-1 md:px-2">
+        <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
-                <div>
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-jakarta flex items-center gap-3 sm:gap-4 tracking-tight">
-                        <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" /> User Login Analytics
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="min-w-0">
+                    <h3 className="ui-title flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-blue-600" /> User login analytics
                     </h3>
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5">
-                        <p className="text-slate-500 font-medium text-xs sm:text-base italic">Security audits, live telemetry, and access activity logs</p>
-                        <span className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest border border-amber-200/50">
-                            <Globe className="w-3 h-3" /> Timezone: IST (+05:30)
+                    <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                        <p className="text-sm text-slate-500">Security audits and access activity logs</p>
+                        <span className="ui-badge border-slate-200 bg-slate-50 text-slate-600">
+                            <Globe className="h-3 w-3" /> Timezone: IST (+05:30)
                         </span>
                     </div>
                 </div>
-                
-                <div className="flex items-center gap-2 sm:gap-3">
-                    <button 
+
+                <div className="flex items-center gap-2">
+                    <button
                         onClick={handleManualRefresh}
-                        className={`p-3 sm:p-4 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all text-slate-500 hover:text-blue-600 ${refreshing ? 'animate-spin text-blue-600 bg-white shadow-xl' : ''}`}
-                        title="Force Refresh Data"
+                        className="ui-btn-secondary shrink-0 px-3"
+                        title="Force refresh data"
+                        aria-label="Refresh data"
                     >
-                        <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-blue-600' : ''}`} />
                     </button>
-                    <button 
+                    <button
                         onClick={handleExportCSV}
                         disabled={activities.length === 0}
-                        className="px-4 sm:px-6 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl sm:rounded-2xl text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] transition-all flex items-center gap-2 sm:gap-3 shadow-xl shadow-blue-600/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                        className="ui-btn-primary flex-1 md:flex-none"
                     >
-                        <Download className="w-4 h-4" /> Export CSV
+                        <Download className="h-4 w-4" /> Export CSV
                     </button>
                 </div>
             </div>
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
-                <MiniStatCard 
-                    label="Total Registered Users" 
-                    value={stats?.totalUsers || 0} 
-                    icon={<Users className="w-5 h-5 sm:w-6 sm:h-6" />} 
-                    color="blue" 
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                <MiniStatCard
+                    label="Total registered users"
+                    value={stats?.totalUsers || 0}
+                    icon={<Users className="h-5 w-5" />}
+                    color="blue"
                 />
-                <MiniStatCard 
-                    label="Total Logins Today" 
-                    value={stats?.loginsToday || 0} 
-                    icon={<Activity className="w-5 h-5 sm:w-6 sm:h-6" />} 
-                    color="emerald" 
-                    pulse
+                <MiniStatCard
+                    label="Total logins today"
+                    value={stats?.loginsToday || 0}
+                    icon={<Activity className="h-5 w-5" />}
+                    color="emerald"
                 />
-                <MiniStatCard 
-                    label="Total Logins This Week" 
-                    value={stats?.loginsThisWeek || 0} 
-                    icon={<Calendar className="w-5 h-5 sm:w-6 sm:h-6" />} 
-                    color="indigo" 
+                <MiniStatCard
+                    label="Total logins this week"
+                    value={stats?.loginsThisWeek || 0}
+                    icon={<Calendar className="h-5 w-5" />}
+                    color="indigo"
                 />
             </div>
 
             {/* Filters and Table Container */}
-            <div className="bg-white border border-slate-100 p-4 sm:p-8 md:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-xl shadow-blue-900/5">
+            <div className="ui-card overflow-hidden">
                 {/* Search & Filters */}
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6 mb-6 sm:mb-10">
-                    <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                        <h4 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta whitespace-nowrap">Session Telemetry</h4>
-                        <span className="px-3 py-1 bg-slate-50 border border-slate-100 text-slate-400 rounded-full text-[10px] font-black uppercase tracking-wider">
-                            {filteredActivities.length} Matches
+                <div className="flex flex-col gap-4 border-b border-slate-100 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-center gap-3">
+                        <h4 className="ui-title whitespace-nowrap">Session telemetry</h4>
+                        <span className="ui-badge border-slate-200 bg-slate-50 text-slate-600">
+                            {filteredActivities.length} matches
                         </span>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full lg:w-auto">
+                    <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-auto">
                         {/* Search Input */}
-                        <div className="flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 bg-slate-50/80 rounded-xl sm:rounded-2xl border border-slate-100 focus-within:bg-white focus-within:border-blue-200 focus-within:shadow-xl focus-within:shadow-blue-900/5 transition-all w-full sm:w-80">
-                            <Search className="w-4 h-4 text-slate-400 shrink-0" />
-                            <input 
-                                type="text" 
-                                placeholder="Search by name, email, blood..." 
+                        <div className="relative w-full sm:w-80">
+                            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by name, email, blood..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-transparent border-none outline-none text-xs sm:text-sm font-semibold text-slate-900 placeholder:text-slate-400 w-full"
+                                aria-label="Search logins"
+                                className="ui-input pl-10"
                             />
                         </div>
 
                         {/* Role Dropdown */}
-                        <select 
+                        <select
                             value={selectedRole}
                             onChange={(e) => setSelectedRole(e.target.value)}
-                            className="px-4 sm:px-5 py-3 sm:py-4 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl text-xs font-bold text-slate-600 uppercase tracking-wider outline-none cursor-pointer focus:bg-white focus:border-blue-200 transition-all w-full sm:w-auto"
+                            aria-label="Filter by role"
+                            className="ui-input cursor-pointer sm:w-44"
                         >
-                            <option value="all">All Roles</option>
+                            <option value="all">All roles</option>
                             <option value="customer">Customer</option>
                             <option value="seller">Seller</option>
                             <option value="delivery">Delivery</option>
@@ -228,27 +231,27 @@ export default function LoginAnalyticsAdmin() {
                 </div>
 
                 {/* Login History Table */}
-                <div className="overflow-x-auto rounded-xl sm:rounded-[2rem] border border-slate-50">
-                    <table className="w-full text-left border-collapse min-w-[700px]">
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[700px] border-collapse text-left">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                <th className="py-5 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">User Profile</th>
-                                <th className="py-5 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Email ID</th>
-                                <th className="py-5 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Blood Group</th>
-                                <th className="py-5 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Login Timestamp (IST)</th>
-                                <th className="py-5 px-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Auditing Info</th>
+                            <tr className="border-b border-slate-100 bg-slate-50/80">
+                                <th className="ui-th pl-5 sm:pl-6">User profile</th>
+                                <th className="ui-th">Email ID</th>
+                                <th className="ui-th text-center">Blood group</th>
+                                <th className="ui-th">Login timestamp (IST)</th>
+                                <th className="ui-th pr-5 sm:pr-6">Auditing info</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-slate-100">
                             <AnimatePresence mode="popLayout">
                                 {filteredActivities.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="py-24 text-center">
-                                            <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <ShieldAlert className="w-8 h-8 text-slate-300" />
+                                        <td colSpan={5} className="p-4 sm:p-6">
+                                            <div className="ui-empty max-w-[calc(100vw-5rem)] sm:max-w-none">
+                                                <ShieldAlert className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                                                <h5 className="font-medium text-slate-700">No logins found</h5>
+                                                <p className="mt-1">Try adjusting search parameters or check connection.</p>
                                             </div>
-                                            <h5 className="font-bold text-slate-400 uppercase tracking-wider">No Logins Found</h5>
-                                            <p className="text-slate-400 text-sm mt-1">Try adjusting search parameters or check connection.</p>
                                         </td>
                                     </tr>
                                 ) : (
@@ -259,22 +262,22 @@ export default function LoginAnalyticsAdmin() {
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0 }}
                                             transition={{ duration: 0.2, delay: Math.min(idx * 0.02, 0.3) }}
-                                            className="hover:bg-blue-50/10 transition-colors"
+                                            className="transition-colors hover:bg-slate-50/60"
                                         >
                                             {/* User Profile */}
-                                            <td className="py-5 px-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-md">
+                                            <td className="ui-td pl-5 align-middle sm:pl-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-sm font-semibold text-white">
                                                         {act.name.charAt(0).toUpperCase()}
                                                     </div>
-                                                    <div>
-                                                        <p className="font-black text-slate-900 text-sm leading-tight">{act.name}</p>
-                                                        <span className={`inline-block px-2 py-0.5 mt-1 rounded text-[8px] font-black uppercase tracking-wider ${
-                                                            act.role === "admin" ? "bg-rose-50 text-rose-600 border border-rose-100" :
-                                                            act.role === "hospital" ? "bg-indigo-50 text-indigo-600 border border-indigo-100" :
-                                                            act.role === "seller" ? "bg-purple-50 text-purple-600 border border-purple-100" :
-                                                            act.role === "delivery" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
-                                                            "bg-blue-50 text-blue-600 border border-blue-100"
+                                                    <div className="min-w-0">
+                                                        <p className="text-sm font-semibold leading-tight text-slate-900">{act.name}</p>
+                                                        <span className={`ui-badge mt-1 capitalize ${
+                                                            act.role === "admin" ? "border-rose-200 bg-rose-50 text-rose-700" :
+                                                            act.role === "hospital" ? "border-indigo-200 bg-indigo-50 text-indigo-700" :
+                                                            act.role === "seller" ? "border-violet-200 bg-violet-50 text-violet-700" :
+                                                            act.role === "delivery" ? "border-emerald-200 bg-emerald-50 text-emerald-700" :
+                                                            "border-blue-200 bg-blue-50 text-blue-700"
                                                         }`}>
                                                             {act.role}
                                                         </span>
@@ -283,39 +286,39 @@ export default function LoginAnalyticsAdmin() {
                                             </td>
 
                                             {/* Email ID */}
-                                            <td className="py-5 px-6">
-                                                <a href={`mailto:${act.email}`} className="text-xs font-bold text-slate-600 hover:text-blue-600 hover:underline">
+                                            <td className="ui-td align-middle">
+                                                <a href={`mailto:${act.email}`} className="text-sm text-slate-600 hover:text-blue-600 hover:underline">
                                                     {act.email}
                                                 </a>
                                             </td>
 
                                             {/* Blood Group */}
-                                            <td className="py-5 px-6 text-center">
+                                            <td className="ui-td text-center align-middle">
                                                 {act.bloodGroup ? (
-                                                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-rose-50 text-rose-600 border border-rose-100 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm">
-                                                        <Droplets className="w-3.5 h-3.5 fill-rose-600 text-rose-600" /> {act.bloodGroup}
+                                                    <span className="ui-badge border-rose-200 bg-rose-50 text-rose-700">
+                                                        <Droplets className="h-3 w-3 fill-rose-600 text-rose-600" /> {act.bloodGroup}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                                                    <span className="text-xs text-slate-400">
                                                         N/A
                                                     </span>
                                                 )}
                                             </td>
 
                                             {/* Timestamp in IST */}
-                                            <td className="py-5 px-6">
-                                                <p className="text-xs font-bold text-slate-800 font-mono">
+                                            <td className="ui-td align-middle">
+                                                <p className="whitespace-nowrap text-sm tabular-nums text-slate-700">
                                                     {formatIST(act.timestamp)}
                                                 </p>
                                             </td>
 
                                             {/* Auditing Info */}
-                                            <td className="py-5 px-6">
+                                            <td className="ui-td pr-5 align-middle sm:pr-6">
                                                 <div className="flex flex-col gap-0.5">
-                                                    <p className="text-[10px] font-bold text-slate-500 font-mono flex items-center gap-1.5">
+                                                    <p className="flex items-center gap-1.5 font-mono text-xs text-slate-600">
                                                         {act.ipAddress}
                                                     </p>
-                                                    <div className="flex items-center gap-1 text-[9px] text-slate-400 max-w-[200px] truncate" title={act.userAgent}>
+                                                    <div className="flex max-w-[220px] items-center gap-1 truncate text-xs text-slate-400" title={act.userAgent}>
                                                         {getDeviceIcon(act.userAgent)}
                                                         <span className="truncate">{act.userAgent}</span>
                                                     </div>
@@ -333,35 +336,22 @@ export default function LoginAnalyticsAdmin() {
     );
 }
 
-function MiniStatCard({ label, value, icon, color, pulse }: any) {
+function MiniStatCard({ label, value, icon, color }: any) {
     const colors: any = {
-        blue: 'bg-blue-50 text-blue-600 border-blue-100/50 shadow-blue-600/5',
-        emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100/50 shadow-emerald-600/5',
-        indigo: 'bg-indigo-50 text-indigo-600 border-indigo-100/50 shadow-indigo-600/5'
+        blue: 'bg-blue-50 text-blue-600',
+        emerald: 'bg-emerald-50 text-emerald-600',
+        indigo: 'bg-indigo-50 text-indigo-600'
     };
 
     return (
-        <motion.div 
-            whileHover={{ y: -4 }}
-            transition={{ duration: 0.3 }}
-            className="p-8 rounded-[2.5rem] bg-white border border-slate-100 shadow-xl hover:shadow-2xl hover:shadow-blue-900/10 transition-all group relative overflow-hidden flex flex-col justify-between min-h-[160px]"
-        >
-            <div className="flex items-center justify-between mb-6 relative z-10">
-                <div className={`p-4 rounded-2xl ${colors[color]} border group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-sm`}>
+        <div className="ui-card p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+                <p className="text-[13px] font-medium leading-snug text-slate-500">{label}</p>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${colors[color]}`}>
                     {icon}
-                </div>
-                {pulse && (
-                    <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100/50">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[9px] font-extrabold uppercase tracking-widest">Live</span>
-                    </div>
-                )}
+                </span>
             </div>
-            
-            <div className="relative z-10">
-                <h5 className="text-4xl font-extrabold text-slate-900 mb-1 tracking-tight font-jakarta">{value}</h5>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
-            </div>
-        </motion.div>
+            <h5 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{value}</h5>
+        </div>
     );
 }

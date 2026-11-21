@@ -74,58 +74,59 @@ export default function AdminUsageModal({ hospital, onClose }: { hospital: { _id
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/50 p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Usage, packs and AI number">
-            <div className="w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white p-5 sm:p-6 shadow-2xl">
-                <div className="flex items-start justify-between gap-3">
-                    <div>
-                        <h3 className="text-lg font-black text-slate-900">{usage?.hospital?.name || hospital.name || "Hospital"}</h3>
-                        <p className="text-sm text-slate-500">
+        <div className="ui-overlay" role="dialog" aria-modal="true" aria-label="Usage, packs and AI number">
+            <div className="ui-dialog sm:max-w-2xl">
+                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                    <div className="min-w-0">
+                        <h3 className="truncate text-lg font-semibold leading-tight text-slate-900">{usage?.hospital?.name || hospital.name || "Hospital"}</h3>
+                        <p className="mt-0.5 text-sm text-slate-500">
                             {usage ? `${usage.plan.label} plan · ₹${fmt(usage.plan.priceMonthly)}/month · ${usage.plan.doctorsUsed}/${usage.plan.maxDoctors ?? "∞"} doctors · ${monthIN(usage.month)}` : "Loading…"}
                         </p>
                     </div>
-                    <button onClick={onClose} className="rounded-xl p-2 hover:bg-slate-100" aria-label="Close">
-                        <X className="w-5 h-5" />
+                    <button onClick={onClose} className="-mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700" aria-label="Close">
+                        <X className="h-5 w-5" />
                     </button>
                 </div>
 
-                {error && <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-                {msg && <p className="mt-4 rounded-xl bg-blue-50 p-3 text-sm font-semibold text-blue-800">{msg}</p>}
-                {!usage && !error && <p className="mt-6 flex items-center gap-2 text-slate-500"><Loader2 className="w-4 h-4 animate-spin" /> Loading…</p>}
+                <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5 sm:px-6">
+                {error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm font-medium text-rose-700">{error}</p>}
+                {msg && <p role="status" className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm font-medium text-blue-800">{msg}</p>}
+                {!usage && !error && <p className="flex items-center gap-2 py-6 text-sm text-slate-500"><Loader2 className="h-4 w-4 animate-spin" /> Loading…</p>}
 
                 {usage && (
                     <>
                         {/* This month */}
-                        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="rounded-2xl border border-slate-100 p-4">
-                                <p className="flex items-center gap-1.5 text-xs font-bold text-slate-500"><MessageCircle className="w-4 h-4 text-green-600" /> WhatsApp this month</p>
-                                <p className="mt-1 text-xl font-black">{fmt(usage.whatsapp.planUsed)} <span className="text-sm text-slate-400">/ {fmt(usage.whatsapp.planLimit)}</span></p>
-                                <p className="text-xs text-slate-500">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <div className="rounded-xl border border-slate-200 p-4">
+                                <p className="flex items-center gap-2.5 text-[13px] font-medium text-slate-500"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"><MessageCircle className="h-4 w-4" /></span> WhatsApp this month</p>
+                                <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{fmt(usage.whatsapp.planUsed)} <span className="text-base font-medium text-slate-400">/ {fmt(usage.whatsapp.planLimit)}</span></p>
+                                <p className="mt-2 text-xs leading-relaxed text-slate-600">
                                     Packs left {fmt(usage.whatsapp.packRemaining)} · grace {fmt(usage.whatsapp.graceUsed)} · not sent {fmt(usage.whatsapp.skipped)}
                                 </p>
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs leading-relaxed text-slate-500">
                                     30 days: {fmt((usage.whatsapp.delivery30d.delivered ?? 0) + (usage.whatsapp.delivery30d.read ?? 0))} delivered, {fmt((usage.whatsapp.delivery30d.failed ?? 0) + (usage.whatsapp.delivery30d.send_error ?? 0))} failed
                                 </p>
                             </div>
-                            <div className="rounded-2xl border border-slate-100 p-4">
-                                <p className="flex items-center gap-1.5 text-xs font-bold text-slate-500"><PhoneCall className="w-4 h-4 text-violet-600" /> AI minutes this month</p>
-                                <p className="mt-1 text-xl font-black">{fmt(usage.ai.planUsedMinutes)} <span className="text-sm text-slate-400">/ {fmt(usage.ai.planMinutes)} min</span></p>
-                                <p className="text-xs text-slate-500">
+                            <div className="rounded-xl border border-slate-200 p-4">
+                                <p className="flex items-center gap-2.5 text-[13px] font-medium text-slate-500"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-600"><PhoneCall className="h-4 w-4" /></span> AI minutes this month</p>
+                                <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{fmt(usage.ai.planUsedMinutes)} <span className="text-base font-medium text-slate-400">/ {fmt(usage.ai.planMinutes)} min</span></p>
+                                <p className="mt-2 text-xs leading-relaxed text-slate-600">
                                     {fmt(usage.ai.calls)} calls · packs left {fmt(usage.ai.packRemainingMinutes)} min · over {fmt(usage.ai.overageMinutes)} min
                                 </p>
                             </div>
                         </div>
 
                         {/* Packs */}
-                        <div className="mt-5 rounded-2xl border border-slate-100 p-4">
-                            <p className="flex items-center gap-1.5 text-sm font-black text-slate-900"><Package className="w-4 h-4" /> Add-on packs</p>
+                        <div className="rounded-xl border border-slate-200 p-4">
+                            <p className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Package className="h-4 w-4 text-slate-400" /> Add-on packs</p>
                             {usage.packs.length === 0 ? (
                                 <p className="mt-2 text-sm text-slate-500">None yet.</p>
                             ) : (
-                                <ul className="mt-2 divide-y divide-slate-50 text-sm">
+                                <ul className="mt-2 divide-y divide-slate-100 text-sm">
                                     {usage.packs.map((p: any) => (
-                                        <li key={p.id} className="flex flex-col sm:flex-row sm:justify-between gap-0.5 py-2">
-                                            <span className="font-semibold">{p.label} <span className="text-xs font-normal text-slate-400">({p.source}{p.status === "pending" ? ", payment pending" : ""})</span></span>
-                                            <span className="text-slate-600">
+                                        <li key={p.id} className="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                                            <span className="font-medium text-slate-800">{p.label} <span className="text-xs font-normal text-slate-400">({p.source}{p.status === "pending" ? ", payment pending" : ""})</span></span>
+                                            <span className={p.status === "pending" ? "text-amber-700" : "text-slate-500"}>
                                                 {p.status === "pending" ? "not paid yet" : `${fmt(p.remaining)}${p.kind === "ai_minutes" ? " min" : ""} left${p.expiresAt ? ` · until ${dateIN(p.expiresAt)}` : ""}`}
                                             </span>
                                         </li>
@@ -133,31 +134,31 @@ export default function AdminUsageModal({ hospital, onClose }: { hospital: { _id
                                 </ul>
                             )}
 
-                            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <select value={packCode} onChange={(e) => setPackCode(e.target.value)} className="sm:col-span-3 rounded-xl border border-slate-200 p-2.5 text-sm">
+                            <div className="mt-4 grid grid-cols-1 gap-2 border-t border-slate-100 pt-4 sm:grid-cols-3">
+                                <select value={packCode} onChange={(e) => setPackCode(e.target.value)} aria-label="Pack to add" className="ui-input sm:col-span-3">
                                     {usage.catalog.map((c: any) => (
                                         <option key={c.code} value={c.code}>{c.label} (₹{fmt(c.price)} + GST)</option>
                                     ))}
                                 </select>
-                                <input value={pricePaid} onChange={(e) => setPricePaid(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Amount paid ₹ (0 = free)" className="rounded-xl border border-slate-200 p-2.5 text-sm" />
-                                <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note (e.g. UPI ref)" className="rounded-xl border border-slate-200 p-2.5 text-sm" />
-                                <button onClick={grant} disabled={busy} className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50">
+                                <input value={pricePaid} onChange={(e) => setPricePaid(e.target.value.replace(/[^\d]/g, ""))} inputMode="numeric" placeholder="Amount paid ₹ (0 = free)" aria-label="Amount paid in rupees (0 = free)" className="ui-input" />
+                                <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note (e.g. UPI ref)" aria-label="Note" className="ui-input" />
+                                <button onClick={grant} disabled={busy} className="ui-btn-primary min-h-[44px]">
                                     Add pack
                                 </button>
                             </div>
                         </div>
 
                         {/* AI receptionist number */}
-                        <div className="mt-5 rounded-2xl border border-slate-100 p-4">
-                            <p className="flex items-center gap-1.5 text-sm font-black text-slate-900"><Phone className="w-4 h-4" /> AI receptionist number</p>
+                        <div className="rounded-xl border border-slate-200 p-4">
+                            <p className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Phone className="h-4 w-4 text-slate-400" /> AI receptionist number</p>
                             {usage.voiceNumbers?.length ? (
-                                <ul className="mt-2 space-y-2 text-sm">
+                                <ul className="mt-3 space-y-2 text-sm">
                                     {usage.voiceNumbers.map((v: any) => (
-                                        <li key={v.number} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                            <span className="font-mono font-semibold">+{v.number} <span className={`ml-1 text-xs font-sans ${v.enabled ? "text-green-700" : "text-amber-700"}`}>{v.enabled ? "live" : "paused"}</span></span>
+                                        <li key={v.number} className="flex flex-col gap-2 rounded-lg bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+                                            <span className="font-mono font-semibold text-slate-900">+{v.number} <span className={`ui-badge ml-1 font-sans ${v.enabled ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700"}`}>{v.enabled ? "Live" : "Paused"}</span></span>
                                             <span className="flex gap-2">
-                                                <button onClick={() => saveNumber(v.number, { enabled: !v.enabled })} disabled={busy} className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold hover:bg-slate-200">{v.enabled ? "Pause" : "Resume"}</button>
-                                                <button onClick={() => confirm(`Unlink +${v.number} from this hospital?`) && saveNumber(v.number, { unlink: true })} disabled={busy} className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100">Unlink</button>
+                                                <button onClick={() => saveNumber(v.number, { enabled: !v.enabled })} disabled={busy} className="ui-btn-secondary ui-btn-sm min-h-[40px] flex-1 sm:min-h-[32px] sm:flex-none">{v.enabled ? "Pause" : "Resume"}</button>
+                                                <button onClick={() => confirm(`Unlink +${v.number} from this hospital?`) && saveNumber(v.number, { unlink: true })} disabled={busy} className="ui-btn ui-btn-sm min-h-[40px] flex-1 border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 sm:min-h-[32px] sm:flex-none">Unlink</button>
                                             </span>
                                         </li>
                                     ))}
@@ -165,15 +166,16 @@ export default function AdminUsageModal({ hospital, onClose }: { hospital: { _id
                             ) : (
                                 <p className="mt-2 text-sm text-slate-500">No number linked. Buy one in Plivo, point it at the Pillora AI application, then link it here.</p>
                             )}
-                            <div className="mt-3 flex flex-col sm:flex-row gap-2">
-                                <input value={number} onChange={(e) => setNumber(e.target.value)} placeholder="+91 22 6985 7389" className="flex-1 rounded-xl border border-slate-200 p-2.5 text-sm" />
-                                <button onClick={() => saveNumber(number, { enabled: true })} disabled={busy || !number.trim()} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800 disabled:opacity-50">
+                            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                                <input value={number} onChange={(e) => setNumber(e.target.value)} placeholder="+91 22 6985 7389" aria-label="Phone number to link" className="ui-input sm:flex-1" />
+                                <button onClick={() => saveNumber(number, { enabled: true })} disabled={busy || !number.trim()} className="ui-btn-dark min-h-[44px] w-full shrink-0 sm:w-auto">
                                     Link number
                                 </button>
                             </div>
                         </div>
                     </>
                 )}
+                </div>
             </div>
         </div>
     );

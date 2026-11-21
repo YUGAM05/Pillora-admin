@@ -44,86 +44,90 @@ export default function SlotGenTool({ doctor, hospitalId, onClose }: SlotGenTool
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="bg-blue-50/50 p-4 rounded-2xl flex items-center gap-4 mb-2">
-                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
-                    <Activity className="w-6 h-6" />
+        <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50/70 p-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
+                    <Activity className="h-5 w-5" />
                 </div>
-                <div>
-                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none mb-1">Generating for</p>
-                    <p className="font-bold text-slate-900 leading-tight">Dr. {doctor.name}</p>
+                <div className="min-w-0">
+                    <p className="text-xs font-medium text-blue-700">Generating for</p>
+                    <p className="truncate font-semibold leading-tight text-slate-900">Dr. {doctor.name}</p>
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <Calendar className="w-3 h-3" /> Select Date
+            <div>
+                <label htmlFor="slotgen-date" className="ui-label flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5 text-slate-400" /> Select date
                 </label>
-                <input 
-                    required 
-                    type="date" 
-                    value={formData.date} 
+                <input
+                    id="slotgen-date"
+                    required
+                    type="date"
+                    value={formData.date}
                     min={new Date().toISOString().split('T')[0]}
-                    onChange={e => setFormData({...formData, date: e.target.value})} 
-                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-50 outline-none transition-all" 
+                    onChange={e => setFormData({...formData, date: e.target.value})}
+                    className="ui-input"
                 />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <Clock className="w-3 h-3" /> Start
+            <div className="grid grid-cols-2 gap-3">
+                <div>
+                    <label htmlFor="slotgen-start" className="ui-label flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" /> Start
                     </label>
-                    <input 
-                        required 
-                        type="time" 
-                        value={formData.startTime} 
-                        onChange={e => setFormData({...formData, startTime: e.target.value})} 
-                        className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-50 outline-none transition-all" 
+                    <input
+                        id="slotgen-start"
+                        required
+                        type="time"
+                        value={formData.startTime}
+                        onChange={e => setFormData({...formData, startTime: e.target.value})}
+                        className="ui-input"
                     />
                 </div>
-                <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <Clock className="w-3 h-3" /> End
+                <div>
+                    <label htmlFor="slotgen-end" className="ui-label flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" /> End
                     </label>
-                    <input 
-                        required 
-                        type="time" 
-                        value={formData.endTime} 
-                        onChange={e => setFormData({...formData, endTime: e.target.value})} 
-                        className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-50 outline-none transition-all" 
+                    <input
+                        id="slotgen-end"
+                        required
+                        type="time"
+                        value={formData.endTime}
+                        onChange={e => setFormData({...formData, endTime: e.target.value})}
+                        className="ui-input"
                     />
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Consultation Duration</label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            <div>
+                <label className="ui-label">Consultation duration</label>
+                <div className="grid grid-cols-4 gap-2" role="group" aria-label="Consultation duration">
                     {[5, 10, 15, 20, 30, 45, 60].map((mins) => (
                         <button
                             key={mins}
                             type="button"
                             onClick={() => setFormData({...formData, duration: mins.toString()})}
-                            className={`py-3 rounded-xl text-xs font-black transition-all border ${
+                            aria-pressed={formData.duration === mins.toString()}
+                            className={`flex min-h-[44px] items-center justify-center rounded-xl border text-sm font-semibold transition-colors ${
                                 formData.duration === mins.toString()
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200'
-                                : 'bg-white text-slate-400 border-slate-100 hover:border-blue-200 hover:text-blue-600'
+                                ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                                : 'border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-700'
                             }`}
                         >
-                            {mins} Min
+                            {mins} min
                         </button>
                     ))}
                 </div>
             </div>
 
-            <button 
-                disabled={loading} 
-                className="w-full py-5 bg-slate-900 text-white font-black rounded-[2rem] shadow-2xl shadow-slate-200 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+            <button
+                disabled={loading}
+                className="ui-btn-dark min-h-[48px] w-full"
             >
                 {loading ? (
-                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full" />
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="h-5 w-5 rounded-full border-2 border-white/20 border-t-white" />
                 ) : (
-                    <>Deploy Smart Slots</>
+                    <>Deploy smart slots</>
                 )}
             </button>
         </form>

@@ -5,35 +5,35 @@ import { getToken, clearAuth } from "@/lib/tokenStorage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus_Jakarta_Sans, Inter } from "next/font/google";
-import { 
-    Users, 
-    Heart, 
-    Package, 
-    Activity, 
-    Lock, 
-    Droplets, 
-    Shield, 
-    ChevronRight, 
-    BarChart3, 
-    CheckCircle2, 
-    XCircle, 
-    Building2, 
+import {
+    Users,
+    Heart,
+    Package,
+    Activity,
+    Lock,
+    Droplets,
+    Shield,
+    ChevronRight,
+    BarChart3,
+    CheckCircle2,
+    XCircle,
+    Building2,
     Plus,
     Handshake,
-    LayoutDashboard,
     LogOut,
     Menu,
     X,
-    Search,
     Bell,
-    ArrowUpRight,
     TrendingUp,
-    Settings,
     FileText,
     MessageSquare,
     DollarSign,
-    CreditCard
+    CreditCard,
+    PanelLeftClose,
+    PanelLeftOpen,
+    TriangleAlert,
+    LoaderCircle,
+    ArrowUpRight,
 } from "lucide-react";
 import BloodBankAdmin from "@/components/BloodBankAdmin";
 import AddHospitalForm from "@/components/AddHospitalForm";
@@ -48,34 +48,17 @@ import HealthHubAdmin from "@/components/HealthHubAdmin";
 import RevenueAdmin from "@/components/RevenueAdmin";
 import FinancialManagementAdmin from "@/components/FinancialManagementAdmin";
 
-// Premium Font Configuration
-const jakarta = Plus_Jakarta_Sans({ 
-    subsets: ["latin"],
-    weight: ['400', '500', '600', '700', '800'],
-    variable: '--font-jakarta',
-});
-
-const inter = Inter({ 
-    subsets: ["latin"],
-    variable: '--font-inter',
-});
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.05
-        }
-    }
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] } }
-};
-
 type TabId = 'overview' | 'analytics' | 'login-analytics' | 'approvals' | 'bloodbank' | 'hospitals' | 'subscriptions' | 'partners' | 'blogs' | 'tickets' | 'health-hub' | 'revenue';
+
+type IconType = React.ComponentType<{ className?: string }>;
+
+type NavItem = {
+    id: TabId;
+    label: string;
+    description: string;
+    icon: IconType;
+    badge?: number;
+};
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -138,7 +121,7 @@ export default function AdminDashboard() {
             const { socket } = await import("@/lib/socket");
             socketInstance = socket;
             socket.connect();
-            
+
             socket.on("platform_activity", (newActivity: any) => {
                 setActivities(prev => [newActivity, ...prev].slice(0, 20));
                 setStats((prev: any) => {
@@ -202,131 +185,232 @@ export default function AdminDashboard() {
         }
     };
 
+    const selectTab = (id: TabId) => {
+        setActiveTab(id);
+        setIsMobileMenuOpen(false);
+        window.scrollTo({ top: 0 });
+    };
+
+    const handleLogout = () => {
+        if (confirm("Log out of the admin panel?")) {
+            clearAuth();
+            window.location.href = '/login';
+        }
+    };
+
     if (loading) {
         return (
-            <div className={`min-h-screen bg-white flex flex-col items-center justify-center relative overflow-hidden ${jakarta.variable} font-sans`}>
-                <div className="absolute w-[600px] h-[600px] bg-blue-50/50 rounded-full blur-[120px] animate-pulse" />
-                <motion.div 
-                    animate={{ rotate: 360 }} 
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-12 h-12 border-[3px] border-blue-50 border-t-blue-600 rounded-full relative z-10"
-                />
-                <p className="mt-8 font-semibold text-slate-400 tracking-[0.3em] uppercase text-[9px] relative z-10">Secure Boot</p>
+            <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-slate-50 font-sans">
+                <LoaderCircle className="h-7 w-7 animate-spin text-blue-600" />
+                <p className="text-sm text-slate-500">Loading admin panel…</p>
             </div>
-        )
+        );
     }
 
-    const navigation = [
-        { id: 'overview', label: 'Overview', icon: BarChart3, color: 'text-blue-600' },
-        { id: 'analytics', label: 'Web Analytics', icon: Activity, color: 'text-blue-600' },
-        { id: 'login-analytics', label: 'Login Analytics', icon: Users, color: 'text-blue-600' },
-        { id: 'approvals', label: 'User Approvals', icon: Lock, color: 'text-amber-500', badge: pendingUsers.length },
-        { id: 'bloodbank', label: 'Blood Connect', icon: Droplets, color: 'text-rose-500' },
-        { id: 'hospitals', label: 'Hospitals', icon: Building2, color: 'text-indigo-600' },
-        { id: 'subscriptions', label: 'Subscriptions & Payments', icon: CreditCard, color: 'text-blue-600' },
-        { id: 'partners', label: 'Partnerships', icon: Handshake, color: 'text-emerald-600' },
-        { id: 'blogs', label: 'Blog Posts', icon: FileText, color: 'text-purple-600' },
-        { id: 'health-hub', label: 'Health Hub', icon: Heart, color: 'text-rose-500' },
-        { id: 'tickets', label: 'Support Tickets', icon: MessageSquare, color: 'text-blue-600' },
-        { id: 'revenue', label: 'Revenue & Settlements', icon: DollarSign, color: 'text-emerald-600' },
+    const pendingCount = pendingUsers.length;
+
+    const navGroups: { label: string; items: NavItem[] }[] = [
+        {
+            label: "Insights",
+            items: [
+                { id: 'overview', label: 'Overview', icon: BarChart3, description: "Key numbers and the latest activity on Pillora" },
+                { id: 'analytics', label: 'Web analytics', icon: Activity, description: "Website traffic and visitors" },
+                { id: 'login-analytics', label: 'Login analytics', icon: Users, description: "Recent sign-ins across Pillora" },
+            ],
+        },
+        {
+            label: "People",
+            items: [
+                { id: 'approvals', label: 'User approvals', icon: Lock, badge: pendingCount, description: "New accounts waiting for your review" },
+                { id: 'bloodbank', label: 'Blood Connect', icon: Droplets, description: "Blood requests, donors and donations" },
+            ],
+        },
+        {
+            label: "Hospitals",
+            items: [
+                { id: 'hospitals', label: 'Hospitals', icon: Building2, description: "Hospitals and clinics registered on Pillora" },
+                { id: 'subscriptions', label: 'Subscriptions & payments', icon: CreditCard, description: "Hospital plans, renewals and payments" },
+                { id: 'partners', label: 'Partnerships', icon: Handshake, description: "Partnership requests from hospitals and NGOs" },
+            ],
+        },
+        {
+            label: "Content & support",
+            items: [
+                { id: 'blogs', label: 'Blog posts', icon: FileText, description: "Articles on the Pillora blog" },
+                { id: 'health-hub', label: 'Health Hub', icon: Heart, description: "Health Hub content for patients" },
+                { id: 'tickets', label: 'Support tickets', icon: MessageSquare, description: "Support requests from hospitals and users" },
+            ],
+        },
+        {
+            label: "Finance",
+            items: [
+                { id: 'revenue', label: 'Revenue & settlements', icon: DollarSign, description: "Payouts, settlements, refunds and the transaction ledger" },
+            ],
+        },
+    ];
+    const navItems = navGroups.flatMap((group) => group.items);
+    const current = navItems.find((item) => item.id === activeTab) ?? navItems[0];
+
+    const shortcuts: { id: TabId; label: string; icon: IconType }[] = [
+        { id: 'hospitals', label: 'Hospitals', icon: Building2 },
+        { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
+        { id: 'tickets', label: 'Support tickets', icon: MessageSquare },
+        { id: 'revenue', label: 'Revenue', icon: DollarSign },
     ];
 
-    return (
-        <div className={`min-h-screen bg-[#FDFDFF] text-slate-900 ${jakarta.variable} ${inter.variable} font-sans selection:bg-blue-600/10 flex overflow-hidden`}>
-            {/* Desktop Sidebar (visible on lg and above) */}
-            <motion.aside 
-                initial={false}
-                animate={{ width: isSidebarOpen ? '320px' : '96px' }}
-                className="hidden lg:flex bg-white border-r border-slate-100 flex-col relative z-50 transition-all duration-500 shrink-0"
-            >
-                {/* Logo Section */}
-                <div className="h-28 flex items-center px-8 gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shrink-0 shadow-2xl shadow-blue-600/40">
-                        <Shield className="w-7 h-7 text-white" />
+    const brandMark = (
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm">
+            <Shield className="h-[18px] w-[18px]" />
+        </span>
+    );
+
+    const brandText = (
+        <div className="min-w-0 leading-tight">
+            <p className="text-[15px] font-semibold tracking-tight text-slate-900">Pillora Hub</p>
+            <p className="text-xs text-slate-500">Admin panel</p>
+        </div>
+    );
+
+    /** Menu used by the desktop sidebar (collapsible) and the phone drawer (roomier rows). */
+    const renderNav = (collapsed: boolean, roomy = false) => {
+        const row = `group relative flex w-full items-center gap-3 rounded-xl text-sm font-medium transition ${roomy ? "min-h-[44px] py-2.5" : "py-2"} ${collapsed ? "justify-center px-0" : "px-3"}`;
+        return (
+            <nav aria-label="Admin sections" className="space-y-5">
+                {navGroups.map((group) => (
+                    <div key={group.label}>
+                        {collapsed ? (
+                            <div className="mx-2 mb-2 border-t border-slate-100" aria-hidden="true" />
+                        ) : (
+                            <p className="px-3 pb-1.5 text-xs font-medium text-slate-400">{group.label}</p>
+                        )}
+                        <div className="space-y-0.5">
+                            {group.items.map((item) => {
+                                const active = activeTab === item.id;
+                                const Icon = item.icon;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => selectTab(item.id)}
+                                        aria-current={active ? "page" : undefined}
+                                        title={collapsed ? item.label : undefined}
+                                        className={`${row} ${active ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
+                                    >
+                                        <Icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-white" : "text-slate-400 group-hover:text-slate-600"}`} />
+                                        {!collapsed && <span className="flex-1 truncate text-left">{item.label}</span>}
+                                        {!!item.badge && (collapsed ? (
+                                            <span className="absolute right-3 top-1.5 h-2 w-2 rounded-full bg-amber-400 ring-2 ring-white">
+                                                <span className="sr-only">{item.badge} waiting</span>
+                                            </span>
+                                        ) : (
+                                            <span className="min-w-[20px] rounded-full bg-amber-400 px-1.5 py-0.5 text-center text-[11px] font-bold leading-4 text-slate-950">
+                                                {item.badge}
+                                                <span className="sr-only"> waiting</span>
+                                            </span>
+                                        ))}
+                                    </button>
+                                );
+                            })}
+                            {group.label === "Insights" && (
+                                <Link
+                                    href="/analytics"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    title={collapsed ? "BI reporting" : undefined}
+                                    className={`${row} text-slate-600 hover:bg-slate-100 hover:text-slate-900`}
+                                >
+                                    <TrendingUp className="h-[18px] w-[18px] shrink-0 text-slate-400 group-hover:text-slate-600" />
+                                    {!collapsed && (
+                                        <>
+                                            <span className="flex-1 truncate text-left">BI reporting</span>
+                                            <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                                        </>
+                                    )}
+                                </Link>
+                            )}
+                        </div>
                     </div>
-                    {isSidebarOpen && (
-                        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="font-bold text-2xl tracking-tight text-slate-900 font-jakarta">
-                            Pillora <span className="text-blue-600 font-extrabold">Hub</span>
-                        </motion.div>
-                    )}
+                ))}
+            </nav>
+        );
+    };
+
+    const renderProfile = (collapsed: boolean) => (
+        <div className={`flex items-center gap-3 rounded-xl ${collapsed ? "flex-col gap-2" : "bg-slate-50 p-2.5"}`}>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-xs font-semibold text-white" aria-hidden="true">
+                SA
+            </span>
+            {!collapsed && (
+                <div className="min-w-0 flex-1 leading-tight">
+                    <p className="truncate text-sm font-semibold text-slate-900">Super Admin</p>
+                    <p className="truncate text-xs text-slate-500">Root access</p>
+                </div>
+            )}
+            <button
+                type="button"
+                onClick={handleLogout}
+                title="Log out"
+                aria-label="Log out"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+            >
+                <LogOut className="h-4 w-4" />
+            </button>
+        </div>
+    );
+
+    const activityStyle = (type?: string) => {
+        switch (type) {
+            case 'blood_request':
+                return { icon: Droplets, tile: "bg-rose-50 text-rose-600", badge: "border-rose-200 bg-rose-50 text-rose-700", label: "Blood request" };
+            case 'blood_donor':
+                return { icon: Heart, tile: "bg-emerald-50 text-emerald-600", badge: "border-emerald-200 bg-emerald-50 text-emerald-700", label: "Blood donor" };
+            case 'hospital':
+                return { icon: Building2, tile: "bg-blue-50 text-blue-600", badge: "border-blue-200 bg-blue-50 text-blue-700", label: "Hospital" };
+            case 'partner':
+                return { icon: Handshake, tile: "bg-violet-50 text-violet-600", badge: "border-violet-200 bg-violet-50 text-violet-700", label: "Partner" };
+            default: {
+                const text = (type || 'system').replace(/_/g, ' ');
+                return { icon: Package, tile: "bg-slate-100 text-slate-500", badge: "border-slate-200 bg-slate-50 text-slate-600", label: text.charAt(0).toUpperCase() + text.slice(1) };
+            }
+        }
+    };
+
+    const isHospitalFormOpen = showAddHospital || !!editingHospital;
+
+    return (
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-600/10">
+            {/* Sidebar (computers) */}
+            <aside
+                className={`fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-slate-200/80 bg-white transition-[width] duration-300 lg:flex ${
+                    isSidebarOpen ? "w-64" : "w-[76px]"
+                }`}
+            >
+                <div className={`flex h-16 shrink-0 items-center gap-3 border-b border-slate-100 ${isSidebarOpen ? "px-5" : "justify-center"}`}>
+                    {brandMark}
+                    {isSidebarOpen && brandText}
                 </div>
 
-                {/* Nav Items */}
-                <nav className="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto custom-scrollbar">
-                    {navigation.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveTab(item.id as TabId)}
-                            className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 relative group ${
-                                activeTab === item.id 
-                                ? 'bg-blue-600 text-white shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)]' 
-                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                            }`}
-                        >
-                            <item.icon className={`w-5 h-5 shrink-0 transition-transform duration-300 ${activeTab === item.id ? 'text-white' : item.color} group-hover:scale-110`} />
-                            {isSidebarOpen && (
-                                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="font-semibold text-[15px] tracking-tight">
-                                    {item.label}
-                                </motion.span>
-                            )}
-                            {item.badge && item.badge > 0 && (
-                                <span className={`absolute right-4 top-1/2 -translate-y-1/2 min-w-[22px] h-[22px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                                    activeTab === item.id ? 'bg-white text-blue-600' : 'bg-red-500 text-white'
-                                }`}>
-                                    {item.badge}
-                                </span>
-                            )}
-                        </button>
-                    ))}
+                <div className="no-scrollbar flex-1 overflow-y-auto px-3 py-5">
+                    {renderNav(!isSidebarOpen)}
+                </div>
 
-                    <div className="pt-4 mt-4 border-t border-slate-50">
-                        <Link
-                            href="/analytics"
-                            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 text-slate-500 hover:bg-blue-50 hover:text-blue-600 group"
-                        >
-                            <TrendingUp className="w-5 h-5 shrink-0 text-indigo-600 group-hover:scale-110 transition-transform" />
-                            {isSidebarOpen && (
-                                <span className="font-bold text-[15px] tracking-tight">BI Reporting</span>
-                            )}
-                        </Link>
-                    </div>
-                </nav>
-
-                {/* User Profile Area */}
-                <div className="p-6 border-t border-slate-50">
-                    <div className={`flex items-center gap-4 p-4 rounded-2xl bg-slate-50 mb-4 transition-all ${!isSidebarOpen && 'justify-center p-2'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold text-sm shrink-0">SA</div>
-                        {isSidebarOpen && (
-                            <div className="overflow-hidden">
-                                <p className="font-bold text-sm text-slate-900 truncate">Super Admin</p>
-                                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest truncate">Root Access</p>
-                            </div>
-                        )}
-                    </div>
-                    <button 
-                        onClick={() => {
-                            if(confirm("Terminate administrative session?")) {
-                                clearAuth();
-                                window.location.href = '/login';
-                            }
-                        }}
-                        className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all group font-bold text-xs uppercase tracking-[0.2em]"
+                <div className="space-y-1 border-t border-slate-100 p-3">
+                    {renderProfile(!isSidebarOpen)}
+                    <button
+                        type="button"
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        aria-label={isSidebarOpen ? "Collapse menu" : "Expand menu"}
+                        title={isSidebarOpen ? "Collapse menu" : "Expand menu"}
+                        className={`flex w-full items-center gap-3 rounded-xl py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 ${
+                            isSidebarOpen ? "px-3" : "justify-center px-0"
+                        }`}
                     >
-                        <LogOut className="w-4 h-4 shrink-0 group-hover:rotate-12 transition-transform" />
-                        {isSidebarOpen && <span>Logout</span>}
+                        {isSidebarOpen ? <PanelLeftClose className="h-[18px] w-[18px] shrink-0" /> : <PanelLeftOpen className="h-[18px] w-[18px] shrink-0" />}
+                        {isSidebarOpen && <span>Collapse menu</span>}
                     </button>
                 </div>
+            </aside>
 
-                {/* Toggle Button */}
-                <button 
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="absolute -right-4 top-32 w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 shadow-xl hover:text-blue-600 hover:border-blue-200 transition-all z-[60]"
-                >
-                    {isSidebarOpen ? <X className="w-3.5 h-3.5" /> : <Menu className="w-3.5 h-3.5" />}
-                </button>
-            </motion.aside>
-
-            {/* Mobile Navigation Drawer Backdrop & Drawer */}
+            {/* Menu drawer (phones and tablets) */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <>
@@ -335,279 +419,224 @@ export default function AdminDashboard() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[90] lg:hidden"
+                            className="fixed inset-0 z-[90] bg-slate-900/50 backdrop-blur-[2px] lg:hidden"
                         />
                         <motion.aside
                             initial={{ x: "-100%" }}
                             animate={{ x: 0 }}
                             exit={{ x: "-100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 220 }}
-                            className="fixed inset-y-0 left-0 w-[300px] max-w-[85vw] bg-white z-[95] lg:hidden flex flex-col shadow-2xl border-r border-slate-100"
+                            transition={{ type: "spring", damping: 32, stiffness: 320 }}
+                            aria-label="Admin menu"
+                            className="fixed inset-y-0 left-0 z-[95] flex w-[288px] max-w-[85vw] flex-col bg-white shadow-2xl lg:hidden"
                         >
-                            {/* Mobile Drawer Header */}
-                            <div className="h-20 flex items-center justify-between px-6 border-b border-slate-100">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30">
-                                        <Shield className="w-5 h-5 text-white" />
-                                    </div>
-                                    <div className="font-bold text-xl tracking-tight text-slate-900 font-jakarta">
-                                        Pillora <span className="text-blue-600 font-extrabold">Hub</span>
-                                    </div>
+                            <div className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-100 pl-4 pr-2">
+                                <div className="flex min-w-0 items-center gap-3">
+                                    {brandMark}
+                                    {brandText}
                                 </div>
                                 <button
+                                    type="button"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+                                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
                                     aria-label="Close menu"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="h-5 w-5" />
                                 </button>
                             </div>
-
-                            {/* Mobile Nav Items */}
-                            <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto custom-scrollbar">
-                                {navigation.map((item) => (
-                                    <button
-                                        key={item.id}
-                                        onClick={() => {
-                                            setActiveTab(item.id as TabId);
-                                            setIsMobileMenuOpen(false);
-                                        }}
-                                        className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all duration-200 relative group ${
-                                            activeTab === item.id 
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' 
-                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                                        }`}
-                                    >
-                                        <item.icon className={`w-5 h-5 shrink-0 ${activeTab === item.id ? 'text-white' : item.color}`} />
-                                        <span className="font-semibold text-sm tracking-tight text-left flex-1 truncate">
-                                            {item.label}
-                                        </span>
-                                        {item.badge && item.badge > 0 && (
-                                            <span className={`min-w-[20px] h-[20px] px-1.5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                                                activeTab === item.id ? 'bg-white text-blue-600' : 'bg-red-500 text-white'
-                                            }`}>
-                                                {item.badge}
-                                            </span>
-                                        )}
-                                    </button>
-                                ))}
-
-                                <div className="pt-3 mt-3 border-t border-slate-100">
-                                    <Link
-                                        href="/analytics"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all duration-200 text-slate-600 hover:bg-blue-50 hover:text-blue-600 group"
-                                    >
-                                        <TrendingUp className="w-5 h-5 shrink-0 text-indigo-600" />
-                                        <span className="font-bold text-sm tracking-tight">BI Reporting</span>
-                                    </Link>
-                                </div>
-                            </nav>
-
-                            {/* Mobile User Profile Area */}
-                            <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 mb-3 shadow-sm">
-                                    <div className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-white font-bold text-xs shrink-0">SA</div>
-                                    <div className="overflow-hidden">
-                                        <p className="font-bold text-xs text-slate-900 truncate">Super Admin</p>
-                                        <p className="text-[9px] text-slate-400 font-medium uppercase tracking-widest truncate">Root Access</p>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={() => {
-                                        if(confirm("Terminate administrative session?")) {
-                                            clearAuth();
-                                            window.location.href = '/login';
-                                        }
-                                    }}
-                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all font-bold text-xs uppercase tracking-wider border border-transparent hover:border-red-100"
-                                >
-                                    <LogOut className="w-4 h-4 shrink-0" />
-                                    <span>Logout</span>
-                                </button>
+                            <div className="flex-1 overflow-y-auto px-3 py-4">
+                                {renderNav(false, true)}
+                            </div>
+                            <div className="border-t border-slate-100 p-3">
+                                {renderProfile(false)}
                             </div>
                         </motion.aside>
                     </>
                 )}
             </AnimatePresence>
 
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col relative overflow-hidden bg-white min-w-0">
-                {/* Background Decoration */}
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-50/30 rounded-full blur-[140px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
-                
-                {/* Header */}
-                <header className="h-16 sm:h-20 lg:h-28 px-4 sm:px-6 lg:px-12 flex items-center justify-between relative z-10 border-b border-slate-100 lg:border-none">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                        {/* Hamburger button on mobile */}
+            <div className={`transition-[padding] duration-300 ${isSidebarOpen ? "lg:pl-64" : "lg:pl-[76px]"}`}>
+                {/* Top bar */}
+                <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur">
+                    <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:px-8">
                         <button
+                            type="button"
                             onClick={() => setIsMobileMenuOpen(true)}
-                            className="lg:hidden p-2.5 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-xl border border-slate-200 transition-colors"
-                            aria-label="Open Navigation"
+                            className="-ml-1.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100 lg:hidden"
+                            aria-label="Open menu"
                         >
-                            <Menu className="w-5 h-5" />
+                            <Menu className="h-5 w-5" />
                         </button>
-                        <div className="space-y-0.5 sm:space-y-1">
-                            <div className="hidden sm:flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.25em]">
-                                <LayoutDashboard className="w-3 h-3" /> System
-                                <ChevronRight className="w-3 h-3" /> {activeTab}
-                            </div>
-                            <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight font-jakarta truncate max-w-[180px] xs:max-w-[260px] sm:max-w-none">
-                                {navigation.find(n => n.id === activeTab)?.label}
-                            </h2>
+                        <div className="min-w-0 flex-1">
+                            <h1 className="truncate text-base font-semibold tracking-tight text-slate-900 sm:text-lg">{current.label}</h1>
+                            <p className="hidden truncate text-xs text-slate-500 sm:block">{current.description}</p>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 sm:gap-4 lg:gap-8">
-                        <div className="hidden xl:flex items-center gap-3 px-6 py-3 bg-slate-50/80 rounded-2xl border border-slate-100 focus-within:bg-white focus-within:border-blue-200 focus-within:shadow-xl focus-within:shadow-blue-900/5 transition-all">
-                            <Search className="w-4 h-4 text-slate-400" />
-                            <input type="text" placeholder="Search system resources..." className="bg-transparent border-none outline-none text-sm font-semibold text-slate-900 placeholder:text-slate-400 w-72" />
-                        </div>
-                        <div className="flex items-center gap-2 sm:gap-3">
-                            <button className="p-2.5 sm:p-3.5 lg:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all relative">
-                                <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
-                                <span className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 w-2 h-2 bg-blue-600 rounded-full ring-2 sm:ring-4 ring-white" />
-                            </button>
-                            <button className="p-2.5 sm:p-3.5 lg:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all">
-                                <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
-                            </button>
-                        </div>
+                        <button
+                            type="button"
+                            onClick={() => selectTab('approvals')}
+                            title={pendingCount > 0 ? `${pendingCount} waiting for approval` : "User approvals"}
+                            aria-label={pendingCount > 0 ? `${pendingCount} accounts waiting for approval` : "User approvals"}
+                            className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-800"
+                        >
+                            <Bell className="h-[18px] w-[18px]" />
+                            {pendingCount > 0 && (
+                                <span className="absolute -right-1.5 -top-1.5 min-w-[20px] rounded-full bg-amber-400 px-1 text-center text-[11px] font-bold leading-5 text-slate-950 ring-2 ring-white">
+                                    {pendingCount}
+                                </span>
+                            )}
+                        </button>
                     </div>
                 </header>
 
-                {/* Content Container */}
-                <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:pb-12 relative z-10 custom-scrollbar">
+                <main className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                    {error && (
+                        <div role="alert" className="mb-6 flex flex-col gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-start gap-3">
+                                <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+                                <div>
+                                    <p className="font-semibold text-rose-900">{error}</p>
+                                    <p className="mt-0.5 text-sm text-rose-800">Some numbers on this page could not be loaded.</p>
+                                </div>
+                            </div>
+                            {error.startsWith("Access") && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        clearAuth();
+                                        window.location.href = '/login';
+                                    }}
+                                    className="ui-btn-secondary shrink-0"
+                                >
+                                    Sign in again
+                                </button>
+                            )}
+                        </div>
+                    )}
+
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeTab}
-                            initial={{ opacity: 0, y: 10 }}
+                            initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.35, ease: "circOut" }}
-                            className="font-inter"
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
                         >
                             {activeTab === 'overview' && (
-                                <div className="space-y-8 sm:space-y-12">
-                                    {/* Stats Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                                <div className="space-y-6">
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                                         <StatCard
-                                            icon={<Users className="w-6 h-6 sm:w-7 sm:h-7" />}
-                                            label="Total Network Users"
-                                            value={stats?.counts?.users || 0}
-                                            trend="+12.4%"
-                                            color="blue"
+                                            label="Registered users"
+                                            value={stats?.counts?.users}
+                                            icon={<Users className="h-5 w-5" />}
+                                            tone="blue"
+                                            sub="Customer accounts on Pillora"
                                         />
                                         <StatCard
-                                            icon={<Heart className="w-6 h-6 sm:w-7 sm:h-7" />}
-                                            label="Verified Donors"
-                                            value={stats?.counts?.donors || 0}
-                                            trend="+3.2%"
-                                            color="rose"
+                                            label="Blood donors"
+                                            value={stats?.counts?.donors}
+                                            icon={<Heart className="h-5 w-5" />}
+                                            tone="rose"
+                                            sub="Registered with Blood Connect"
                                         />
                                         <StatCard
-                                            icon={<TrendingUp className="w-6 h-6 sm:w-7 sm:h-7" />}
-                                            label="System Activity"
-                                            value={stats?.counts?.activity || 0}
-                                            trend="+28.1%"
-                                            color="emerald"
+                                            label="Pending approvals"
+                                            value={pendingCount}
+                                            icon={<Lock className="h-5 w-5" />}
+                                            tone="amber"
+                                            sub={pendingCount > 0 ? "Waiting for your review" : "All caught up"}
                                         />
                                     </div>
 
-                                    {/* Detailed Insights */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
-                                        {/* Activity Log */}
-                                        <div className="lg:col-span-8 bg-white border border-slate-100 p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] shadow-xl shadow-blue-900/5">
-                                            <div className="flex items-center justify-between mb-6 sm:mb-10">
-                                                <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-jakarta flex items-center gap-2.5 sm:gap-3">
-                                                    <Activity className="w-5 h-5 text-blue-600" /> Platform Insights
-                                                </h3>
-                                                <button className="text-xs font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all flex items-center gap-2">
-                                                    <span>View Log</span> <ArrowUpRight className="w-4 h-4" />
-                                                </button>
+                                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                                        {/* Recent activity */}
+                                        <section className="ui-card lg:col-span-8" aria-labelledby="activity-heading">
+                                            <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+                                                <div className="min-w-0">
+                                                    <h2 id="activity-heading" className="ui-title">Recent activity</h2>
+                                                    <p className="ui-subtitle">The latest events across Pillora</p>
+                                                </div>
+                                                <span className="ui-badge shrink-0 border-slate-200 bg-slate-50 text-slate-600">
+                                                    {activities.length} {activities.length === 1 ? "event" : "events"}
+                                                </span>
                                             </div>
-                                            <div className="space-y-3 sm:space-y-4 max-h-[500px] sm:max-h-[600px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar">
-                                                {activities.length === 0 ? (
-                                                    <div className="py-16 sm:py-20 text-center">
-                                                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                                                            <Activity className="w-7 h-7 sm:w-8 sm:h-8 text-slate-200" />
-                                                        </div>
-                                                        <p className="text-slate-400 font-medium text-sm">No recent activities detected.</p>
+                                            {activities.length === 0 ? (
+                                                <div className="p-5 sm:p-6">
+                                                    <div className="ui-empty">
+                                                        <Activity className="mx-auto mb-2 h-7 w-7 text-slate-300" />
+                                                        No recent activity yet.
                                                     </div>
-                                                ) : (
-                                                    activities.map((log, i) => (
-                                                        <motion.div 
-                                                            key={log._id || i} 
-                                                            initial={{ opacity: 0, x: -10 }}
-                                                            animate={{ opacity: 1, x: 0 }}
-                                                            className="flex items-center justify-between p-4 sm:p-6 bg-[#FDFDFF] hover:bg-blue-50/30 rounded-2xl sm:rounded-3xl border border-slate-50 transition-all group gap-3"
-                                                        >
-                                                            <div className="flex items-center gap-3 sm:gap-6 min-w-0 flex-1">
-                                                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-sm border transition-all shrink-0 ${
-                                                                    log.type === 'blood_request' ? 'bg-rose-50 text-rose-500 border-rose-100' :
-                                                                    log.type === 'blood_donor' ? 'bg-emerald-50 text-emerald-500 border-emerald-100' :
-                                                                    log.type === 'hospital' ? 'bg-blue-50 text-blue-500 border-blue-100' :
-                                                                    log.type === 'partner' ? 'bg-purple-50 text-purple-500 border-purple-100' :
-                                                                    'bg-slate-50 text-slate-400 border-slate-100'
-                                                                } group-hover:scale-110`}>
-                                                                    {log.type === 'blood_request' ? <Droplets className="w-5 h-5" /> :
-                                                                     log.type === 'blood_donor' ? <Heart className="w-5 h-5" /> :
-                                                                     log.type === 'hospital' ? <Building2 className="w-5 h-5" /> :
-                                                                     log.type === 'partner' ? <Handshake className="w-5 h-5" /> :
-                                                                     <Package className="w-5 h-5" />}
-                                                                </div>
+                                                </div>
+                                            ) : (
+                                                <ul className="divide-y divide-slate-100 lg:max-h-[560px] lg:overflow-y-auto">
+                                                    {activities.map((log, i) => {
+                                                        const style = activityStyle(log.type);
+                                                        const Icon = style.icon;
+                                                        return (
+                                                            <li key={log._id || i} className="flex items-center gap-3 px-5 py-3.5 sm:gap-4 sm:px-6">
+                                                                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${style.tile}`}>
+                                                                    <Icon className="h-[18px] w-[18px]" />
+                                                                </span>
                                                                 <div className="min-w-0 flex-1">
-                                                                    <p className="font-bold text-slate-900 text-sm sm:text-base mb-0.5 truncate">{log.title}</p>
-                                                                    <p className="text-xs sm:text-sm text-slate-500 font-medium line-clamp-1">{log.description}</p>
+                                                                    <p className="truncate text-sm font-medium text-slate-900">{log.title}</p>
+                                                                    <p className="truncate text-sm text-slate-500">{log.description}</p>
                                                                 </div>
-                                                            </div>
-                                                            <div className="text-right shrink-0 hidden sm:block">
-                                                                <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${
-                                                                    log.type === 'blood_request' ? 'text-rose-600' :
-                                                                    log.type === 'blood_donor' ? 'text-emerald-600' :
-                                                                    log.type === 'hospital' ? 'text-blue-600' :
-                                                                    log.type === 'partner' ? 'text-purple-600' :
-                                                                    'text-slate-400'
-                                                                }`}>{log.type?.replace('_', ' ') || 'System'}</p>
-                                                                <p className="text-[11px] font-semibold text-slate-400">{formatTimeAgo(log.timestamp)}</p>
-                                                            </div>
-                                                        </motion.div>
-                                                    ))
-                                                )}
-                                            </div>
-                                        </div>
+                                                                <div className="shrink-0 text-right">
+                                                                    <span className={`ui-badge hidden sm:inline-flex ${style.badge}`}>{style.label}</span>
+                                                                    <p className="mt-1 text-xs text-slate-400">{formatTimeAgo(log.timestamp)}</p>
+                                                                </div>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            )}
+                                        </section>
 
-                                        {/* Notifications / Alerts */}
-                                        <div className="lg:col-span-4 bg-slate-900 p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-                                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-600/20 rounded-full blur-3xl" />
-                                            <h3 className="text-lg sm:text-xl font-bold text-white font-jakarta mb-6 sm:mb-8 flex items-center gap-3 relative z-10">
-                                                <Bell className="w-5 h-5 text-amber-500" /> Active Alerts
-                                            </h3>
-                                            <div className="space-y-4 sm:space-y-6 relative z-10">
-                                                <div className="p-4 sm:p-6 bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group/alert">
-                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-2 sm:mb-3">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Urgent Requirement
-                                                    </div>
-                                                    <p className="text-xs sm:text-sm font-semibold text-slate-200 leading-relaxed">NGO &quot;LifeSource&quot; is requesting priority access for blood donor API.</p>
-                                                    <div className="flex items-center justify-between mt-3 sm:mt-4">
-                                                        <span className="text-[10px] text-slate-500 font-bold uppercase">Today • 11:24 AM</span>
-                                                        <ChevronRight className="w-4 h-4 text-slate-600 group-hover/alert:translate-x-1 transition-transform" />
-                                                    </div>
+                                        {/* Needs attention + shortcuts */}
+                                        <section className="ui-card self-start p-5 sm:p-6 lg:col-span-4" aria-labelledby="attention-heading">
+                                            <h2 id="attention-heading" className="ui-title">Needs your attention</h2>
+                                            <p className="ui-subtitle">Things waiting on you right now</p>
+
+                                            {pendingCount > 0 ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => selectTab('approvals')}
+                                                    className="mt-4 flex w-full items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-left transition hover:bg-amber-100/70"
+                                                >
+                                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                                                        <Lock className="h-[18px] w-[18px]" />
+                                                    </span>
+                                                    <span className="min-w-0 flex-1">
+                                                        <span className="block text-sm font-semibold text-slate-900">
+                                                            {pendingCount} {pendingCount === 1 ? "account is" : "accounts are"} waiting for approval
+                                                        </span>
+                                                        <span className="block text-xs text-amber-800">Review them in User approvals</span>
+                                                    </span>
+                                                    <ChevronRight className="h-4 w-4 shrink-0 text-amber-700" />
+                                                </button>
+                                            ) : (
+                                                <div className="mt-4 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5">
+                                                    <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+                                                    <p className="text-sm font-medium text-emerald-800">All caught up. No accounts are waiting for approval.</p>
                                                 </div>
-                                                <div className="p-4 sm:p-6 bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 hover:bg-white/10 transition-all cursor-pointer group/alert">
-                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2 sm:mb-3">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400" /> System Update
-                                                    </div>
-                                                    <p className="text-xs sm:text-sm font-semibold text-slate-300 leading-relaxed">Automatic backup of PostgreSQL database completed successfully.</p>
-                                                    <div className="flex items-center justify-between mt-3 sm:mt-4">
-                                                        <span className="text-[10px] text-slate-500 font-bold uppercase">Today • 04:12 AM</span>
-                                                        <ChevronRight className="w-4 h-4 text-slate-600 group-hover/alert:translate-x-1 transition-transform" />
-                                                    </div>
-                                                </div>
+                                            )}
+
+                                            <p className="mt-6 text-xs font-medium text-slate-500">Shortcuts</p>
+                                            <div className="mt-2 grid grid-cols-2 gap-2">
+                                                {shortcuts.map((shortcut) => {
+                                                    const Icon = shortcut.icon;
+                                                    return (
+                                                        <button
+                                                            key={shortcut.id}
+                                                            type="button"
+                                                            onClick={() => selectTab(shortcut.id)}
+                                                            className="flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                                                        >
+                                                            <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+                                                            <span className="truncate">{shortcut.label}</span>
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
-                                            <button className="w-full mt-6 sm:mt-10 py-3.5 sm:py-4 bg-white/10 text-white font-bold rounded-xl sm:rounded-2xl text-[11px] uppercase tracking-[0.2em] hover:bg-white hover:text-slate-900 transition-all">
-                                                Clear Command Center
-                                            </button>
-                                        </div>
+                                        </section>
                                     </div>
                                 </div>
                             )}
@@ -621,63 +650,61 @@ export default function AdminDashboard() {
                             )}
 
                             {activeTab === 'approvals' && (
-                                <div className="space-y-6 sm:space-y-8">
-                                    <div className="bg-white border border-slate-100 p-5 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-xl shadow-blue-900/5">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-12">
-                                            <div>
-                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-jakarta flex items-center gap-3">
-                                                    <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" /> Identity Verification
-                                                </h3>
-                                                <p className="text-slate-500 font-medium text-xs sm:text-sm mt-1">Review credentials of new platform participants</p>
-                                            </div>
-                                            <div className="self-start sm:self-auto px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                                                {pendingUsers.length} Applications Pending
-                                            </div>
+                                <section className="ui-card" aria-labelledby="approvals-heading">
+                                    <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                                        <div className="min-w-0">
+                                            <h2 id="approvals-heading" className="ui-title">Identity verification</h2>
+                                            <p className="ui-subtitle">Review new accounts before they can use Pillora.</p>
                                         </div>
+                                        <span className={`ui-badge self-start sm:self-auto ${pendingCount > 0 ? "border-amber-200 bg-amber-50 text-amber-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
+                                            {pendingCount} pending
+                                        </span>
+                                    </div>
 
-                                        {pendingUsers.length === 0 ? (
-                                            <div className="text-center py-16 sm:py-24 bg-[#FDFDFF] rounded-2xl sm:rounded-[2.5rem] border-2 border-dashed border-slate-100">
-                                                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full shadow-xl flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                                                    <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-slate-200" />
-                                                </div>
-                                                <h4 className="text-lg sm:text-xl font-bold text-slate-400 uppercase tracking-widest">Verification Clear</h4>
-                                                <p className="text-slate-400 mt-2 font-medium text-xs sm:text-sm">No pending user applications to process.</p>
+                                    <div className="p-5 sm:p-6">
+                                        {pendingCount === 0 ? (
+                                            <div className="ui-empty">
+                                                <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-emerald-500" />
+                                                <p className="font-medium text-slate-700">All caught up</p>
+                                                <p className="mt-1">No accounts are waiting for approval.</p>
                                             </div>
                                         ) : (
-                                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+                                            <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
                                                 <AnimatePresence>
                                                     {pendingUsers.map((user: any) => (
-                                                        <motion.div 
+                                                        <motion.div
                                                             key={user._id}
                                                             initial={{ opacity: 0, scale: 0.98 }}
                                                             animate={{ opacity: 1, scale: 1 }}
-                                                            exit={{ opacity: 0, scale: 0.95 }}
-                                                            className="flex flex-col p-5 sm:p-8 bg-[#FDFDFF] hover:bg-white rounded-2xl sm:rounded-[2rem] border border-slate-50 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500"
+                                                            exit={{ opacity: 0, scale: 0.96 }}
+                                                            className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center"
                                                         >
-                                                            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6 sm:mb-10">
-                                                                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-slate-900 flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-xl shrink-0">
-                                                                    {user.name.charAt(0)}
-                                                                </div>
+                                                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                                                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-base font-semibold text-white">
+                                                                    {(user.name || "?").charAt(0)}
+                                                                </span>
                                                                 <div className="min-w-0">
-                                                                    <p className="font-bold text-slate-900 text-base sm:text-lg leading-tight truncate">{user.name}</p>
-                                                                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
-                                                                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-widest">{user.role}</span>
-                                                                        <span className="text-slate-400 text-xs font-semibold truncate">{user.email}</span>
+                                                                    <p className="truncate font-semibold text-slate-900">{user.name}</p>
+                                                                    <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2">
+                                                                        <span className="ui-badge border-blue-200 bg-blue-50 capitalize text-blue-700">{user.role}</span>
+                                                                        <span className="truncate text-sm text-slate-500">{user.email}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+                                                            <div className="flex gap-2 sm:shrink-0">
                                                                 <button
-                                                                    onClick={() => handleStatusUpdate(user._id, 'approved')}
-                                                                    className="flex-1 py-3.5 sm:py-4 bg-blue-600 text-white hover:bg-blue-700 rounded-xl sm:rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                                                                    type="button"
+                                                                    onClick={() => handleStatusUpdate(user._id, 'rejected')}
+                                                                    className="ui-btn-secondary flex-1 text-rose-600 hover:text-rose-700 sm:flex-none"
                                                                 >
-                                                                    Approve
+                                                                    <XCircle className="h-4 w-4" /> Reject
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => handleStatusUpdate(user._id, 'rejected')}
-                                                                    className="flex-1 py-3.5 sm:py-4 bg-white text-rose-500 hover:bg-rose-50 border border-rose-100 rounded-xl sm:rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] transition-all active:scale-95"
+                                                                    type="button"
+                                                                    onClick={() => handleStatusUpdate(user._id, 'approved')}
+                                                                    className="ui-btn-primary flex-1 sm:flex-none"
                                                                 >
-                                                                    Reject
+                                                                    <CheckCircle2 className="h-4 w-4" /> Approve
                                                                 </button>
                                                             </div>
                                                         </motion.div>
@@ -686,90 +713,76 @@ export default function AdminDashboard() {
                                             </div>
                                         )}
                                     </div>
-                                </div>
+                                </section>
                             )}
 
                             {activeTab === 'bloodbank' && (
-                                <div className="space-y-6 sm:space-y-8">
-                                    <div className="bg-white border border-slate-100 p-4 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-xl shadow-blue-900/5">
-                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-8 mb-6 sm:mb-12">
-                                            <div className="space-y-1">
-                                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-jakarta flex items-center gap-3">
-                                                    <Droplets className="w-6 h-6 sm:w-8 sm:h-8 text-rose-500" /> Blood Network Live
-                                                </h3>
-                                                <p className="text-slate-500 font-medium text-xs sm:text-sm italic">Emergency resource tracking and donor coordination console</p>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <div className="flex items-center gap-2.5 px-4 py-2 sm:px-5 sm:py-2.5 bg-emerald-50 text-emerald-600 rounded-xl sm:rounded-2xl border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
-                                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" /> Network Synchronized
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-[#FDFDFF] rounded-xl sm:rounded-2xl lg:rounded-[2.5rem] border border-slate-100 p-3 sm:p-6 lg:p-8">
-                                            <BloodBankAdmin />
-                                        </div>
-                                    </div>
-                                </div>
+                                <section className="ui-card p-3 sm:p-6">
+                                    <BloodBankAdmin />
+                                </section>
                             )}
 
                             {activeTab === 'hospitals' && (
-                                <div className="space-y-6 sm:space-y-12">
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-8">
-                                        <div className="space-y-1">
-                                            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight font-jakarta">Medical Directory</h2>
-                                            <p className="text-slate-500 font-medium text-sm sm:text-base lg:text-lg italic">Manage healthcare infrastructure and system registration</p>
+                                <div className="space-y-4">
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                        <div className="min-w-0">
+                                            <h2 className="ui-title">
+                                                {editingHospital ? "Edit hospital" : showAddHospital ? "Register a hospital" : "Medical directory"}
+                                            </h2>
+                                            <p className="ui-subtitle">
+                                                {isHospitalFormOpen
+                                                    ? "Fill in the details and save. Close the form to go back to the list."
+                                                    : "Manage hospitals and clinics registered on Pillora."}
+                                            </p>
                                         </div>
                                         <button
-                                             onClick={() => {
-                                                 if (showAddHospital || editingHospital) {
-                                                     setShowAddHospital(false);
-                                                     setEditingHospital(null);
-                                                 } else {
-                                                     setShowAddHospital(true);
-                                                 }
-                                             }}
-                                             className={`w-full sm:w-auto justify-center px-6 sm:px-10 py-3.5 sm:py-5 rounded-xl sm:rounded-2xl text-[11px] font-bold uppercase tracking-[0.25em] transition-all duration-500 flex items-center gap-3 shadow-2xl ${
-                                                 showAddHospital || editingHospital 
-                                                 ? 'bg-slate-900 text-white hover:bg-slate-800' 
-                                                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/40 hover:-translate-y-1 active:scale-95'
-                                             }`}
-                                         >
-                                             {showAddHospital || editingHospital ? <XCircle className="w-5 h-5 sm:w-6 sm:h-6" /> : <Plus className="w-5 h-5 sm:w-6 sm:h-6" />}
-                                             {showAddHospital || editingHospital ? 'Exit Form' : 'Register Hospital'}
-                                         </button>
+                                            type="button"
+                                            onClick={() => {
+                                                if (showAddHospital || editingHospital) {
+                                                    setShowAddHospital(false);
+                                                    setEditingHospital(null);
+                                                } else {
+                                                    setShowAddHospital(true);
+                                                }
+                                            }}
+                                            className={`${isHospitalFormOpen ? "ui-btn-secondary" : "ui-btn-primary"} w-full shrink-0 sm:w-auto`}
+                                        >
+                                            {isHospitalFormOpen ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                                            {isHospitalFormOpen ? "Close form" : "Register hospital"}
+                                        </button>
                                     </div>
 
                                     <AnimatePresence mode="wait">
-                                        {showAddHospital || editingHospital ? (
-                                             <motion.div
-                                                 key="hospital-form"
-                                                 initial={{ opacity: 0, scale: 0.99, y: 20 }}
-                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                 exit={{ opacity: 0, scale: 0.99, y: -20 }}
-                                                 className="bg-white rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-slate-100 overflow-hidden"
-                                             >
-                                                 <AddHospitalForm 
-                                                     hospitalToEdit={editingHospital}
-                                                     onClose={() => {
-                                                         setShowAddHospital(false);
-                                                         setEditingHospital(null);
-                                                         setRefreshTrigger(prev => prev + 1);
-                                                     }} 
-                                                 />
-                                             </motion.div>
-                                         ) : (
-                                             <motion.div 
-                                                 key="hospital-list"
-                                                 initial={{ opacity: 0 }}
-                                                 animate={{ opacity: 1 }}
-                                                 className="bg-white p-4 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3.5rem] shadow-xl shadow-blue-900/5 border border-slate-50"
-                                             >
-                                                 <HospitalListAdmin 
-                                                     key={refreshTrigger} 
-                                                     onEdit={(hospital) => setEditingHospital(hospital)}
-                                                 />
-                                             </motion.div>
-                                         )}
+                                        {isHospitalFormOpen ? (
+                                            <motion.div
+                                                key="hospital-form"
+                                                initial={{ opacity: 0, y: 12 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -12 }}
+                                                className="ui-card overflow-hidden"
+                                            >
+                                                <AddHospitalForm
+                                                    hospitalToEdit={editingHospital}
+                                                    onClose={() => {
+                                                        setShowAddHospital(false);
+                                                        setEditingHospital(null);
+                                                        setRefreshTrigger(prev => prev + 1);
+                                                    }}
+                                                />
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="hospital-list"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                className="ui-card p-4 sm:p-6"
+                                            >
+                                                <HospitalListAdmin
+                                                    key={refreshTrigger}
+                                                    onEdit={(hospital) => setEditingHospital(hospital)}
+                                                />
+                                            </motion.div>
+                                        )}
                                     </AnimatePresence>
                                 </div>
                             )}
@@ -781,19 +794,9 @@ export default function AdminDashboard() {
                             )}
 
                             {activeTab === 'partners' && (
-                                <div className="space-y-6 sm:space-y-10">
-                                    <div className="bg-white border border-slate-100 p-4 sm:p-8 lg:p-12 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] shadow-xl shadow-blue-900/5">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-12">
-                                            <div className="space-y-1">
-                                                <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-jakarta flex items-center gap-3 sm:gap-4 tracking-tight">
-                                                    <Handshake className="w-7 h-7 sm:w-10 sm:h-10 text-blue-600" /> Strategic Hub
-                                                </h3>
-                                                <p className="text-slate-500 font-medium text-sm sm:text-base lg:text-lg italic">Collaboration proposals from Healthcare Entities & NGOs</p>
-                                            </div>
-                                        </div>
-                                        <PartnerInquiriesAdmin />
-                                    </div>
-                                </div>
+                                <section className="ui-card p-4 sm:p-6">
+                                    <PartnerInquiriesAdmin />
+                                </section>
                             )}
 
                             {activeTab === 'blogs' && (
@@ -813,64 +816,28 @@ export default function AdminDashboard() {
                             )}
                         </motion.div>
                     </AnimatePresence>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 }
 
-function StatCard({ icon, label, value, trend, color }: any) {
-    const colors: any = {
-        blue: {
-            bg: 'bg-blue-50',
-            icon: 'text-blue-600',
-            border: 'border-blue-100/50',
-            indicator: 'bg-blue-500'
-        },
-        rose: {
-            bg: 'bg-rose-50',
-            icon: 'text-rose-600',
-            border: 'border-rose-100/50',
-            indicator: 'bg-rose-500'
-        },
-        emerald: {
-            bg: 'bg-emerald-50',
-            icon: 'text-emerald-600',
-            border: 'border-emerald-100/50',
-            indicator: 'bg-emerald-500'
-        }
-    };
+const STAT_TONES = {
+    blue: "bg-blue-50 text-blue-600",
+    rose: "bg-rose-50 text-rose-600",
+    amber: "bg-amber-50 text-amber-600",
+    emerald: "bg-emerald-50 text-emerald-600",
+} as const;
 
+function StatCard({ label, value, icon, tone = "blue", sub }: { label: string; value?: number; icon: React.ReactNode; tone?: keyof typeof STAT_TONES; sub?: string }) {
     return (
-        <motion.div
-            variants={itemVariants}
-            className="group p-5 sm:p-7 lg:p-10 rounded-2xl sm:rounded-3xl lg:rounded-[3rem] bg-white border border-slate-100 transition-all duration-700 hover:shadow-2xl hover:shadow-blue-900/10 hover:border-blue-100 relative overflow-hidden"
-        >
-            <div className={`absolute -right-12 -top-12 w-48 h-48 rounded-full ${colors[color].bg} blur-3xl opacity-30 group-hover:opacity-60 transition-opacity duration-700`} />
-            
-            <div className="flex items-start justify-between mb-6 sm:mb-10 relative z-10">
-                <div className={`p-3.5 sm:p-5 ${colors[color].bg} rounded-xl sm:rounded-2xl group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 border border-transparent group-hover:border-white shadow-sm`}>
-                    <div className={colors[color].icon}>{icon}</div>
-                </div>
-                <div className="flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-slate-50 border border-slate-100 rounded-full">
-                    <div className={`w-1.5 h-1.5 rounded-full ${colors[color].indicator} animate-pulse`} />
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Realtime</span>
-                </div>
+        <div className="ui-card p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+                <p className="text-[13px] font-medium leading-snug text-slate-500">{label}</p>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${STAT_TONES[tone]}`}>{icon}</span>
             </div>
-            
-            <div className="relative z-10">
-                <h3 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-slate-900 mb-1 sm:mb-2 tracking-tighter font-jakarta">
-                    {value}
-                </h3>
-                <p className="text-slate-400 font-bold tracking-[0.2em] uppercase text-[9px] italic">{label}</p>
-            </div>
-
-            <div className="mt-6 sm:mt-10 pt-4 sm:pt-8 border-t border-slate-50 flex items-center justify-between">
-                <div className={`flex items-center gap-1.5 ${colors[color].icon} text-xs sm:text-sm font-bold`}>
-                    <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {trend}
-                </div>
-                <span className="text-slate-300 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">Growth Index</span>
-            </div>
-        </motion.div>
-    )
+            <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{(Number(value) || 0).toLocaleString("en-IN")}</p>
+            {sub && <p className="mt-1 text-xs leading-snug text-slate-500">{sub}</p>}
+        </div>
+    );
 }

@@ -167,26 +167,26 @@ export default function BlogAdmin() {
     };
 
     return (
-        <div className="space-y-8 font-inter">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl shadow-blue-900/5 border border-slate-100">
-                <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0">
-                        <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" />
+        <div className="space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                        <FileText className="h-5 w-5 text-blue-600" />
                     </div>
-                    <div>
-                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-jakarta">Content Management</h2>
-                        <p className="text-slate-500 text-xs sm:text-sm font-medium">Manage articles, updates, and medical blogs</p>
+                    <div className="min-w-0">
+                        <h2 className="ui-title">Content management</h2>
+                        <p className="ui-subtitle">Manage articles, updates, and medical blogs</p>
                     </div>
                 </div>
                 {!isFormOpen && (
-                    <div className="flex flex-wrap sm:flex-nowrap gap-2.5 sm:gap-4 w-full sm:w-auto">
+                    <div className="flex w-full gap-2 sm:w-auto sm:shrink-0">
                         <button
                             onClick={handleMigrateSlugs}
                             disabled={loading || migrating}
-                            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all active:scale-95 disabled:opacity-70 whitespace-nowrap"
+                            className="ui-btn-secondary flex-1 sm:flex-none"
                         >
-                            {migrating ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : null}
-                            Generate Slugs
+                            {migrating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                            Generate slugs
                         </button>
                         <button
                             onClick={() => {
@@ -194,10 +194,10 @@ export default function BlogAdmin() {
                                 setEditingId(null);
                                 setIsFormOpen(true);
                             }}
-                            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider shadow-xl shadow-blue-600/30 transition-all active:scale-95 whitespace-nowrap"
+                            className="ui-btn-primary flex-1 sm:flex-none"
                         >
-                            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                            Create Post
+                            <Plus className="h-4 w-4" />
+                            Create post
                         </button>
                     </div>
                 )}
@@ -210,66 +210,67 @@ export default function BlogAdmin() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-[2.5rem] shadow-2xl border border-slate-100"
+                        className="ui-card overflow-hidden"
                     >
-                        <div className="flex justify-between items-center mb-8">
-                            <h3 className="text-xl font-bold text-slate-900">{editingId ? 'Edit Blog Post' : 'New Blog Post'}</h3>
+                        <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
+                            <h3 className="ui-title">{editingId ? 'Edit blog post' : 'New blog post'}</h3>
                             <button
                                 onClick={() => setIsFormOpen(false)}
-                                className="p-2 bg-slate-50 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"
+                                aria-label="Close editor"
+                                className="-mr-2 rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="h-5 w-5" />
                             </button>
                         </div>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Title</label>
-                                    <input required name="title" value={formData.title} onChange={handleInputChange} onBlur={handleTitleBlur} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="Enter article title" />
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 gap-5 p-5 sm:p-6 md:grid-cols-2">
+                                <div className="md:col-span-2">
+                                    <label htmlFor="blog-title" className="ui-label">Title</label>
+                                    <input id="blog-title" required name="title" value={formData.title} onChange={handleInputChange} onBlur={handleTitleBlur} className="ui-input" placeholder="Enter article title" />
                                 </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">URL Slug</label>
-                                    <input name="slug" value={formData.slug} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="e.g. how-to-find-blood-donors-india" />
-                                    <p className="text-xs text-slate-500 font-medium mt-1">
-                                        Preview: <span className="text-blue-600 font-semibold font-jakarta">pillora.in/blog/{formData.slug || '[slug]'}</span>
+                                <div className="md:col-span-2">
+                                    <label htmlFor="blog-slug" className="ui-label">URL slug</label>
+                                    <input id="blog-slug" name="slug" value={formData.slug} onChange={handleInputChange} className="ui-input" placeholder="e.g. how-to-find-blood-donors-india" />
+                                    <p className="ui-hint break-all">
+                                        Preview: <span className="font-medium text-blue-600">pillora.in/blog/{formData.slug || '[slug]'}</span>
                                     </p>
                                 </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Description Summary</label>
-                                    <textarea required name="description" value={formData.description} onChange={handleInputChange} rows={2} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-medium text-slate-900 outline-none transition-all resize-none" placeholder="Brief summary of the article" />
+                                <div className="md:col-span-2">
+                                    <label htmlFor="blog-description" className="ui-label">Description summary</label>
+                                    <textarea id="blog-description" required name="description" value={formData.description} onChange={handleInputChange} rows={2} className="ui-input min-h-[96px] resize-none" placeholder="Brief summary of the article" />
                                 </div>
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Full Content</label>
-                                    <textarea required name="content" value={formData.content} onChange={handleInputChange} rows={10} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-medium text-slate-900 outline-none transition-all resize-none" placeholder="Write the main content here..." />
+                                <div className="md:col-span-2">
+                                    <label htmlFor="blog-content" className="ui-label">Full content</label>
+                                    <textarea id="blog-content" required name="content" value={formData.content} onChange={handleInputChange} rows={10} className="ui-input min-h-[240px] resize-y" placeholder="Write the main content here..." />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Category</label>
-                                    <input required name="category" value={formData.category} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="e.g. Health, Nutrition, Medical News" />
+                                <div>
+                                    <label htmlFor="blog-category" className="ui-label">Category</label>
+                                    <input id="blog-category" required name="category" value={formData.category} onChange={handleInputChange} className="ui-input" placeholder="e.g. Health, Nutrition, Medical News" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Image URL</label>
+                                <div>
+                                    <label htmlFor="blog-image-url" className="ui-label">Image URL</label>
                                     <div className="relative">
-                                        <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                        <input name="imageUrl" value={formData.imageUrl} onChange={handleInputChange} className="w-full pl-12 pr-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-medium text-slate-900 outline-none transition-all" placeholder="https://..." />
+                                        <ImageIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                        <input id="blog-image-url" name="imageUrl" value={formData.imageUrl} onChange={handleInputChange} className="ui-input pl-10" placeholder="https://..." />
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Author Name</label>
-                                    <input required name="author" value={formData.author} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="Dr. John Doe" />
+                                <div>
+                                    <label htmlFor="blog-author" className="ui-label">Author name</label>
+                                    <input id="blog-author" required name="author" value={formData.author} onChange={handleInputChange} className="ui-input" placeholder="Dr. John Doe" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Author Role</label>
-                                    <input name="authorRole" value={formData.authorRole} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-medium text-slate-900 outline-none transition-all" placeholder="Chief Medical Officer" />
+                                <div>
+                                    <label htmlFor="blog-author-role" className="ui-label">Author role</label>
+                                    <input id="blog-author-role" name="authorRole" value={formData.authorRole} onChange={handleInputChange} className="ui-input" placeholder="Chief Medical Officer" />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Read Time</label>
-                                    <input required name="readTime" value={formData.readTime} onChange={handleInputChange} className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-bold text-slate-900 outline-none transition-all" placeholder="e.g. 5 min read" />
+                                <div>
+                                    <label htmlFor="blog-read-time" className="ui-label">Read time</label>
+                                    <input id="blog-read-time" required name="readTime" value={formData.readTime} onChange={handleInputChange} className="ui-input" placeholder="e.g. 5 min read" />
                                 </div>
                             </div>
-                            <div className="flex justify-end pt-6 border-t border-slate-100">
-                                <button type="submit" disabled={loading} className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold text-sm uppercase tracking-widest shadow-xl shadow-slate-900/20 transition-all active:scale-95 disabled:opacity-70">
-                                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                                    {editingId ? 'Update Post' : 'Publish Post'}
+                            <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-5 py-4 sm:px-6">
+                                <button type="submit" disabled={loading} className="ui-btn-primary w-full sm:w-auto">
+                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                                    {editingId ? 'Update post' : 'Publish post'}
                                 </button>
                             </div>
                         </form>
@@ -280,49 +281,49 @@ export default function BlogAdmin() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
                     >
                         {loading ? (
-                            <div className="col-span-full py-20 flex justify-center">
-                                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+                            <div role="status" aria-label="Loading blog posts" className="ui-card col-span-full flex justify-center py-16">
+                                <Loader2 className="h-7 w-7 animate-spin text-blue-600" />
                             </div>
                         ) : blogs.length === 0 ? (
-                            <div className="col-span-full py-20 bg-white rounded-3xl border border-slate-100 flex flex-col items-center justify-center text-center">
-                                <FileText className="w-16 h-16 text-slate-200 mb-4" />
-                                <h3 className="text-xl font-bold text-slate-900 font-jakarta">No Content Found</h3>
-                                <p className="text-slate-500 mt-2">Get started by creating your first blog post.</p>
+                            <div className="ui-empty col-span-full bg-white py-16">
+                                <FileText className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                                <h3 className="font-medium text-slate-700">No content found</h3>
+                                <p className="mt-1">Get started by creating your first blog post.</p>
                             </div>
                         ) : (
                             blogs.map(blog => (
-                                <div key={blog._id} className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 group flex flex-col">
+                                <div key={blog._id} className="ui-card flex flex-col overflow-hidden">
                                     {blog.imageUrl && (
-                                        <div className="h-48 overflow-hidden bg-slate-100">
+                                        <div className="h-44 overflow-hidden border-b border-slate-100 bg-slate-100">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={blog.imageUrl} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                            <img src={blog.imageUrl} alt={blog.title} className="h-full w-full object-cover" />
                                         </div>
                                     )}
-                                    <div className="p-6 flex-1 flex flex-col">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest rounded-lg">
+                                    <div className="flex flex-1 flex-col p-4 sm:p-5">
+                                        <div className="mb-3 flex items-center justify-between gap-3">
+                                            <span className="ui-badge min-w-0 truncate border-blue-200 bg-blue-50 text-blue-700">
                                                 {blog.category}
                                             </span>
-                                            <span className="text-xs text-slate-400 font-medium">{new Date(blog.date || blog.createdAt).toLocaleDateString()}</span>
+                                            <span className="shrink-0 text-xs text-slate-500">{new Date(blog.date || blog.createdAt).toLocaleDateString()}</span>
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2 leading-tight">{blog.title}</h3>
-                                        <p className="text-sm text-slate-500 mb-6 line-clamp-3 flex-1">{blog.description}</p>
-                                        
-                                        <div className="pt-4 border-t border-slate-50 flex items-center justify-between mt-auto">
-                                            <div className="flex items-center gap-2">
-                                                <button onClick={() => handleEdit(blog)} className="w-10 h-10 bg-slate-50 hover:bg-blue-50 text-slate-500 hover:text-blue-600 rounded-xl flex items-center justify-center transition-colors">
-                                                    <Edit2 className="w-4 h-4" />
+                                        <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-900">{blog.title}</h3>
+                                        <p className="mt-1.5 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600">{blog.description}</p>
+
+                                        <div className="mt-4 flex flex-row-reverse items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                                            <div className="flex shrink-0 items-center gap-2">
+                                                <button onClick={() => handleEdit(blog)} aria-label="Edit blog post" className="ui-btn-secondary h-10 w-10 px-0 text-slate-500 hover:text-slate-900">
+                                                    <Edit2 className="h-4 w-4" />
                                                 </button>
-                                                <button onClick={() => handleDelete(blog._id)} className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl flex items-center justify-center transition-colors">
-                                                    <Trash2 className="w-4 h-4" />
+                                                <button onClick={() => handleDelete(blog._id)} aria-label="Delete blog post" className="ui-btn-secondary h-10 w-10 px-0 text-slate-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600">
+                                                    <Trash2 className="h-4 w-4" />
                                                 </button>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="text-xs font-bold text-slate-900">{blog.author}</p>
-                                                <p className="text-[10px] text-slate-400 uppercase tracking-wider">{blog.readTime}</p>
+                                            <div className="min-w-0">
+                                                <p className="truncate text-sm font-medium text-slate-900">{blog.author}</p>
+                                                <p className="truncate text-xs text-slate-500">{blog.readTime}</p>
                                             </div>
                                         </div>
                                     </div>

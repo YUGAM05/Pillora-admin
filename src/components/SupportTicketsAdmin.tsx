@@ -84,11 +84,11 @@ export default function SupportTicketsAdmin() {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'Open': return 'bg-rose-50 text-rose-600 border-rose-100';
-            case 'In Progress': return 'bg-amber-50 text-amber-600 border-amber-100';
-            case 'Resolved': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-            case 'Closed': return 'bg-gray-50 text-gray-600 border-gray-100';
-            default: return 'bg-gray-50 text-gray-600 border-gray-100';
+            case 'Open': return 'bg-rose-50 text-rose-700 border-rose-200';
+            case 'In Progress': return 'bg-amber-50 text-amber-700 border-amber-200';
+            case 'Resolved': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            case 'Closed': return 'bg-slate-100 text-slate-600 border-slate-200';
+            default: return 'bg-slate-100 text-slate-600 border-slate-200';
         }
     };
 
@@ -101,18 +101,21 @@ export default function SupportTicketsAdmin() {
 
     if (loading) {
         return (
-            <div className="py-12 flex flex-col items-center justify-center">
-                <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-3" />
-                <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Retrieving Support Tickets...</p>
+            <div className="ui-card flex flex-col items-center justify-center py-16">
+                <Loader2 className="mb-3 h-7 w-7 animate-spin text-blue-600" />
+                <p className="text-sm text-slate-500">Retrieving support tickets...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="py-12 text-center">
-                <p className="text-rose-500 font-bold">{error}</p>
-                <button onClick={fetchTickets} className="mt-4 text-blue-600 font-bold underline">Try Again</button>
+            <div className="ui-card px-6 py-12 text-center">
+                <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50">
+                    <AlertCircle className="h-6 w-6 text-rose-500" />
+                </span>
+                <p className="font-semibold text-rose-600">{error}</p>
+                <button onClick={fetchTickets} className="ui-btn-primary mt-4">Try again</button>
             </div>
         );
     }
@@ -120,11 +123,11 @@ export default function SupportTicketsAdmin() {
     const filteredTickets = tickets.filter(t => filter === "all" || t.status === filter);
 
     return (
-        <div className="space-y-8 font-sans">
+        <div className="space-y-4 sm:space-y-5">
             {/* Status Tabs */}
-            <div className="flex items-center gap-2 bg-slate-50 p-1.5 sm:p-2 rounded-2xl border border-slate-100 overflow-x-auto no-scrollbar">
+            <div role="group" aria-label="Filter tickets by status" className="ui-segmented no-scrollbar flex w-fit max-w-full gap-1 overflow-x-auto">
                 {[
-                    { id: 'all', label: 'All Tickets', icon: BookOpen },
+                    { id: 'all', label: 'All tickets', icon: BookOpen },
                     { id: 'Open', label: 'Open', icon: AlertCircle },
                     { id: 'In Progress', label: 'In Progress', icon: Clock },
                     { id: 'Resolved', label: 'Resolved', icon: CheckCircle2 },
@@ -133,17 +136,18 @@ export default function SupportTicketsAdmin() {
                     <button
                         key={tab.id}
                         onClick={() => setFilter(tab.id)}
-                        className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
-                            filter === tab.id 
-                            ? 'bg-white text-blue-600 shadow-lg shadow-blue-900/5' 
-                            : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/50'
+                        aria-pressed={filter === tab.id}
+                        className={`ui-segment inline-flex min-h-[40px] shrink-0 items-center gap-2 whitespace-nowrap ${
+                            filter === tab.id
+                            ? 'ui-segment-active'
+                            : ''
                         }`}
                     >
-                        <tab.icon className="w-3.5 h-3.5" />
+                        <tab.icon className="h-4 w-4" />
                         {tab.label}
                         {tickets.filter(t => tab.id === 'all' || t.status === tab.id).length > 0 && (
-                            <span className={`ml-1.5 px-1.5 py-0.5 rounded-md text-[9px] ${
-                                filter === tab.id ? 'bg-blue-50 text-blue-600' : 'bg-slate-200 text-slate-500'
+                            <span className={`rounded-full px-1.5 py-0.5 text-[11px] font-semibold leading-none ${
+                                filter === tab.id ? 'bg-blue-50 text-blue-700' : 'bg-slate-200/70 text-slate-600'
                             }`}>
                                 {tickets.filter(t => tab.id === 'all' || t.status === tab.id).length}
                             </span>
@@ -153,13 +157,13 @@ export default function SupportTicketsAdmin() {
             </div>
 
             {filteredTickets.length === 0 ? (
-                <div className="text-center py-16 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-                    <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h4 className="text-xl font-bold text-gray-800">No support tickets found</h4>
-                    <p className="text-gray-500 font-medium">Tickets matching this status filter will show up here.</p>
+                <div className="ui-empty bg-white py-16">
+                    <MessageSquare className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                    <h4 className="font-medium text-slate-700">No support tickets found</h4>
+                    <p className="mt-1">Tickets matching this status filter will show up here.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-3">
                     <AnimatePresence mode="popLayout">
                         {filteredTickets.map((ticket) => (
                             <motion.div
@@ -167,43 +171,43 @@ export default function SupportTicketsAdmin() {
                                 layout
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-white border border-gray-100 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 overflow-hidden"
+                                className="ui-card overflow-hidden"
                             >
                                 {/* Header Bar */}
-                                <div 
-                                    className="p-4 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                <div
+                                    className="flex cursor-pointer flex-col gap-3 p-4 transition-colors hover:bg-slate-50/60 sm:p-5 md:flex-row md:items-center md:justify-between md:gap-4"
                                     onClick={() => toggleExpand(ticket._id)}
                                 >
-                                    <div className="flex items-center gap-3 sm:gap-4">
-                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner bg-blue-50 text-blue-600">
-                                            <MessageSquare className="w-6 h-6 sm:w-7 sm:h-7" />
+                                    <div className="flex min-w-0 items-start gap-3">
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                                            <MessageSquare className="h-5 w-5" />
                                         </div>
-                                        <div>
-                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                                                <h4 className="font-black text-gray-900 text-base sm:text-lg leading-tight">{ticket.subject}</h4>
-                                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(ticket.status)}`}>
+                                        <div className="min-w-0">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <h4 className="text-base font-semibold leading-snug text-slate-900">{ticket.subject}</h4>
+                                                <span className={`ui-badge ${getStatusColor(ticket.status)}`}>
                                                     {ticket.status}
                                                 </span>
-                                                <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-semibold">
+                                                <span className="ui-badge border-slate-200 bg-slate-50 text-slate-600">
                                                     {ticket.type || 'Refund Inquiry'}
                                                 </span>
                                             </div>
-                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1 text-xs sm:text-sm text-gray-500 font-medium">
-                                                <span className="flex items-center gap-1">
-                                                    <User className="w-3.5 h-3.5" /> 
-                                                    {ticket.guestName || ticket.userId?.name || 'Guest User'}
-                                                    {ticket.guestName && <span className="ml-1.5 px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded text-[9px] font-bold uppercase tracking-wider">Guest</span>}
+                                            <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-500">
+                                                <span className="flex items-center gap-1.5">
+                                                    <User className="h-3.5 w-3.5 text-slate-400" />
+                                                    {ticket.guestName || ticket.userId?.name || 'Guest user'}
+                                                    {ticket.guestName && <span className="ui-badge ml-1 border-slate-200 bg-slate-100 text-slate-600">Guest</span>}
                                                 </span>
-                                                <span className="text-gray-300">•</span>
-                                                <span className="text-xs truncate">{ticket.guestEmail || ticket.userId?.email || 'No Email'}</span>
+                                                <span aria-hidden="true" className="text-slate-300">•</span>
+                                                <span className="min-w-0 max-w-full truncate">{ticket.guestEmail || ticket.userId?.email || 'No email'}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3 self-end md:self-auto">
-                                        <div className="text-right hidden md:block">
-                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Created On</p>
-                                            <p className="text-xs font-bold text-gray-700">
+                                    <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-3 md:justify-end md:border-0 md:pt-0">
+                                        <div className="text-left md:text-right">
+                                            <p className="text-xs font-medium text-slate-500">Created on</p>
+                                            <p className="text-sm font-medium text-slate-700">
                                                 {new Date(ticket.createdAt).toLocaleDateString('en-IN', { 
                                                     day: '2-digit', 
                                                     month: 'short', 
@@ -213,9 +217,9 @@ export default function SupportTicketsAdmin() {
                                                 })}
                                             </p>
                                         </div>
-                                        <div className="h-10 w-[1px] bg-gray-100 mx-2 hidden md:block" />
-                                        <button className="p-2.5 sm:p-3 bg-gray-50 rounded-xl sm:rounded-2xl text-gray-400 hover:text-blue-600 transition-colors">
-                                            {expandedId === ticket._id ? <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" /> : <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />}
+                                        <div className="mx-1 hidden h-10 w-px bg-slate-200 md:block" />
+                                        <button aria-expanded={expandedId === ticket._id} aria-label="Toggle ticket details" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900">
+                                            {expandedId === ticket._id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                                         </button>
                                     </div>
                                 </div>
@@ -227,49 +231,49 @@ export default function SupportTicketsAdmin() {
                                             initial={{ height: 0, opacity: 0 }}
                                             animate={{ height: 'auto', opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
-                                            className="border-t border-gray-50 bg-slate-50/30"
+                                            className="overflow-hidden border-t border-slate-100 bg-slate-50/60"
                                         >
-                                            <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
+                                            <div className="grid grid-cols-1 gap-4 p-4 sm:p-5 lg:grid-cols-3 lg:gap-5">
                                                 {/* User Info Card */}
-                                                <div>
-                                                    <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Requester Details</h5>
-                                                    <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+                                                <div className="min-w-0">
+                                                    <h5 className="mb-2 text-xs font-medium text-slate-500">Requester details</h5>
+                                                    <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
                                                         <div>
-                                                            <p className="text-xs font-bold text-gray-400 uppercase">User Name</p>
-                                                            <p className="font-black text-gray-900">{ticket.guestName || ticket.userId?.name || 'Guest User'}</p>
+                                                            <p className="text-xs font-medium text-slate-500">User name</p>
+                                                            <p className="font-semibold text-slate-900">{ticket.guestName || ticket.userId?.name || 'Guest user'}</p>
                                                         </div>
-                                                        <div className="pt-3 border-t border-gray-50 flex flex-col gap-2">
-                                                            <span className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                                                <Mail className="w-4 h-4 text-blue-500" /> {ticket.guestEmail || ticket.userId?.email || 'N/A'}
+                                                        <div className="flex flex-col gap-2 border-t border-slate-100 pt-3">
+                                                            <span className="flex min-w-0 items-center gap-2 break-all text-sm text-slate-700">
+                                                                <Mail className="h-4 w-4 shrink-0 text-slate-400" /> {ticket.guestEmail || ticket.userId?.email || 'N/A'}
                                                             </span>
-                                                            <span className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                                                <Phone className="w-4 h-4 text-emerald-500" /> {ticket.guestPhone || ticket.userId?.phone || 'N/A'}
+                                                            <span className="flex min-w-0 items-center gap-2 break-all text-sm text-slate-700">
+                                                                <Phone className="h-4 w-4 shrink-0 text-slate-400" /> {ticket.guestPhone || ticket.userId?.phone || 'N/A'}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 {/* Message Details */}
-                                                <div>
-                                                    <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Ticket Description</h5>
-                                                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm min-h-[140px]">
-                                                        <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                                                <div className="min-w-0">
+                                                    <h5 className="mb-2 text-xs font-medium text-slate-500">Ticket description</h5>
+                                                    <div className="min-h-[120px] rounded-xl border border-slate-200 bg-white p-4">
+                                                        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-700">
                                                             {ticket.message}
                                                         </p>
                                                     </div>
                                                 </div>
 
                                                 {/* Management Actions */}
-                                                <div className="space-y-6">
+                                                <div className="min-w-0">
                                                     <div>
-                                                        <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Action Control & Notes</h5>
-                                                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+                                                        <h5 className="mb-2 text-xs font-medium text-slate-500">Action control & notes</h5>
+                                                        <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
                                                             <div>
-                                                                <label className="text-xs font-bold text-gray-400 uppercase block mb-2">Status</label>
+                                                                <label htmlFor={`status-select-${ticket._id}`} className="ui-label">Status</label>
                                                                 <select
                                                                     defaultValue={ticket.status}
                                                                     id={`status-select-${ticket._id}`}
-                                                                    className="w-full bg-slate-50 border border-gray-100 rounded-xl py-3 px-4 text-sm font-bold text-slate-800 focus:outline-none"
+                                                                    className="ui-input"
                                                                 >
                                                                     <option value="Open">Open</option>
                                                                     <option value="In Progress">In Progress</option>
@@ -278,13 +282,14 @@ export default function SupportTicketsAdmin() {
                                                                 </select>
                                                             </div>
                                                             <div>
-                                                                <label className="text-xs font-bold text-gray-400 uppercase block mb-2">Internal Admin Notes</label>
+                                                                <label htmlFor={`admin-notes-${ticket._id}`} className="ui-label">Internal admin notes</label>
                                                                 <textarea
+                                                                    id={`admin-notes-${ticket._id}`}
                                                                     value={adminNotesText[ticket._id] || ""}
                                                                     onChange={(e) => handleNoteChange(ticket._id, e.target.value)}
                                                                     placeholder="Write internal notes about refund status or actions..."
                                                                     rows={3}
-                                                                    className="w-full bg-slate-50 border border-gray-100 rounded-xl p-3 text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 resize-none"
+                                                                    className="ui-input min-h-[96px] resize-y"
                                                                 />
                                                             </div>
                                                             <button 
@@ -293,14 +298,14 @@ export default function SupportTicketsAdmin() {
                                                                     const select = document.getElementById(`status-select-${ticket._id}`) as HTMLSelectElement;
                                                                     handleUpdateTicket(ticket._id, select.value);
                                                                 }}
-                                                                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-blue-600/10 flex items-center justify-center gap-2"
+                                                                className="ui-btn-primary w-full"
                                                             >
                                                                 {updatingId === ticket._id ? (
                                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                                 ) : (
                                                                     <Save className="w-4 h-4" />
                                                                 )}
-                                                                Save Updates
+                                                                Save updates
                                                             </button>
                                                         </div>
                                                     </div>
