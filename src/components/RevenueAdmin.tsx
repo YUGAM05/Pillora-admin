@@ -246,7 +246,8 @@ export default function RevenueAdmin() {
             });
 
             if (res.data.success) {
-                alert(`Settlement created successfully! ID: ${res.data.settlement.settlementId}`);
+                const st = res.data.settlement || {};
+                alert(`Settlement created! ID: ${st.settlementId}. Amount: ${formatCurrency(st.netAmount)}` + (Number(st.deductionAmount) > 0 ? ` (after ${formatCurrency(st.deductionAmount)} cancellation deductions)` : ''));
                 setIsTransferModalOpen(false);
                 setUtrNumber("");
                 setTransferNotes("");
@@ -1080,6 +1081,34 @@ export default function RevenueAdmin() {
                         >
                             <h3 className="text-xl font-bold text-slate-900 mb-2">Transfer Settlement Payment</h3>
                             <p className="text-xs text-slate-400 font-semibold mb-6">Enter transfer reference codes to initiate manual payouts</p>
+
+                            {(() => {
+                                // Same rule as the server: pending cancellation deductions, oldest first, as long as they fit.
+                                const r2 = (n: number) => Math.round(n * 100) / 100;
+                                const selectedNet = r2((hospitalDetails?.transactionTable || [])
+                                    .filter((t: any) => selectedPaymentsForPayout.includes(t.paymentId))
+                                    .reduce((sum: number, t: any) => sum + (Number(t.netAmount) || 0), 0));
+                                let left = selectedNet;
+                                const applied: any[] = [];
+                                for (const d of (hospitalDetails?.pendingDeductions || [])) {
+                                    if (Number(d.amount) > left + 0.001) break;
+                                    applied.push(d);
+                                    left = r2(left - Number(d.amount));
+                                }
+                                const dedTotal = r2(applied.reduce((sum, d) => sum + (Number(d.amount) || 0), 0));
+                                return (
+                                    <div className="mb-5 space-y-1.5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs">
+                                        <div className="flex justify-between gap-3"><span className="text-slate-500">Selected advances (net of 2.36%)</span><span className="font-semibold text-slate-900">{formatCurrency(selectedNet)}</span></div>
+                                        {dedTotal > 0 && (
+                                            <div className="flex justify-between gap-3 text-rose-600"><span>Cancellation deductions ({applied.length})</span><span className="font-semibold">- {formatCurrency(dedTotal)}</span></div>
+                                        )}
+                                        <div className="flex justify-between gap-3 border-t border-slate-200 pt-1.5 text-sm"><span className="font-semibold text-slate-700">Amount to transfer</span><span className="font-bold text-emerald-700">{formatCurrency(r2(selectedNet - dedTotal))}</span></div>
+                                        {dedTotal > 0 && (
+                                            <p className="pt-1 text-[11px] leading-relaxed text-slate-500">Bookings the hospital cancelled after the patient paid online: Pillora refunded the patient, and the hospital covers the Razorpay charge (or the full advance if it was already paid out).</p>
+                                        )}
+                                    </div>
+                                );
+                            })()}
 
                             <form onSubmit={handleInitiatePayout} className="space-y-5">
                                 <div className="space-y-1">

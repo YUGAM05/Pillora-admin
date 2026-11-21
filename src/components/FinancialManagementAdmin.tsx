@@ -1390,6 +1390,26 @@ export default function FinancialManagementAdmin() {
                                             </div>
                                         </div>
 
+                                        {Number(rangeCalculation.calculation?.cancellationDeductions) > 0 && (
+                                            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
+                                                <span className="block font-semibold text-rose-900">
+                                                    - {fmt(rangeCalculation.calculation?.cancellationDeductions)} cancellation deductions already taken off the net payable
+                                                </span>
+                                                <span className="block">
+                                                    Net before deductions: {fmt(rangeCalculation.calculation?.netBeforeDeductions)}. These are bookings the hospital cancelled after the patient paid online:
+                                                    Pillora refunded the patient, and the hospital covers the Razorpay charge (or the full advance if it was already paid out).
+                                                </span>
+                                                <ul className="mt-2 space-y-0.5 text-xs text-rose-700">
+                                                    {(rangeCalculation.deductions || []).map((d: any) => (
+                                                        <li key={d._id}>#{d.bookingRef} · {d.patientName} · - {fmt(d.amount)} ({d.type === 'settled_refund' ? 'already paid out' : 'Razorpay charge'})</li>
+                                                    ))}
+                                                </ul>
+                                                {Number(rangeCalculation.calculation?.carriedForwardDeductions) > 0 && (
+                                                    <span className="mt-2 block text-xs">{fmt(rangeCalculation.calculation?.carriedForwardDeductions)} more is larger than this payout and waits for the next one.</span>
+                                                )}
+                                            </div>
+                                        )}
+
                                         {rangeCalculation.calculation?.advanceCount === 0 && (
                                             <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
                                                 <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
@@ -1755,9 +1775,14 @@ export default function FinancialManagementAdmin() {
                                                     <td className="ui-td text-right font-medium text-emerald-600 whitespace-nowrap">{fmt(s.alreadySettled)}</td>
                                                     <td className="ui-td text-right whitespace-nowrap">
                                                         {hasPendingPayout ? (
-                                                            <span className="rounded-lg bg-amber-50 px-2 py-1 font-semibold text-amber-700">
-                                                                {fmt(s.pendingSettlement)}
-                                                            </span>
+                                                            <>
+                                                                <span className="rounded-lg bg-amber-50 px-2 py-1 font-semibold text-amber-700">
+                                                                    {fmt(s.pendingSettlement)}
+                                                                </span>
+                                                                {Number(s.cancellationDeductions) > 0 && (
+                                                                    <span className="mt-1 block text-[11px] font-normal text-rose-600">after - {fmt(s.cancellationDeductions)} cancellations</span>
+                                                                )}
+                                                            </>
                                                         ) : (
                                                             <span className="font-medium text-emerald-600">₹0.00</span>
                                                         )}
@@ -1810,6 +1835,12 @@ export default function FinancialManagementAdmin() {
                                         <span className="text-slate-500">IFSC & bank:</span>
                                         <span className="text-right font-medium text-slate-900">{payoutModalHosp.bankDetails?.ifscCode || "N/A"} ({payoutModalHosp.bankDetails?.bankName || "Bank"})</span>
                                     </div>
+                                    {Number(payoutModalHosp.cancellationDeductions) > 0 && (
+                                        <div className="flex justify-between gap-3 text-rose-600">
+                                            <span>Cancellation deductions (hospital-cancelled bookings):</span>
+                                            <span className="text-right font-medium">- {fmt(payoutModalHosp.cancellationDeductions)}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between gap-3 border-t border-slate-200 pt-2 font-medium text-amber-700">
                                         <span>Outstanding net settlement:</span>
                                         <span className="font-semibold text-amber-700">{fmt(payoutModalHosp.pendingSettlement)}</span>
