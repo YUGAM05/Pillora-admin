@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Edit2, Trash2, X, Loader2, Save, FileText, Image as ImageIcon } from "lucide-react";
 import api from "@/lib/api";
+import { isSafeMediaUrl } from "@/lib/safeUrl";
 import { getToken } from "@/lib/tokenStorage";
 
 export default function BlogAdmin() {
@@ -141,6 +142,10 @@ export default function BlogAdmin() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!isSafeMediaUrl(formData.imageUrl)) {
+            alert("Image URL must start with https:// (or http://).");
+            return;
+        }
         setLoading(true);
         try {
             const token = getToken();

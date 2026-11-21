@@ -2,9 +2,13 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { getToken } from '@/lib/tokenStorage';
-import { Download, FileSpreadsheet, FileText, Users, Droplet, Calendar, Phone, MapPin, AlertCircle, Search, ChevronRight, Trash2, Upload, X } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Users, Droplet, Calendar, Phone, MapPin, AlertCircle, Search, ChevronRight, Trash2, Upload, X, CheckCircle2 } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// ID images are uploaded by the public; only show real image data or https links.
+const isSafeImageSrc = (src: unknown): src is string =>
+    typeof src === 'string' && (/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(src) || /^https:\/\//i.test(src));
 
 export default function BloodBankAdmin() {
     const [activeTab, setActiveTab] = useState<'donors' | 'requests'>('donors');
@@ -23,6 +27,13 @@ export default function BloodBankAdmin() {
     const [importResult, setImportResult] = useState<any>(null);
     const [showImportModal, setShowImportModal] = useState(false);
     const [selectedDonors, setSelectedDonors] = useState<string[]>([]);
+    const [kycUpdatingId, setKycUpdatingId] = useState<string | null>(null);
+    const [idPreview, setIdPreview] = useState<any>(null);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    };
 
     useEffect(() => {
         setSelectedDonors([]);
@@ -179,6 +190,24 @@ export default function BloodBankAdmin() {
             setRequests(requests.map(r => r._id === id ? { ...r, status } : r));
         } catch (error) {
             console.error('Failed to update status', error);
+        }
+    };
+
+    // Blood Connect: donor contacts (max 5) are shared with the requester only after an admin approves the ID.
+    const handleKycDecision = async (request: any, status: 'Verified' | 'Rejected') => {
+        const message = status === 'Verified'
+            ? `Approve the request for ${request.patientName}? Up to 5 matching donors' contact details will be shared with the requester.`
+            : `Reject the request for ${request.patientName}? The requester will be told their ID could not be verified.`;
+        if (!window.confirm(message)) return;
+        setKycUpdatingId(request._id);
+        try {
+            const res = await api.patch(`blood-bank/admin/requests/${request._id}/kyc`, { status });
+            setRequests(prev => prev.map(r => r._id === request._id ? { ...r, ...(res.data || {}), aiVerificationStatus: status } : r));
+            showToast(status === 'Verified' ? 'Request approved. Donor details are being shared.' : 'Request rejected.', 'success');
+        } catch (error: any) {
+            showToast(error.response?.data?.message || 'Could not update the request. Please try again.', 'error');
+        } finally {
+            setKycUpdatingId(null);
         }
     };
 
@@ -522,6 +551,9 @@ export default function BloodBankAdmin() {
                                 requests={filteredRequests} 
                                 onUpdateStatus={handleUpdateStatus}
                                 onDelete={handleDeleteRequest}
+                                onKycDecision={handleKycDecision}
+                                onViewId={setIdPreview}
+                                kycUpdatingId={kycUpdatingId}
                             />
                         )}
                     </motion.div>
@@ -682,6 +714,37 @@ export default function BloodBankAdmin() {
                     </div>
                 )}
             </AnimatePresence>
+
+            {/* ID document preview (Blood Connect request review) */}
+            {idPreview && isSafeImageSrc(idPreview.kycDocumentImage) && (
+                <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="id-preview-title">
+                    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-[2px]" onClick={() => setIdPreview(null)} />
+                    <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:rounded-2xl">
+                        <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+                            <h3 id="id-preview-title" className="text-base font-semibold text-slate-900">
+                                ID document · {idPreview.patientName}
+                            </h3>
+                            <button onClick={() => setIdPreview(null)} className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Close">
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                        <div className="overflow-auto p-5">
+                            <p className="mb-3 text-sm text-slate-600">{idPreview.kycDocumentType || 'ID'} · {idPreview.kycDocumentId || 'No number'}</p>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={idPreview.kycDocumentImage} alt="Uploaded ID document" className="mx-auto max-h-[60vh] w-auto rounded-lg border border-slate-200" />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {toast && (
+                <div role="status" className={`fixed bottom-4 left-4 right-4 z-[9999] flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium shadow-lg sm:bottom-6 sm:left-auto sm:right-6 ${
+                    toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+                }`}>
+                    {toast.type === 'success' ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
+                    <span>{toast.message}</span>
+                </div>
+            )}
         </div>
     );
 }
@@ -833,10 +896,13 @@ function DonorsTable({
     );
 }
 
-function RequestsTable({ requests, onUpdateStatus, onDelete }: { 
+function RequestsTable({ requests, onUpdateStatus, onDelete, onKycDecision, onViewId, kycUpdatingId }: { 
     requests: any[], 
     onUpdateStatus: (id: string, status: string) => void,
-    onDelete: (id: string) => void 
+    onDelete: (id: string) => void,
+    onKycDecision: (request: any, status: 'Verified' | 'Rejected') => void,
+    onViewId: (request: any) => void,
+    kycUpdatingId: string | null
 }) {
     return (
         <div className="overflow-x-auto">
@@ -896,7 +962,38 @@ function RequestsTable({ requests, onUpdateStatus, onDelete }: {
                                         {request.aiVerificationStatus}
                                     </span>
                                 </div>
-                                <p className="mt-1 font-mono text-[11px] text-slate-400">{request.kycDocumentId || 'NO_ID'}</p>
+                                <p className="mt-1 font-mono text-[11px] text-slate-400">{request.kycDocumentType ? `${request.kycDocumentType} · ` : ''}{request.kycDocumentId || 'NO_ID'}</p>
+                                {isSafeImageSrc(request.kycDocumentImage) && (
+                                    <button
+                                        type="button"
+                                        onClick={() => onViewId(request)}
+                                        className="mt-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                                    >
+                                        View ID document
+                                    </button>
+                                )}
+                                {request.aiVerificationStatus !== 'Verified' && request.aiVerificationStatus !== 'Rejected' && (
+                                    <div className="mt-2 flex flex-wrap gap-1.5">
+                                        <button
+                                            type="button"
+                                            disabled={kycUpdatingId === request._id}
+                                            onClick={() => onKycDecision(request, 'Verified')}
+                                            className="ui-btn ui-btn-sm min-h-[40px] border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 disabled:opacity-50 md:min-h-[32px]"
+                                            title="Approve ID and share up to 5 donor contacts"
+                                        >
+                                            {kycUpdatingId === request._id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />} Approve
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={kycUpdatingId === request._id}
+                                            onClick={() => onKycDecision(request, 'Rejected')}
+                                            className="ui-btn ui-btn-sm min-h-[40px] border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 disabled:opacity-50 md:min-h-[32px]"
+                                            title="Reject ID"
+                                        >
+                                            <X className="h-3.5 w-3.5" /> Reject
+                                        </button>
+                                    </div>
+                                )}
                             </td>
                             <td className="ui-td align-middle">
                                 <div className="flex items-center justify-end gap-2">

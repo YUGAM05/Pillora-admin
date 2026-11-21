@@ -158,7 +158,22 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
         
         try {
             const token = getToken();
-            const payload = {
+            // Edit mode: the backend only accepts profile fields (slug, doctors, plan, payment,
+            // subscription and admin notes are ignored), so don't send them.
+            const CREATE_ONLY_FIELDS = [
+                'plan', 'joiningDate', 'paymentStatus', 'paymentReceivedDate', 'paymentAmount',
+                'paymentMethod', 'transactionReference', 'adminNotes', 'doctors',
+            ];
+            const profileFields = Object.fromEntries(
+                Object.entries(formData).filter(([key]) => !CREATE_ONLY_FIELDS.includes(key))
+            );
+            const payload = hospitalToEdit ? {
+                ...profileFields,
+                consultationFee: Number(formData.consultationFee),
+                bedCapacity: Number(formData.bedCapacity),
+                images: formData.images.filter((img: string) => img.trim() !== ""),
+                phoneNumbers: formData.phoneNumbers.filter((ph: string) => ph.trim() !== ""),
+            } : {
                 ...formData,
                 slug: formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
                 consultationFee: Number(formData.consultationFee),
@@ -371,6 +386,12 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                             </div>
                         </div>
 
+                        {hospitalToEdit ? (
+                        <div>
+                            <p className="ui-label">Subscription plan</p>
+                            <p className="ui-hint">Plan changes are managed in Subscriptions &amp; payments.</p>
+                        </div>
+                        ) : (
                         <div>
                             <label className="ui-label">Subscription plan</label>
                             <div className="grid grid-cols-1 gap-2">
@@ -402,6 +423,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                                 ))}
                             </div>
                         </div>
+                        )}
 
                         <div>
                             <label htmlFor="hospital-management" className="ui-label">Management mode</label>
@@ -549,7 +571,15 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                 </div>
             </div>
 
-            {/* Subscription & Payment Management Section */}
+            {/* Subscription & Payment Management Section (create only; edits go through Subscriptions & payments) */}
+            {hospitalToEdit ? (
+                <div className="flex items-start gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-sm text-slate-600">
+                    <CreditCard className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                    <span className="leading-relaxed">
+                        Plan, payments, subscription dates and admin notes can&apos;t be changed here. Manage them in Subscriptions &amp; payments. The page URL (slug) stays the same after a rename so existing links keep working.
+                    </span>
+                </div>
+            ) : (
             <div className="space-y-5 border-t border-slate-100 pt-6">
                 <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center">
                     <div>
@@ -733,6 +763,7 @@ export default function AddHospitalForm({ onClose, hospitalToEdit }: { onClose?:
                     </span>
                 </div>
             </div>
+            )}
 
             {/* About Hospital */}
             <div className="space-y-4 border-t border-slate-100 pt-6">

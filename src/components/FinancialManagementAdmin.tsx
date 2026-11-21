@@ -410,6 +410,9 @@ export default function FinancialManagementAdmin() {
             const res = await api.post("/admin/financial/settlements/payout", {
                 hospitalId: payoutModalHosp.hospitalId,
                 amount: payoutAmount,
+                // Backend reads transferMethod/utrNumber; old names kept for older API deployments
+                transferMethod: payoutMethod,
+                utrNumber: payoutUtr.trim(),
                 paymentMethod: payoutMethod,
                 utrReference: payoutUtr.trim(),
                 notes: payoutNotes.trim()

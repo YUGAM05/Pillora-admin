@@ -25,9 +25,7 @@ import {
     Mail,
     PlusCircle,
     XCircle,
-    Lock,
-    Eye,
-    EyeOff
+    Lock
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -47,16 +45,14 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
     const [showSlotGen, setShowSlotGen] = useState<any>(null);
     const [showAddDoctor, setShowAddDoctor] = useState<string | null>(null); // hospitalId
     const [newDoctor, setNewDoctor] = useState({ name: "", specialization: "", fee: 200 });
-    const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
 
     const fetchHospitals = useCallback(async () => {
         try {
-            // /admin/hospitals includes the linked login account (user.email); the public
-            // /hospitals list does not. Fall back to it only if the admin route fails.
-            const res = await api.get("/admin/hospitals").catch(() => api.get("/hospitals"));
+            // Admin data only comes from /admin/hospitals (the public /hospitals list has no login/plan fields).
+            const res = await api.get("/admin/hospitals");
             setHospitals(Array.isArray(res.data) ? res.data : (res.data?.hospitals || []));
         } catch (err: any) {
-            setError("Failed to fetch hospitals");
+            setError(err.response?.data?.message || err.response?.data?.error || "Failed to fetch hospitals");
         } finally {
             setLoading(false);
         }
@@ -286,18 +282,10 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                                     </div>
                                                                 </div>
                                                                 <div>
-                                                                    <label className="text-xs font-medium text-slate-500">Access password</label>
-                                                                    <div className="mt-1 flex min-h-[42px] items-center justify-between rounded-lg border border-slate-200 bg-slate-50 py-0.5 pl-3 pr-0.5 font-mono text-xs tracking-wider text-slate-900">
-                                                                        <span className="break-all">{showPasswords[hospital._id] ? (hospital.tempPassword || "Saved Securely (Encrypted)") : "••••••••"}</span>
-                                                                        <button
-                                                                            onClick={() => setShowPasswords(prev => ({ ...prev, [hospital._id]: !prev[hospital._id] }))}
-                                                                            className="ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-200/60 hover:text-slate-700"
-                                                                            type="button"
-                                                                            aria-label={showPasswords[hospital._id] ? "Hide password" : "Show password"}
-                                                                        >
-                                                                            {showPasswords[hospital._id] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                                        </button>
-                                                                    </div>
+                                                                    <p className="text-xs font-medium text-slate-500">Access password</p>
+                                                                    <p className="mt-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-600">
+                                                                        Not stored. The password was shown once when the hospital was created; the hospital can reset it from its login page.
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         </div>

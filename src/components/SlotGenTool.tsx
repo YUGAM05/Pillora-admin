@@ -11,10 +11,13 @@ interface SlotGenToolProps {
     onClose: () => void;
 }
 
+// Today's date in India (YYYY-MM-DD); toISOString() gives the UTC date, which is yesterday before 05:30 IST.
+const istToday = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
+
 export default function SlotGenTool({ doctor, hospitalId, onClose }: SlotGenToolProps) {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        date: new Date().toISOString().split('T')[0],
+        date: istToday(),
         startTime: "09:00",
         endTime: "17:00",
         duration: "15"
@@ -64,7 +67,7 @@ export default function SlotGenTool({ doctor, hospitalId, onClose }: SlotGenTool
                     required
                     type="date"
                     value={formData.date}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={istToday()}
                     onChange={e => setFormData({...formData, date: e.target.value})}
                     className="ui-input"
                 />

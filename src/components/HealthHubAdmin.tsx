@@ -18,6 +18,7 @@ import {
     ExternalLink 
 } from "lucide-react";
 import api from "@/lib/api";
+import { isSafeLinkUrl, isSafeMediaUrl } from "@/lib/safeUrl";
 import { getToken } from "@/lib/tokenStorage";
 
 interface HealthTip {
@@ -123,6 +124,14 @@ export default function HealthHubAdmin() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (formData.mediaType === 'url' && !isSafeLinkUrl(formData.linkUrl)) {
+            alert("Please enter a full web link starting with https:// (or http://).");
+            return;
+        }
+        if (!isSafeMediaUrl(formData.imageUrl) || !isSafeMediaUrl(formData.videoUrl)) {
+            alert("Image and video must be uploaded files or https:// links.");
+            return;
+        }
         setLoading(true);
         try {
             const token = getToken();
@@ -425,7 +434,7 @@ export default function HealthHubAdmin() {
                                         <h3 className="line-clamp-2 text-base font-semibold leading-snug text-slate-900">{tip.title}</h3>
                                         <p className="mt-1.5 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600">{tip.description}</p>
 
-                                        {tip.mediaType === 'url' && tip.linkUrl && (
+                                        {tip.mediaType === 'url' && isSafeLinkUrl(tip.linkUrl) && (
                                             <a href={tip.linkUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex max-w-full items-center gap-1.5 self-start text-xs font-medium text-blue-600 transition-colors hover:text-blue-700 hover:underline">
                                                 <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                                                 <span className="truncate">{tip.linkUrl}</span>

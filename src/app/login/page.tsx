@@ -13,14 +13,15 @@ export default function LoginPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [email, setEmail] = useState("admin@pillora.in");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     // MFA state for admin login
     const [mfaStep, setMfaStep] = useState(false);
     const [mfaSetup, setMfaSetup] = useState(false);
     const [mfaCode, setMfaCode] = useState("");
-    const [mfaUserId, setMfaUserId] = useState("");
+    // Short-lived token from /auth/login proving the password step passed
+    const [mfaToken, setMfaToken] = useState("");
     const [qrCode, setQrCode] = useState("");
 
     useEffect(() => {
@@ -43,14 +44,14 @@ export default function LoginPage() {
 
             // ✅ Handle MFA required (admin flow) — DO NOT save token here
             if (data.mfaRequired) {
-                setMfaUserId(data.userId);
+                setMfaToken(data.mfaToken);
                 setMfaStep(true);
                 return;
             }
 
             // ✅ Handle MFA setup required (first-time admin)
             if (data.mfaSetupRequired) {
-                setMfaUserId(data.userId);
+                setMfaToken(data.mfaToken);
                 setQrCode(data.qrCode);
                 setMfaSetup(true);
                 setMfaStep(true);
@@ -104,7 +105,7 @@ export default function LoginPage() {
         setError("");
         try {
             const res = await api.post('/auth/verify-mfa', {
-                userId: mfaUserId,
+                mfaToken,
                 token: mfaCode,
             });
             const data = res.data;
