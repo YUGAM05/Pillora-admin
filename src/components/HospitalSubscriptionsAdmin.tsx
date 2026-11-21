@@ -150,14 +150,15 @@ export default function HospitalSubscriptionsAdmin() {
         try {
             const params: any = {};
             if (search.trim()) params.search = search.trim();
-            if (statusFilter !== "all") params.status = statusFilter;
+            // The backend calls the unpaid state "Pending"; the screen calls it "Pending Payment".
+            if (statusFilter !== "all") params.status = statusFilter === "Pending Payment" ? "Pending" : statusFilter;
             if (paymentFilter !== "all") params.paymentStatus = paymentFilter;
 
             const res = await api.get("/admin/subscriptions", { params });
             const list = Array.isArray(res.data) 
                 ? res.data 
                 : (Array.isArray(res.data?.hospitals) ? res.data.hospitals : []);
-            setHospitals(list);
+            setHospitals(list.map((h: any) => (h.subscriptionStatus === "Pending" ? { ...h, subscriptionStatus: "Pending Payment" } : h)));
         } catch (err: any) {
             console.warn("Direct /admin/subscriptions endpoint returned error, trying fallback to /hospitals", err);
             try {
@@ -297,7 +298,14 @@ export default function HospitalSubscriptionsAdmin() {
         setLoadingHistory(true);
         try {
             const res = await api.get(`/admin/hospitals/${hospital._id}/payments`);
-            setPaymentHistory(res.data.payments || []);
+            // The backend returns a plain array of HospitalSubscriptionPayment records.
+            const raw: any[] = Array.isArray(res.data) ? res.data : (res.data?.payments || []);
+            setPaymentHistory(raw.map((p: any) => ({
+                ...p,
+                newStartDate: p.newStartDate ?? p.subscriptionStartDate,
+                newExpiryDate: p.newExpiryDate ?? p.subscriptionExpiryDate,
+                renewalType: p.renewalType ?? (p.paymentType ? String(p.paymentType).toUpperCase() : ""),
+            })));
         } catch (err: any) {
             console.error("Failed to fetch payment history", err);
             showToast("Failed to load payment history records");

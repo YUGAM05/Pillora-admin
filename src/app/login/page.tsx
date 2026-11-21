@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { setToken, setUser as setStoredUser, getToken, getUser, clearAuth } from "@/lib/tokenStorage";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ArrowRight, Lock, Mail, KeyRound, ShieldCheck } from "lucide-react";
@@ -231,10 +230,7 @@ export default function LoginPage() {
                             </div>
 
                             <div>
-                                <div className="mb-1.5 flex items-center justify-between">
-                                    <label htmlFor="password" className="text-[13px] font-medium text-slate-700">Password</label>
-                                    <Link href="/forgot-password" className="text-[13px] font-medium text-blue-600 hover:underline">Forgot password?</Link>
-                                </div>
+                                <label htmlFor="password" className="ui-label">Password</label>
                                 <div className="relative">
                                     <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                     <input

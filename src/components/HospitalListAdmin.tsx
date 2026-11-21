@@ -51,8 +51,10 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
 
     const fetchHospitals = useCallback(async () => {
         try {
-            const res = await api.get("/hospitals");
-            setHospitals(res.data);
+            // /admin/hospitals includes the linked login account (user.email); the public
+            // /hospitals list does not. Fall back to it only if the admin route fails.
+            const res = await api.get("/admin/hospitals").catch(() => api.get("/hospitals"));
+            setHospitals(Array.isArray(res.data) ? res.data : (res.data?.hospitals || []));
         } catch (err: any) {
             setError("Failed to fetch hospitals");
         } finally {
@@ -168,7 +170,7 @@ export default function HospitalListAdmin({ onEdit }: { onEdit: (hospital: any) 
                                                         {PLAN_LABEL[hospital.plan] ?? hospital.plan}
                                                     </div>
                                                 )}
-                                                {hospital.rating && (
+                                                {Number(hospital.rating) > 0 && (
                                                     <div className="ui-badge border-amber-200 bg-amber-50 text-amber-700">
                                                         <Star className="h-3 w-3 fill-amber-500 text-amber-500" /> {hospital.rating}
                                                     </div>

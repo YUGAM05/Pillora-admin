@@ -35,6 +35,67 @@ import {
     Save
 } from "lucide-react";
 
+/** The backend's date filter params (`dateFilter`, `customStart`, `customEnd`) for the chosen period. */
+function appendPeriodParams(params: URLSearchParams, period: string, customStart: string, customEnd: string) {
+    params.append("dateFilter", period);
+    if (period === "custom") {
+        if (customStart) params.append("customStart", customStart);
+        if (customEnd) params.append("customEnd", customEnd);
+    }
+}
+
+/**
+ * Turns GET /admin/financial/refunds into the flat rows the refund table shows:
+ * cancelled appointments that still hold a paid advance ("Pending Approval") and
+ * refunds already processed ("Refunded").
+ */
+function buildRefundRows(data: any): any[] {
+    const idOf = (v: any) => (v && typeof v === "object" ? String(v._id ?? "") : String(v ?? ""));
+    const pending = (data?.pendingRefundCandidates || []).map((a: any) => ({
+        appointmentId: idOf(a._id),
+        tokenNumber: a.tokenNumber ?? null,
+        patientName: a.patientName || a.patient?.name || "Patient",
+        patientPhone: a.patientPhone || a.patient?.phone || "",
+        hospitalName: a.hospital?.name || a.hospitalName || "",
+        consultationFee: Number(a.consultationFee ?? a.doctor?.fee ?? 0),
+        advancePaid: Number(a.advancePaid ?? 0),
+        refundAmount: 0,
+        cancellationReason: a.cancellationReason || a.notes || "",
+        cancellationDate: a.updatedAt || a.createdAt,
+        refundStatus: "Pending Approval",
+    }));
+    const done = (data?.refunds || []).map((r: any) => {
+        const appt = r.appointmentId && typeof r.appointmentId === "object" ? r.appointmentId : null;
+        return {
+            appointmentId: idOf(r.appointmentId) || String(r._id ?? ""),
+            tokenNumber: appt?.tokenNumber ?? null,
+            patientName: appt?.patientName || "Patient",
+            patientPhone: appt?.patientPhone || "",
+            hospitalName: r.hospitalId?.name || "",
+            consultationFee: Number(appt?.consultationFee ?? 0),
+            advancePaid: Number(r.amount ?? 0),
+            refundAmount: Number(r.amount ?? 0),
+            cancellationReason: r.reason || "",
+            cancellationDate: r.processedAt || r.createdAt,
+            refundStatus: "Refunded",
+        };
+    });
+    // Rows from the old flat shape (if the backend ever sends it) pass through unchanged.
+    const flat = (data?.refunds || []).every((r: any) => typeof r?.appointmentId === "string" && r?.refundStatus)
+        ? data.refunds
+        : null;
+    return flat ?? [...pending, ...done];
+}
+
+/** Badge colours for a payment's status in the master ledger. */
+function txStatusTone(status?: string) {
+    const s = (status || "").toLowerCase();
+    if (s === "completed" || s === "paid" || s === "success") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+    if (s === "pending" || s === "created" || s === "processing") return "border-amber-200 bg-amber-50 text-amber-700";
+    if (s === "refunded") return "border-slate-200 bg-slate-100 text-slate-600";
+    return "border-rose-200 bg-rose-50 text-rose-700";
+}
+
 export default function FinancialManagementAdmin() {
     // 5 Subsections: 'overall' | 'hospital_reports' | 'settlements' | 'transactions' | 'refunds'
     const [activeSection, setActiveSection] = useState<"overall" | "hospital_reports" | "settlements" | "transactions" | "refunds">("overall");
@@ -87,14 +148,21 @@ export default function FinancialManagementAdmin() {
         setLoadingOverall(true);
         try {
             const params = new URLSearchParams();
-            params.append("period", period);
-            if (period === "custom") {
-                if (customStartDate) params.append("startDate", customStartDate);
-                if (customEndDate) params.append("endDate", customEndDate);
-            }
+            appendPeriodParams(params, period, customStartDate, customEndDate);
             const res = await api.get(`/admin/financial/overview?${params.toString()}`);
             if (res.data?.success) {
-                setOverallData(res.data.cards);
+                // The backend sends `summary`; map its field names to the ones the cards read.
+                const s = res.data.summary || res.data.cards || {};
+                setOverallData({
+                    totalConsultationFees: s.totalConsultationFees,
+                    grossOnlineAdvances: s.grossOnlineAdvances ?? s.totalOnlineAdvances,
+                    netPayableToHospitals: s.netPayableToHospitals ?? s.totalNetPayableToHospitals,
+                    totalCashAtClinics: s.totalCashAtClinics ?? s.totalCashCollectedAtHospitals,
+                    totalOnlineAtClinics: s.totalOnlineAtClinics ?? s.totalOnlineCollectedAtHospitals,
+                    totalGatewayCharges: s.totalGatewayCharges,
+                    totalPendingSettlements: s.totalPendingSettlements ?? s.totalPendingHospitalSettlements,
+                    totalCompletedSettlements: s.totalCompletedSettlements ?? s.totalCompletedHospitalSettlements,
+                });
             }
         } catch (err) {
             console.error("Failed to fetch overall dashboard:", err);
@@ -134,11 +202,7 @@ export default function FinancialManagementAdmin() {
         setLoadingHospitalReport(true);
         try {
             const params = new URLSearchParams();
-            params.append("period", period);
-            if (period === "custom") {
-                if (customStartDate) params.append("startDate", customStartDate);
-                if (customEndDate) params.append("endDate", customEndDate);
-            }
+            appendPeriodParams(params, period, customStartDate, customEndDate);
             const res = await api.get(`/admin/financial/hospital/${selectedHospitalId}?${params.toString()}`);
             if (res.data?.success) {
                 setHospitalReport(res.data);
@@ -385,11 +449,7 @@ export default function FinancialManagementAdmin() {
 
     const getTxnParams = useCallback((isExport: boolean = false) => {
         const params = new URLSearchParams();
-        params.append("period", period);
-        if (period === "custom") {
-            if (customStartDate) params.append("startDate", customStartDate);
-            if (customEndDate) params.append("endDate", customEndDate);
-        }
+        appendPeriodParams(params, period, customStartDate, customEndDate);
         if (txnSearch.trim()) params.append("search", txnSearch.trim());
         if (txnTypeFilter !== "all") params.append("paymentType", txnTypeFilter);
         if (txnSourceFilter !== "all") params.append("paymentSource", txnSourceFilter);
@@ -398,7 +458,9 @@ export default function FinancialManagementAdmin() {
         if (txnHospFilter !== "all") params.append("hospitalId", txnHospFilter);
 
         if (isExport) {
-            params.append("export", "csv");
+            // The backend has no CSV mode: fetch every matching row as JSON and build the CSV here.
+            params.append("page", "1");
+            params.append("limit", "5000");
         } else {
             params.append("page", txnPage.toString());
             params.append("limit", txnLimit.toString());
@@ -416,7 +478,7 @@ export default function FinancialManagementAdmin() {
                 if (res.data.pagination) {
                     setTxnPagination({
                         totalPages: res.data.pagination.totalPages || 1,
-                        totalRecords: res.data.pagination.totalRecords || 0
+                        totalRecords: res.data.pagination.totalRecords ?? res.data.pagination.total ?? 0
                     });
                 }
             }
@@ -432,10 +494,15 @@ export default function FinancialManagementAdmin() {
         setExportingTxn(true);
         try {
             const query = getTxnParams(true);
-            const res = await api.get(`/admin/financial/transactions?${query}`, {
-                responseType: "blob"
-            });
-            const blob = new Blob([res.data], { type: "text/csv;charset=utf-8;" });
+            const res = await api.get(`/admin/financial/transactions?${query}`);
+            const rows: any[] = res.data?.transactions || [];
+            const columns = ["transactionId", "createdAt", "hospitalName", "patientName", "tokenNumber", "amount", "paymentType", "paymentSource", "paymentMethod", "gatewayCharges", "gatewayTaxes", "netPayable", "status", "settlementStatus", "razorpayPaymentId", "razorpayOrderId", "notes"];
+            const cell = (v: any) => {
+                const s = v === null || v === undefined ? "" : String(v);
+                return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+            };
+            const csv = [columns.join(","), ...rows.map((r) => columns.map((c) => cell(r[c])).join(","))].join("\n");
+            const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
@@ -468,7 +535,7 @@ export default function FinancialManagementAdmin() {
         try {
             const res = await api.get("/admin/financial/refunds");
             if (res.data?.success) {
-                setRefunds(res.data.refunds || []);
+                setRefunds(buildRefundRows(res.data));
             }
         } catch (err) {
             console.error("Failed to load refunds:", err);
@@ -490,6 +557,7 @@ export default function FinancialManagementAdmin() {
         try {
             const res = await api.post("/admin/financial/refunds/process", {
                 appointmentId: refundModalAppt.appointmentId,
+                amount: refundAmountInput,
                 refundAmount: refundAmountInput,
                 reason: refundReasonInput.trim() || refundModalAppt.cancellationReason || "Appointment cancellation",
                 manualNotes: refundManualNotes.trim()
@@ -506,7 +574,7 @@ export default function FinancialManagementAdmin() {
             }
         } catch (err: any) {
             console.error("Refund error:", err);
-            showToast(err.response?.data?.message || "Failed to process refund", "error");
+            showToast(err.response?.data?.message || err.response?.data?.error || "Failed to process refund", "error");
         } finally {
             setRefundSubmitting(false);
         }
@@ -2010,7 +2078,7 @@ export default function FinancialManagementAdmin() {
                                                     {tx.gatewayCharges > 0 ? `₹${tx.gatewayCharges}` : "—"}
                                                 </td>
                                                 <td className="ui-td">
-                                                    <span className="ui-badge border-emerald-200 bg-emerald-50 capitalize text-emerald-700">
+                                                    <span className={`ui-badge capitalize ${txStatusTone(tx.status)}`}>
                                                         {tx.status}
                                                     </span>
                                                 </td>
