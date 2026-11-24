@@ -1,13 +1,14 @@
 "use client";
 
 // Admin: one hospital's plan usage, add-on packs (grant one, e.g. after an
-// offline UPI / bank payment) and the AI receptionist phone number.
+// offline UPI / bank payment), the AI receptionist phone number and its settings.
 // API: GET /admin/hospitals/:id/usage, POST /admin/hospitals/:id/packs,
-//      PUT /admin/hospitals/:id/voice-number
+//      PUT /admin/hospitals/:id/voice-number, GET/PUT /admin/hospitals/:id/ai-receptionist
 
 import { useCallback, useEffect, useState } from "react";
 import api from "@/lib/api";
 import { X, MessageCircle, PhoneCall, Package, Loader2, Phone } from "lucide-react";
+import AdminAiReceptionistForm from "@/components/AdminAiReceptionistForm";
 
 const fmt = (n: number) => (n ?? 0).toLocaleString("en-IN");
 const dateIN = (d?: string) => (d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "");
@@ -173,6 +174,9 @@ export default function AdminUsageModal({ hospital, onClose }: { hospital: { _id
                                 </button>
                             </div>
                         </div>
+
+                        {/* AI receptionist settings: spoken name, greeting language, information */}
+                        <AdminAiReceptionistForm hospitalId={hospital._id} />
                     </>
                 )}
                 </div>
