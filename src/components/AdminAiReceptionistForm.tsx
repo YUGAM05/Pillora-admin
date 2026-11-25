@@ -25,8 +25,8 @@ const pick = (s: any): Form => ({
 // Same words as the voice server's greeting (voice-agent server/agent.js, greetingFor).
 const greeting = (lang: Lang, name: string) =>
     lang === "gu"
-        ? `નમસ્તે, ${name} માં આપનું સ્વાગત છે. હું તમારી એપોઈન્ટમેન્ટ બુક કરવામાં મદદ કરીશ. તમારે કયા ડૉક્ટરને બતાવવું છે?`
-        : `नमस्ते, ${name} में आपका स्वागत है. मैं आपकी अपॉइंटमेंट बुक करने में मदद करूँगी. आपको किस डॉक्टर को दिखाना है?`;
+        ? `નમસ્તે, ${/[઀-૿]$/.test(name) ? `${name}માંથી` : `${name} માંથી`} બોલું છું. બોલો, શું મદદ કરું?`
+        : `नमस्ते, ${name} से बोल रही हूँ। बताइए, क्या मदद करूँ?`;
 
 export default function AdminAiReceptionistForm({ hospitalId }: { hospitalId: string }) {
     const [data, setData] = useState<any>(null);
